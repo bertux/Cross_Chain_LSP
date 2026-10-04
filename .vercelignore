@@ -1,0 +1,6 @@
+# Files and folders to exclude from Vercel deployment
+.git
+.gitignore
+.htaccess
+tools/
+*.md
