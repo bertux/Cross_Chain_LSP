@@ -1,1025 +1,1418 @@
 <!DOCTYPE html>
 <html lang="it">
+
 <head>
-<meta charset="UTF-8">
-<script src="theme.js"></script>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="referrer" content="no-referrer">
-<title>UP Identity Cross-Chain — ChainIntegrate</title>
-<meta name="description" content="Legge e mostra il profilo LSP3 (nome, immagini, link) di una Universal Profile su qualsiasi rete dove è deployata, e lo confronta con quello su LUKSO, con token e NFT; può allinearlo a LUKSO con una transazione firmata dal tuo controller.">
-<link rel="icon" href="favicon.ico">
-<meta property="og:type" content="website">
-<meta property="og:title" content="UP Identity Cross-Chain — ChainIntegrate">
-<meta property="og:description" content="Il profilo LSP3 di una Universal Profile su Base, Polygon e le altre reti, confrontato con LUKSO, con token e NFT, e allineabile con una transazione.">
-<meta property="og:image" content="https://crosschain-lukso.chainintegrate.it/banner.png">
-<meta property="og:url" content="https://crosschain-lukso.chainintegrate.it/up-identity.html">
-<meta name="twitter:card" content="summary_large_image">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.4/ethers.umd.min.js" integrity="sha384-6Zl0Pc8zjSz8KvmNeXRvUQgY4ryFb+BwDvKCmLYcBME0joAaru491tQgi9B7zsMM" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script src="chains.js"></script>
-<script src="backup-check.js"></script>
-<script src="config.js"></script>
-<script src="asset-list.js"></script>
-<script src="gas-relay-client.js"></script>
-<style>
-  :root {
-    --bg: #0f1115; --panel: #171a21; --border: #2a2f3a; --field: #10131a; --chip: #2a2f3a; --disabled: #3a3f4b; --raised: #1d2330;
-    --text: #e6e8ec; --text-dim: #9aa1ad;
-    --accent: #5b8cff; --ok: #3fbf6f; --warn: #e0a83c; --err: #e05a5a;
-  }
-  * { box-sizing: border-box; }
-  body { background: var(--bg); color: var(--text); font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
-         max-width: 820px; margin: 0 auto; padding: 32px 20px 80px; }
-  .brand-row { margin-bottom: 24px; }
-  .brand-logo { display: block; width: 100%; height: auto; border-radius: 10px; }
-  .header-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
-  h1 { font-size: 20px; margin-bottom: 4px; }
-  .subtitle { color: var(--text-dim); font-size: 13px; margin-bottom: 28px; }
-  #langToggle { width: auto; background: var(--chip); padding: 8px 14px; font-size: 12.5px; font-weight: 600;
-                border-radius: 6px; border: 1px solid var(--border); color: var(--text); cursor: pointer; margin-top: 2px; flex-shrink: 0; }
-  .panel { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 20px; margin-bottom: 20px; }
-  .panel h2 { font-size: 14px; margin: 0 0 14px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.03em; }
-  label { display: block; font-size: 13px; color: var(--text-dim); margin: 14px 0 6px; }
-  select, input { width: 100%; background: var(--field); border: 1px solid var(--border); color: var(--text);
-                  border-radius: 6px; padding: 10px 12px; font-size: 13.5px; font-family: inherit; }
-  button { width: 100%; background: var(--accent); color: white; border: none; border-radius: 6px;
-           padding: 12px; font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 12px; }
-  button:disabled { background: var(--disabled); cursor: not-allowed; }
-  button.secondary { background: var(--chip); }
-  .note { font-size: 12.5px; color: var(--text-dim); line-height: 1.55; }
-  .note b { color: var(--text); }
-  .disclaimer { margin-top: 12px; padding: 12px 14px; border: 1px solid var(--warn); border-radius: 8px; background: rgba(224,168,60,0.08); font-size: 12.5px; line-height: 1.55; }
-  .status { font-size: 13px; margin-top: 12px; line-height: 1.6; white-space: pre-wrap; word-break: break-word; }
-  .line-ok { color: var(--ok); } .line-warn { color: var(--warn); } .line-err { color: var(--err); } .line-dim { color: var(--text-dim); }
-  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-  @media (max-width: 640px) { .cols { grid-template-columns: 1fr; } }
-  .card { background: var(--field); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
-  .card .bg { height: 90px; background: var(--raised) center / cover no-repeat; }
-  .card .body { padding: 12px 14px 14px; }
-  .card .avatar { width: 72px; height: 72px; border-radius: 50%; border: 3px solid var(--field); margin-top: -48px; background: var(--chip) center / cover no-repeat; }
-  .card .where { font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-dim); margin-top: 6px; }
-  .card .name { font-size: 17px; font-weight: 700; margin-top: 2px; word-break: break-word; }
-  .card .desc { font-size: 13px; color: var(--text); margin-top: 6px; white-space: pre-wrap; word-break: break-word; }
-  .card .links a { display: inline-block; margin: 6px 10px 0 0; color: var(--accent); font-size: 13px; text-decoration: none; word-break: break-all; }
-  .card .tags span { display: inline-block; margin: 6px 6px 0 0; padding: 2px 8px; border-radius: 10px; background: var(--chip); font-size: 11.5px; }
-  .card .meta { font-size: 11.5px; color: var(--text-dim); margin-top: 10px; line-height: 1.5; word-break: break-all; }
-  .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-family: monospace; }
-  .badge.ok { background: rgba(63,191,111,0.15); color: var(--ok); }
-  .badge.err { background: rgba(224,90,90,0.15); color: var(--err); }
-  .badge.warn { background: rgba(224,168,60,0.15); color: var(--warn); }
-  .ctrl { background: var(--field); border: 1px solid var(--border); border-radius: 6px; padding: 8px 12px; margin-top: 8px; font-size: 12.5px; }
-  .ctrl .addr { font-family: monospace; word-break: break-all; }
-  .cap { background: var(--field); border: 1px solid var(--border); border-radius: 6px; padding: 8px 12px; margin-top: 8px; font-size: 12.5px; line-height: 1.55; }
-  .cap .t { font-weight: 700; }
-  .cap a { color: var(--accent); text-decoration: none; }
-  .assets { background: var(--field); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; font-size: 13px; }
-  .assets .where { font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-dim); }
-  .assets .native { font-size: 15px; font-weight: 700; margin-top: 4px; }
-  .asset { border-top: 1px solid var(--border); padding: 7px 0; word-break: break-word; display: flex; gap: 10px; align-items: flex-start; }
-  .asset .thumb { width: 40px; height: 40px; flex-shrink: 0; border-radius: 8px; background: var(--chip) center / cover no-repeat;
-                  display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--text-dim); font-family: monospace; overflow: hidden; }
-  .asset .thumb.has-img { color: transparent; }
-  .asset .info { min-width: 0; flex: 1; }
-  button.danger { background: var(--err); }
-  button.danger:disabled { background: var(--disabled); }
-  #pubLog { font-size: 12.5px; margin-top: 10px; white-space: pre-wrap; word-break: break-all; line-height: 1.6; }
-  .asset .kind { display: inline-block; padding: 1px 6px; border-radius: 4px; background: var(--chip); font-size: 11px; font-family: monospace; margin-right: 6px; }
-  .asset .addr { font-family: monospace; font-size: 11.5px; color: var(--text-dim); word-break: break-all; }
-  .asset .addr a { color: var(--text-dim); }
-  .assets details { margin-top: 8px; }
-  .assets summary { cursor: pointer; color: var(--text-dim); font-size: 12.5px; }
-  .site-footer { margin-top: 40px; padding: 18px 20px; background: #f5f6f8; border: 1px solid #e3e5ea; border-radius: 10px; color: #4b4f58; }
-  .footer-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
-  .footer-logo { height: 48px; width: auto; flex-shrink: 0; }
-  .footer-text { font-size: 13px; line-height: 1.6; }
-  .footer-li { display: inline-flex; vertical-align: middle; margin: 0 2px; }
-  .site-footer a { color: #2563eb; text-decoration: none; font-weight: 600; }
-</style>
+  <meta charset="UTF-8">
+  <script src="theme.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <title>UP Identity Cross-Chain — ChainIntegrate</title>
+  <meta name="description"
+    content="Legge e mostra il profilo LSP3 (nome, immagini, link) di una Universal Profile su qualsiasi rete dove è deployata, e lo confronta con quello su LUKSO, con token e NFT; può allinearlo a LUKSO con una transazione firmata dal tuo controller.">
+  <link rel="icon" href="favicon.ico">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="UP Identity Cross-Chain — ChainIntegrate">
+  <meta property="og:description"
+    content="Il profilo LSP3 di una Universal Profile su Base, Polygon e le altre reti, confrontato con LUKSO, con token e NFT, e allineabile con una transazione.">
+  <meta property="og:image" content="https://crosschain-lukso.chainintegrate.it/banner.png">
+  <meta property="og:url" content="https://crosschain-lukso.chainintegrate.it/up-identity.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.4/ethers.umd.min.js"
+    integrity="sha384-6Zl0Pc8zjSz8KvmNeXRvUQgY4ryFb+BwDvKCmLYcBME0joAaru491tQgi9B7zsMM" crossorigin="anonymous"
+    referrerpolicy="no-referrer"></script>
+  <script src="chains.js"></script>
+  <script src="backup-check.js"></script>
+  <script src="config.js"></script>
+  <script src="asset-list.js"></script>
+  <script src="gas-relay-client.js"></script>
+  <style>
+    :root {
+      --bg: #0f1115;
+      --panel: #171a21;
+      --border: #2a2f3a;
+      --field: #10131a;
+      --chip: #2a2f3a;
+      --disabled: #3a3f4b;
+      --raised: #1d2330;
+      --text: #e6e8ec;
+      --text-dim: #9aa1ad;
+      --accent: #5b8cff;
+      --ok: #3fbf6f;
+      --warn: #e0a83c;
+      --err: #e05a5a;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 32px 20px 80px;
+    }
+
+    .brand-row {
+      margin-bottom: 24px;
+    }
+
+    .brand-logo {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 10px;
+    }
+
+    .header-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    h1 {
+      font-size: 20px;
+      margin-bottom: 4px;
+    }
+
+    .subtitle {
+      color: var(--text-dim);
+      font-size: 13px;
+      margin-bottom: 28px;
+    }
+
+    #langToggle {
+      width: auto;
+      background: var(--chip);
+      padding: 8px 14px;
+      font-size: 12.5px;
+      font-weight: 600;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      color: var(--text);
+      cursor: pointer;
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .panel h2 {
+      font-size: 14px;
+      margin: 0 0 14px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      color: var(--text-dim);
+      margin: 14px 0 6px;
+    }
+
+    select,
+    input {
+      width: 100%;
+      background: var(--field);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 6px;
+      padding: 10px 12px;
+      font-size: 13.5px;
+      font-family: inherit;
+    }
+
+    button {
+      width: 100%;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 12px;
+    }
+
+    button:disabled {
+      background: var(--disabled);
+      cursor: not-allowed;
+    }
+
+    button.secondary {
+      background: var(--chip);
+    }
+
+    .note {
+      font-size: 12.5px;
+      color: var(--text-dim);
+      line-height: 1.55;
+    }
+
+    .note b {
+      color: var(--text);
+    }
+
+    .disclaimer {
+      margin-top: 12px;
+      padding: 12px 14px;
+      border: 1px solid var(--warn);
+      border-radius: 8px;
+      background: rgba(224, 168, 60, 0.08);
+      font-size: 12.5px;
+      line-height: 1.55;
+    }
+
+    .status {
+      font-size: 13px;
+      margin-top: 12px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .line-ok {
+      color: var(--ok);
+    }
+
+    .line-warn {
+      color: var(--warn);
+    }
+
+    .line-err {
+      color: var(--err);
+    }
+
+    .line-dim {
+      color: var(--text-dim);
+    }
+
+    .cols {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    @media (max-width: 640px) {
+      .cols {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: var(--field);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .card .bg {
+      height: 90px;
+      background: var(--raised) center / cover no-repeat;
+    }
+
+    .card .body {
+      padding: 12px 14px 14px;
+    }
+
+    .card .avatar {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      border: 3px solid var(--field);
+      margin-top: -48px;
+      background: var(--chip) center / cover no-repeat;
+    }
+
+    .card .where {
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-dim);
+      margin-top: 6px;
+    }
+
+    .card .name {
+      font-size: 17px;
+      font-weight: 700;
+      margin-top: 2px;
+      word-break: break-word;
+    }
+
+    .card .desc {
+      font-size: 13px;
+      color: var(--text);
+      margin-top: 6px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .card .links a {
+      display: inline-block;
+      margin: 6px 10px 0 0;
+      color: var(--accent);
+      font-size: 13px;
+      text-decoration: none;
+      word-break: break-all;
+    }
+
+    .card .tags span {
+      display: inline-block;
+      margin: 6px 6px 0 0;
+      padding: 2px 8px;
+      border-radius: 10px;
+      background: var(--chip);
+      font-size: 11.5px;
+    }
+
+    .card .meta {
+      font-size: 11.5px;
+      color: var(--text-dim);
+      margin-top: 10px;
+      line-height: 1.5;
+      word-break: break-all;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-family: monospace;
+    }
+
+    .badge.ok {
+      background: rgba(63, 191, 111, 0.15);
+      color: var(--ok);
+    }
+
+    .badge.err {
+      background: rgba(224, 90, 90, 0.15);
+      color: var(--err);
+    }
+
+    .badge.warn {
+      background: rgba(224, 168, 60, 0.15);
+      color: var(--warn);
+    }
+
+    .ctrl {
+      background: var(--field);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 8px 12px;
+      margin-top: 8px;
+      font-size: 12.5px;
+    }
+
+    .ctrl .addr {
+      font-family: monospace;
+      word-break: break-all;
+    }
+
+    .cap {
+      background: var(--field);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 8px 12px;
+      margin-top: 8px;
+      font-size: 12.5px;
+      line-height: 1.55;
+    }
+
+    .cap .t {
+      font-weight: 700;
+    }
+
+    .cap a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .assets {
+      background: var(--field);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 13px;
+    }
+
+    .assets .where {
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-dim);
+    }
+
+    .assets .native {
+      font-size: 15px;
+      font-weight: 700;
+      margin-top: 4px;
+    }
+
+    .asset {
+      border-top: 1px solid var(--border);
+      padding: 7px 0;
+      word-break: break-word;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .asset .thumb {
+      width: 40px;
+      height: 40px;
+      flex-shrink: 0;
+      border-radius: 8px;
+      background: var(--chip) center / cover no-repeat;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      color: var(--text-dim);
+      font-family: monospace;
+      overflow: hidden;
+    }
+
+    .asset .thumb.has-img {
+      color: transparent;
+    }
+
+    .asset .info {
+      min-width: 0;
+      flex: 1;
+    }
+
+    button.danger {
+      background: var(--err);
+    }
+
+    button.danger:disabled {
+      background: var(--disabled);
+    }
+
+    #pubLog {
+      font-size: 12.5px;
+      margin-top: 10px;
+      white-space: pre-wrap;
+      word-break: break-all;
+      line-height: 1.6;
+    }
+
+    .asset .kind {
+      display: inline-block;
+      padding: 1px 6px;
+      border-radius: 4px;
+      background: var(--chip);
+      font-size: 11px;
+      font-family: monospace;
+      margin-right: 6px;
+    }
+
+    .asset .addr {
+      font-family: monospace;
+      font-size: 11.5px;
+      color: var(--text-dim);
+      word-break: break-all;
+    }
+
+    .asset .addr a {
+      color: var(--text-dim);
+    }
+
+    .assets details {
+      margin-top: 8px;
+    }
+
+    .assets summary {
+      cursor: pointer;
+      color: var(--text-dim);
+      font-size: 12.5px;
+    }
+
+    .site-footer {
+      margin-top: 40px;
+      padding: 18px 20px;
+      background: #f5f6f8;
+      border: 1px solid #e3e5ea;
+      border-radius: 10px;
+      color: #4b4f58;
+    }
+
+    .footer-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .footer-logo {
+      height: 48px;
+      width: auto;
+      flex-shrink: 0;
+    }
+
+    .footer-text {
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .footer-li {
+      display: inline-flex;
+      vertical-align: middle;
+      margin: 0 2px;
+    }
+
+    .site-footer a {
+      color: #2563eb;
+      text-decoration: none;
+      font-weight: 600;
+    }
+  </style>
 </head>
+
 <body>
 
-<div class="brand-row"><img src="banner.png" alt="ChainIntegrate" class="brand-logo" onerror="this.style.display='none'"></div>
+  <div class="brand-row"><img src="banner.png" alt="ChainIntegrate" class="brand-logo"
+      onerror="this.style.display='none'"></div>
 
-<div class="header-row">
-  <div>
-    <h1 data-i18n="h1">Identità della UP su altre reti</h1>
-    <div class="subtitle" data-i18n="subtitle"></div>
+  <div class="header-row">
+    <div>
+      <h1 data-i18n="h1">Identità della UP su altre reti</h1>
+      <div class="subtitle" data-i18n="subtitle"></div>
+    </div>
+    <button id="langToggle" type="button">English</button>
   </div>
-  <button id="langToggle" type="button">English</button>
-</div>
 
-<div class="panel">
-  <h2 data-i18n="panel0Title">0 · Cos'è</h2>
-  <div class="note" data-i18n-html="panel0Note"></div>
-  <div class="disclaimer" data-i18n-html="disclaimer"></div>
-</div>
-
-<div class="panel">
-  <h2 data-i18n="panel1Title">1 · Rete</h2>
-  <input type="text" id="networkFilter" data-i18n-placeholder="networkFilterPlaceholder" placeholder="Filtra per nome...">
-  <select id="network" style="margin-top:8px;"></select>
-  <div id="customRpcWrap" style="display:none;">
-    <label data-i18n="customRpcLabel">RPC URL custom</label>
-    <input type="text" id="customRpc" placeholder="https://...">
+  <div class="panel">
+    <h2 data-i18n="panel0Title">0 · Cos'è</h2>
+    <div class="note" data-i18n-html="panel0Note"></div>
+    <div class="disclaimer" data-i18n-html="disclaimer"></div>
   </div>
-</div>
 
-<div class="panel">
-  <h2 data-i18n="panel2Title">2 · Universal Profile</h2>
-  <button id="connectUp" class="secondary" data-i18n="connectUpBtn">Leggi l'indirizzo dall'estensione UP</button>
-  <label for="upAddress" data-i18n="upAddressLabel">Indirizzo della UP</label>
-  <input type="text" id="upAddress" placeholder="0x...">
-  <button id="readBtn" data-i18n="readBtn">Leggi il profilo</button>
-  <div class="status" id="status"></div>
-</div>
-
-<div class="panel" id="resultPanel" hidden>
-  <h2 data-i18n="panel3Title">3 · Profilo</h2>
-  <div class="status" id="compare"></div>
-  <div class="cols" style="margin-top:12px;">
-    <div class="card" id="cardNet"></div>
-    <div class="card" id="cardLukso"></div>
+  <div class="panel">
+    <h2 data-i18n="panel1Title">1 · Rete</h2>
+    <input type="text" id="networkFilter" data-i18n-placeholder="networkFilterPlaceholder"
+      placeholder="Filtra per nome...">
+    <select id="network" style="margin-top:8px;"></select>
+    <div id="customRpcWrap" style="display:none;">
+      <label data-i18n="customRpcLabel">RPC URL custom</label>
+      <input type="text" id="customRpc" placeholder="https://...">
+    </div>
   </div>
-</div>
 
-<div class="panel" id="ctrlPanel" hidden>
-  <h2 data-i18n="panel4Title">4 · Chi controlla la UP su questa rete</h2>
-  <div class="note" data-i18n="panel4Note"></div>
-  <div class="status" id="ctrlStatus"></div>
-  <div id="ctrlList"></div>
-  <h3 style="font-size:13.5px; margin:18px 0 6px;" data-i18n="capTitle">Cosa può fare la UP su questa rete</h3>
-  <div class="note" data-i18n="capNote"></div>
-  <div id="capList"></div>
-</div>
-
-<div class="panel" id="pubPanel" hidden>
-  <h2 data-i18n="panel6Title">6 · Allinea il profilo a LUKSO su questa rete</h2>
-  <div class="note" data-i18n-html="panel6Note"></div>
-  <div class="status" id="pubState"></div>
-  <button id="pubConnect" class="secondary" data-i18n="pubConnectBtn">Connetti il controller della UP (MetaMask)</button>
-  <div class="status" id="pubSigner"></div>
-  <button id="pubBtn" class="danger" disabled data-i18n="pubBtn">Pubblica il profilo di LUKSO su questa rete (una transazione)</button>
-  <div id="pubLog"></div>
-</div>
-
-<div class="panel" id="assetPanel" hidden>
-  <h2 data-i18n="panel5Title">5 · Token e NFT</h2>
-  <div class="note" data-i18n-html="panel5Note"></div>
-  <div class="cols" style="margin-top:12px;">
-    <div class="assets" id="assetsNet"></div>
-    <div class="assets" id="assetsLukso"></div>
+  <div class="panel">
+    <h2 data-i18n="panel2Title">2 · Universal Profile</h2>
+    <button id="connectUp" class="secondary" data-i18n="connectUpBtn">Leggi l'indirizzo dall'estensione UP</button>
+    <label for="upAddress" data-i18n="upAddressLabel">Indirizzo della UP</label>
+    <input type="text" id="upAddress" placeholder="0x...">
+    <button id="readBtn" data-i18n="readBtn">Leggi il profilo</button>
+    <div class="status" id="status"></div>
   </div>
-</div>
 
-<div class="site-footer">
-  <div class="footer-row">
-    <img src="logo.png" alt="ChainIntegrate" class="footer-logo" onerror="this.style.display='none'">
-    <div class="footer-text" data-i18n-html="footerHtml"></div>
+  <div class="panel" id="resultPanel" hidden>
+    <h2 data-i18n="panel3Title">3 · Profilo</h2>
+    <div class="status" id="compare"></div>
+    <div class="cols" style="margin-top:12px;">
+      <div class="card" id="cardNet"></div>
+      <div class="card" id="cardLukso"></div>
+    </div>
   </div>
-</div>
 
-<script>
-const $ = (id) => document.getElementById(id);
+  <div class="panel" id="ctrlPanel" hidden>
+    <h2 data-i18n="panel4Title">4 · Chi controlla la UP su questa rete</h2>
+    <div class="note" data-i18n="panel4Note"></div>
+    <div class="status" id="ctrlStatus"></div>
+    <div id="ctrlList"></div>
+    <h3 style="font-size:13.5px; margin:18px 0 6px;" data-i18n="capTitle">Cosa può fare la UP su questa rete</h3>
+    <div class="note" data-i18n="capNote"></div>
+    <div id="capList"></div>
+  </div>
 
-// ==================== I18N ====================
-let LANG = "it";
-const I18N = {
-  it: {
-    pageTitle: "UP Identity Cross-Chain — ChainIntegrate",
-    h1: "Identità della UP su altre reti",
-    subtitle: "Il profilo LSP3 (nome, descrizione, immagini, link) di una Universal Profile, letto sulla rete che scegli e confrontato con quello attuale su LUKSO, con i token e gli NFT della UP. La lettura non usa wallet né firme; solo la sezione 6, se la usi, scrive il profilo con una transazione firmata dal tuo controller.",
-    langToggleBtn: "English",
-    panel0Title: "0 · Cos'è",
-    panel0Note: "La tua Universal Profile esiste allo stesso indirizzo su ogni rete dove l'hai deployata. I suoi dati di identità stanno nella chiave <b>LSP3Profile</b> della UP: un riferimento a un file JSON (di solito su IPFS) con il suo hash. Questa pagina legge quella chiave sulla rete scelta e su LUKSO, scarica il file, <b>controlla che l'hash corrisponda</b> e mostra il profilo. Un deploy su un'altra rete copia solo i dati della creazione originale: lì il profilo è quello del giorno della creazione, oppure manca, e la pagina te lo dice.",
-    disclaimer: "<b>È una lettura fatta da ChainIntegrate</b> dei dati ERC725Y della UP, secondo gli standard LUKSO (LSP2, LSP3). Base, Polygon e le altre reti non \"sanno\" cos'è una Universal Profile: nessuna pretesa che la rete, i suoi explorer o altri servizi riconoscano questo profilo.",
-    panel1Title: "1 · Rete",
-    networkFilterPlaceholder: "Filtra per nome...",
-    customRpcLabel: "RPC URL custom",
-    customNetName: "Rete custom",
-    panel2Title: "2 · Universal Profile",
-    connectUpBtn: "Leggi l'indirizzo dall'estensione UP",
-    upAddressLabel: "Indirizzo della UP",
-    readBtn: "Leggi il profilo",
-    panel3Title: "3 · Profilo",
-    panel4Title: "4 · Chi controlla la UP su questa rete",
-    panel4Note: "I controller della UP sulla rete scelta, con a cosa servono, e se c'è un controller di backup.",
-    extNotFound: "Estensione Universal Profile non trovata in questo browser.",
-    needAddr: "Inserisci un indirizzo valido.",
-    needNet: "Scegli la rete.",
-    reading: "Lettura in corso...",
-    rpcWrong: (v) => `L'RPC risponde con chainId ${v.id}, non ${v.exp}.`,
-    notDeployed: (v) => `A questo indirizzo non c'è una UP su ${v.net}.`,
-    luksoNone: "Su LUKSO a questo indirizzo non c'è una UP.",
-    where: (v) => `Su ${v.net}`,
-    whereLukso: "Su LUKSO (attuale)",
-    noProfile: "Nessun profilo LSP3 impostato.",
-    badValue: "Valore di LSP3Profile non riconosciuto.",
-    fetchFail: (v) => `File del profilo non scaricabile: ${v.err}`,
-    hashOk: "✅ hash verificato",
-    hashBad: "❌ hash diverso da quello dichiarato: contenuto non attendibile, non mostrato",
-    hashUnknown: "⚠️ metodo di verifica non riconosciuto: contenuto non verificato",
-    source: (v) => `File: ${v.uri}`,
-    noName: "(senza nome)",
-    same: "✅ Il profilo su questa rete è identico a quello attuale su LUKSO.",
-    diff: "⚠️ Il profilo su questa rete è diverso da quello attuale su LUKSO: probabilmente è quello del giorno della creazione. Puoi allinearlo nella sezione 6.",
-    netEmpty: "ℹ️ Su questa rete la UP non ha un profilo LSP3: il deploy ha copiato solo i dati della creazione, che non lo includevano.",
-    luksoEmptyOnly: "ℹ️ Su LUKSO la UP non ha un profilo LSP3.",
-    ctrlReading: "Lettura dei controller...",
-    ctrlFail: (v) => `Lettura dei controller non riuscita: ${v.err}`,
-    ctrlBackupOk: "✅ C'è un controller di backup (due controller amministratori con gli stessi permessi).",
-    ctrlBackupNo: "⚠️ Nessun controller di backup su questa rete: se perdi la chiave del controller, perdi l'accesso. Si aggiunge dalla pagina di deploy, sezione 5.",
-    roleEp: "EntryPoint 4337 (gas relay): esegue operazioni firmate da un tuo controller, non può cambiare dati o controller",
-    roleUrd: "Universal Receiver Delegate: tiene la lista dei token e NFT LUKSO ricevuti, non può spostare fondi",
-    roleAdmin: "controller amministratore: firma qualsiasi operazione e gestisce i controller",
-    roleLimited: "controller con permessi limitati",
-    roleBad: "voce non valida",
-    capTitle: "Cosa può fare la UP su questa rete",
-    capNote: "Letto dai dati della UP su questa rete: ogni funzione si attiva una volta per rete, dalla pagina indicata.",
-    capReading: "Lettura...",
-    capFail: (v) => `Non letto: ${v.err}`,
-    capLspT: "Token e NFT LUKSO (LSP7, LSP8)",
-    capLspOk: "✅ Sì: il Universal Receiver Delegate registra i token ricevuti nella lista LSP5 della UP.",
-    capLspNo: "⚠️ Nessun Universal Receiver Delegate: i token LSP7/LSP8 arrivano lo stesso, ma la UP non li registra nella sua lista.",
-    capNftT: "NFT ERC-721 ed ERC-1155",
-    capNftOk: "✅ Sì: estensione di ricezione 0x7F68…C03e registrata, con codice verificato.",
-    capNftOther: (v) => `⚠️ Sì, ma con un'altra estensione (${v.addr}), non verificata da questa pagina.`,
-    capNftPartial: (v) => `⚠️ Solo in parte: manca ${v.missing}. Rifalla dalla pagina NFT.`,
-    capNftNo: "❌ No: un NFT ERC-721 inviato con safeTransferFrom, o un ERC-1155, viene rifiutato. Gli acquisti su OpenSea falliscono.",
-    capNftLink: "→ Attiva la ricezione degli NFT (pagina NFT)",
-    capGasT: "Gas pagato dal sito (ERC-4337)",
-    capGasNo: "Non configurato su questa rete: il controller paga il gas di ogni operazione.",
-    capGasOk: (v) => `✅ UP configurata: Extension4337 registrata, EntryPoint con esattamente 0x500 (chiamate e invii, niente dati né permessi). Firmano: ${v.signers}.`,
-    capGasNoSigner: "⚠️ Extension4337 ed EntryPoint a posto, ma nessun controller ha il permesso 4337: nessuno può firmare.",
-    capGasEpBad: (v) => `❌ L'EntryPoint ha permessi ${v.p}, non esattamente 0x500: controlla subito dalla pagina gas relay (AUDIT G-M2).`,
-    capGasPartial: (v) => `⚠️ Configurazione incompleta: ${v.what}.`,
-    capGasWhatExt: "Extension4337 mancante o diversa",
-    capGasWhatEp: "EntryPoint non tra i controller",
-    capGasReady: (v) => `✅ Il sito paga il gas su questa rete: la UP è nella lista del gestore (paymaster ${v.pm}, tetto ${v.cap} per operazione, deposito ${v.dep}).`,
-    capGasSub: (v) => `✅ Il sito paga il gas su questa rete: iscrizione attiva, saldo ${v.bal} USDC (${v.price} USDC per operazione qui).`,
-    capGasSponsored: "✅ Il sito paga il gas su questa rete.",
-    capGasEmpty: (v) => `⚠️ Iscrizione attiva, ma il saldo (${v.balance} USDC) non basta per un'operazione: ricarica.`,
-    capGasPaid: "⚠️ Pagamento dell'iscrizione ricevuto, in attesa di attivazione (riceverai un'email).",
-    capGasNotSub: "Il sito non paga ancora il gas di questa UP: serve un'iscrizione.",
-    capSubLink: "→ Iscrizione, saldo e ricariche (pagina Iscrizione)",
-    capGasNotReady: (v) => `⚠️ La UP è nella lista del paymaster ${v.pm}, ma: ${v.why}.`,
-    capGasNoRelay: "Il sito non paga il gas di questa UP su questa rete (rete non servita, o iscrizioni non ancora aperte).",
-    capGasLink: "→ Configura la UP (pagina Gas pagato dal sito)",
-    panel6Title: "6 · Allinea il profilo a LUKSO su questa rete",
-    panel6Note: "Copia su questa rete il profilo che la UP ha oggi su LUKSO: <b>una transazione</b> firmata da un controller della UP su questa rete, che paga il gas. Scrive solo la chiave <b>LSP3Profile</b>, con lo stesso valore di LUKSO: lo stesso file e lo stesso hash. Non cambia l'indirizzo della UP né i controller. Non è automatico: se poi cambi il profilo su LUKSO, qui resta questa versione finché non ripubblichi. Serve un controller con il permesso SUPER_SETDATA, oppure SETDATA con la chiave LSP3Profile tra quelle consentite.",
-    pubConnectBtn: "Connetti il controller della UP (MetaMask)",
-    pubBtn: "Pubblica il profilo di LUKSO su questa rete (una transazione)",
-    pubNeedLukso: "Su LUKSO non c'è un profilo verificato da copiare (serve un profilo LSP3 con hash verificato).",
-    pubSame: "✅ Già allineato: su questa rete il profilo è identico a quello di LUKSO.",
-    pubReady: "Su questa rete il profilo è diverso da quello di LUKSO, o manca: si può allineare.",
-    pubSignerNone: "Nessun wallet connesso.",
-    pubNoWallet: "Nessun wallet trovato (serve MetaMask o un wallet simile).",
-    pubRejected: "Connessione rifiutata.",
-    pubSignerOk: (v) => `Firmerà ${v.addr}: controller della UP su questa rete, può scrivere LSP3Profile (${v.why}).`,
-    pubSignerNot: (v) => `${v.addr} non è un controller di questa UP su questa rete: connetti la chiave di genesi o il backup.`,
-    pubSignerNoPerm: (v) => `${v.addr} è un controller, ma non può scrivere LSP3Profile (manca SUPER_SETDATA, e SETDATA non la consente).`,
-    pubWhySuper: "SUPER_SETDATA",
-    pubWhyAllowed: "SETDATA, chiave consentita",
-    pubStart: (v) => `—— ${v.time} · UP ${v.up} · ${v.net} ——`,
-    pubChanged: "Il profilo su LUKSO o su questa rete è cambiato dall'ultima lettura: premi di nuovo \"Leggi il profilo\".",
-    pubWrongChain: (v) => `Il wallet è sulla rete con chainId ${v.got}, non su ${v.net} (chainId ${v.exp}): cambia rete nel wallet e riprova.`,
-    pubPlan: (v) => `Piano (una transazione, firmata da ${v.signer} tramite il Key Manager ${v.km}):\n- LSP3Profile su ${v.net} → il valore di LUKSO (file ${v.uri})`,
-    pubSimulating: "Simulazione...",
-    pubSimFail: (v) => `❌ Simulazione fallita, niente inviato: ${v.err}`,
-    pubSimOk: "✅ Simulazione riuscita. Conferma la transazione nel wallet.",
-    pubSignerChanged: (v) => `Il wallet ora firma con ${v.now}, non con ${v.checked}: riconnetti e riprova.`,
-    pubTx: (v) => `Tx: ${v.hash}`,
-    pubWaiting: "In attesa di conferma...",
-    pubTxFailed: "❌ La transazione è stata inclusa ma è fallita: il profilo non è cambiato.",
-    pubNoReceipt: "⚠️ Nessuna conferma entro un minuto. La transazione può ancora essere inclusa: controlla sull'explorer prima di riprovare.",
-    pubOk: "✅ Profilo pubblicato: su questa rete LSP3Profile ora è identico a quello di LUKSO.",
-    pubVerifyBad: (v) => `⚠️ Transazione confermata, ma la rilettura non corrisponde: ${v.what}. Rileggi il profilo tra poco.`,
-    pubError: (v) => `Errore: ${v.err}`,
-    pubCancelled: "Annullato nel wallet: nessuna transazione inviata.",
-    pubNoGas: (v) => `❌ ${v.addr} ha ${v.bal} ${v.cur} su questa rete, ne servono circa ${v.cost} per il gas. Niente inviato: aggiungi un po' di ${v.cur || "valuta della rete"} a questo account, oppure connetti un altro controller che ne abbia.`,
-    pubGasOk: (v) => `Gas stimato: circa ${v.cost} ${v.cur}, pagato da ${v.addr} (saldo ${v.bal} ${v.cur}).`,
-    panel5Title: "5 · Token e NFT",
-    panel5Note: "Quello che la UP possiede su ciascuna rete: la valuta della rete, i token e NFT LUKSO (LSP7, LSP8) dalla lista <b>LSP5ReceivedAssets</b> della UP, letta dalla blockchain, e gli altri token e NFT (ERC-20, ERC-721, ERC-1155) da un <b>indicizzatore</b> (Alchemy o Blockscout), che può essere incompleto. I contratti segnalati come spam sono raccolti a parte. Nessun token qui è stato verificato come autentico: un nome o un simbolo può imitare quello di un altro token.",
-    assetsReading: "Lettura di token e NFT...",
-    assetsFail: (v) => `Token e NFT non letti: ${v.err}`,
-    nativeBal: (v) => `${v.amount} ${v.cur}`,
-    nativeFail: (v) => `Saldo ${v.cur} non letto: ${v.err}`,
-    assetsNone: "Nessun token o NFT trovato.",
-    nftCount: (v) => `${v.n} NFT`,
-    nftIds: (v) => `ID: ${v.ids}${v.more ? " …" : ""}`,
-    unreadable: "saldo non leggibile",
-    spamSummary: (v) => `Probabile spam (${v.n})`,
-    srcLsp5: (v) => `LSP5 della UP (blockchain): ${v.n} contratti registrati${v.cut ? `, letti i primi ${v.max}` : ""}.`,
-    srcLsp5Fail: (v) => `LSP5 non letto: ${v.err}`,
-    srcIndexer: (v) => `${v.name} (indicizzatore): ${v.n} voci.`,
-    srcIndexerFail: (v) => `${v.name} non raggiungibile: ${v.err}. Si vedono solo valuta e LSP5.`,
-    srcNoIndexer: "Nessun indicizzatore per questa rete: si vedono solo valuta e LSP5 (token LUKSO). Per ERC-20 e NFT serve una rete coperta da Alchemy o Blockscout.",
-    footerHtml: `Servizi di consulenza in integrazione dati &amp; blockchain a cura di ChainIntegrate <a href="https://www.linkedin.com/company/chainintegrate" target="_blank" rel="noopener" aria-label="LinkedIn" class="footer-li"><svg width="20" height="20" viewBox="0 0 20 20"><rect width="20" height="20" rx="4" fill="#0A66C2"/><text x="10" y="15" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#fff">in</text></svg></a> · <a href="https://t.me/Simone_1977_2" target="_blank" rel="noopener">Assistenza via Telegram</a> · <a href="https://github.com/ChainIntegrate/Cross_Chain" target="_blank" rel="noopener">Codice sorgente su GitHub</a>`,
-  },
-  en: {
-    pageTitle: "UP Identity Cross-Chain — ChainIntegrate",
-    h1: "The UP's identity on other networks",
-    subtitle: "A Universal Profile's LSP3 profile (name, description, images, links), read on the network you choose and compared with the current one on LUKSO, with the UP's tokens and NFTs. Reading needs no wallet and no signature; only section 6, if you use it, writes the profile with a transaction signed by your controller.",
-    langToggleBtn: "Italiano",
-    panel0Title: "0 · What this is",
-    panel0Note: "Your Universal Profile exists at the same address on every network where you deployed it. Its identity data sits in the UP's <b>LSP3Profile</b> key: a reference to a JSON file (usually on IPFS) with its hash. This page reads that key on the chosen network and on LUKSO, downloads the file, <b>checks that the hash matches</b> and shows the profile. A deploy on another network copies only the original creation data: there the profile is the one from the day of creation, or missing, and the page tells you.",
-    disclaimer: "<b>This is ChainIntegrate's reading</b> of the UP's ERC725Y data, following the LUKSO standards (LSP2, LSP3). Base, Polygon and the other networks do not \"know\" what a Universal Profile is: no claim that the network, its explorers or other services recognise this profile.",
-    panel1Title: "1 · Network",
-    networkFilterPlaceholder: "Filter by name...",
-    customRpcLabel: "Custom RPC URL",
-    customNetName: "Custom network",
-    panel2Title: "2 · Universal Profile",
-    connectUpBtn: "Read the address from the UP extension",
-    upAddressLabel: "UP address",
-    readBtn: "Read the profile",
-    panel3Title: "3 · Profile",
-    panel4Title: "4 · Who controls the UP on this network",
-    panel4Note: "The UP's controllers on the chosen network, what each is for, and whether there is a backup controller.",
-    extNotFound: "Universal Profile extension not found in this browser.",
-    needAddr: "Enter a valid address.",
-    needNet: "Choose the network.",
-    reading: "Reading...",
-    rpcWrong: (v) => `The RPC answers with chainId ${v.id}, not ${v.exp}.`,
-    notDeployed: (v) => `There is no UP at this address on ${v.net}.`,
-    luksoNone: "There is no UP at this address on LUKSO.",
-    where: (v) => `On ${v.net}`,
-    whereLukso: "On LUKSO (current)",
-    noProfile: "No LSP3 profile set.",
-    badValue: "LSP3Profile value not recognised.",
-    fetchFail: (v) => `Profile file could not be downloaded: ${v.err}`,
-    hashOk: "✅ hash verified",
-    hashBad: "❌ hash differs from the declared one: content not trustworthy, not shown",
-    hashUnknown: "⚠️ verification method not recognised: content not verified",
-    source: (v) => `File: ${v.uri}`,
-    noName: "(no name)",
-    same: "✅ The profile on this network is identical to the current one on LUKSO.",
-    diff: "⚠️ The profile on this network differs from the current one on LUKSO: probably the one from the day of creation. You can align it in section 6.",
-    netEmpty: "ℹ️ On this network the UP has no LSP3 profile: the deploy copied only the creation data, which did not include it.",
-    luksoEmptyOnly: "ℹ️ On LUKSO the UP has no LSP3 profile.",
-    ctrlReading: "Reading the controllers...",
-    ctrlFail: (v) => `Reading the controllers failed: ${v.err}`,
-    ctrlBackupOk: "✅ There is a backup controller (two admin controllers with the same permissions).",
-    ctrlBackupNo: "⚠️ No backup controller on this network: if you lose the controller key, you lose access. Add one from the deploy page, section 5.",
-    roleEp: "4337 EntryPoint (gas relay): runs operations signed by one of your controllers, cannot change data or controllers",
-    roleUrd: "Universal Receiver Delegate: keeps the list of received LUKSO tokens and NFTs, cannot move funds",
-    roleAdmin: "admin controller: signs any operation and manages the controllers",
-    roleLimited: "controller with limited permissions",
-    roleBad: "invalid entry",
-    capTitle: "What the UP can do on this network",
-    capNote: "Read from the UP's data on this network: each feature is enabled once per network, from the page shown.",
-    capReading: "Reading...",
-    capFail: (v) => `Not read: ${v.err}`,
-    capLspT: "LUKSO tokens and NFTs (LSP7, LSP8)",
-    capLspOk: "✅ Yes: the Universal Receiver Delegate records received tokens in the UP's LSP5 list.",
-    capLspNo: "⚠️ No Universal Receiver Delegate: LSP7/LSP8 tokens still arrive, but the UP does not record them in its list.",
-    capNftT: "ERC-721 and ERC-1155 NFTs",
-    capNftOk: "✅ Yes: receiver extension 0x7F68…C03e registered, code verified.",
-    capNftOther: (v) => `⚠️ Yes, but with another extension (${v.addr}), not verified by this page.`,
-    capNftPartial: (v) => `⚠️ Only partly: ${v.missing} missing. Redo it from the NFT page.`,
-    capNftNo: "❌ No: an ERC-721 sent with safeTransferFrom, or an ERC-1155, is refused. OpenSea purchases fail.",
-    capNftLink: "→ Enable NFT reception (NFT page)",
-    capGasT: "Gas paid by the site (ERC-4337)",
-    capGasNo: "Not set up on this network: the controller pays the gas of every operation.",
-    capGasOk: (v) => `✅ UP set up: Extension4337 registered, EntryPoint with exactly 0x500 (calls and transfers, no data or permissions). Signers: ${v.signers}.`,
-    capGasNoSigner: "⚠️ Extension4337 and EntryPoint are fine, but no controller has the 4337 permission: nobody can sign.",
-    capGasEpBad: (v) => `❌ The EntryPoint has permissions ${v.p}, not exactly 0x500: check it now from the gas relay page (AUDIT G-M2).`,
-    capGasPartial: (v) => `⚠️ Incomplete setup: ${v.what}.`,
-    capGasWhatExt: "Extension4337 missing or different",
-    capGasWhatEp: "EntryPoint not among the controllers",
-    capGasReady: (v) => `✅ The site pays the gas on this network: the UP is on the operator's list (paymaster ${v.pm}, cap ${v.cap} per operation, deposit ${v.dep}).`,
-    capGasSub: (v) => `✅ The site pays the gas on this network: subscription active, balance ${v.bal} USDC (${v.price} USDC per operation here).`,
-    capGasSponsored: "✅ The site pays the gas on this network.",
-    capGasEmpty: (v) => `⚠️ Subscription active, but the balance (${v.balance} USDC) does not cover an operation: top up.`,
-    capGasPaid: "⚠️ Subscription payment received, waiting for activation (you will get an e-mail).",
-    capGasNotSub: "The site does not pay this UP's gas yet: it needs a subscription.",
-    capSubLink: "→ Subscription, balance and top-ups (Subscription page)",
-    capGasNotReady: (v) => `⚠️ The UP is on paymaster ${v.pm}'s list, but: ${v.why}.`,
-    capGasNoRelay: "The site does not pay this UP's gas on this network (network not served, or subscriptions not open yet).",
-    capGasLink: "→ Set up the UP (Gas paid by the site page)",
-    panel6Title: "6 · Align the profile with LUKSO on this network",
-    panel6Note: "Copies to this network the profile the UP has on LUKSO today: <b>one transaction</b> signed by a controller of the UP on this network, which pays the gas. It writes only the <b>LSP3Profile</b> key, with the same value as on LUKSO: the same file and the same hash. It changes neither the UP's address nor its controllers. It is not automatic: if you later change the profile on LUKSO, this network keeps this version until you publish again. It needs a controller with SUPER_SETDATA, or SETDATA with the LSP3Profile key among the allowed ones.",
-    pubConnectBtn: "Connect the UP's controller (MetaMask)",
-    pubBtn: "Publish LUKSO's profile on this network (one transaction)",
-    pubNeedLukso: "There is no verified profile on LUKSO to copy (an LSP3 profile with a verified hash is needed).",
-    pubSame: "✅ Already aligned: on this network the profile is identical to LUKSO's.",
-    pubReady: "On this network the profile differs from LUKSO's, or is missing: it can be aligned.",
-    pubSignerNone: "No wallet connected.",
-    pubNoWallet: "No wallet found (MetaMask or a similar wallet is needed).",
-    pubRejected: "Connection rejected.",
-    pubSignerOk: (v) => `${v.addr} will sign: a controller of the UP on this network, allowed to write LSP3Profile (${v.why}).`,
-    pubSignerNot: (v) => `${v.addr} is not a controller of this UP on this network: connect the genesis key or the backup.`,
-    pubSignerNoPerm: (v) => `${v.addr} is a controller but cannot write LSP3Profile (no SUPER_SETDATA, and SETDATA does not allow it).`,
-    pubWhySuper: "SUPER_SETDATA",
-    pubWhyAllowed: "SETDATA, key allowed",
-    pubStart: (v) => `—— ${v.time} · UP ${v.up} · ${v.net} ——`,
-    pubChanged: "The profile on LUKSO or on this network changed since the last read: press \"Read the profile\" again.",
-    pubWrongChain: (v) => `The wallet is on chainId ${v.got}, not on ${v.net} (chainId ${v.exp}): switch network in the wallet and try again.`,
-    pubPlan: (v) => `Plan (one transaction, signed by ${v.signer} through the Key Manager ${v.km}):\n- LSP3Profile on ${v.net} → LUKSO's value (file ${v.uri})`,
-    pubSimulating: "Simulating...",
-    pubSimFail: (v) => `❌ Simulation failed, nothing sent: ${v.err}`,
-    pubSimOk: "✅ Simulation succeeded. Confirm the transaction in the wallet.",
-    pubSignerChanged: (v) => `The wallet now signs with ${v.now}, not ${v.checked}: reconnect and try again.`,
-    pubTx: (v) => `Tx: ${v.hash}`,
-    pubWaiting: "Waiting for confirmation...",
-    pubTxFailed: "❌ The transaction was included but failed: the profile did not change.",
-    pubNoReceipt: "⚠️ No confirmation within a minute. The transaction can still be included: check the explorer before trying again.",
-    pubOk: "✅ Profile published: on this network LSP3Profile is now identical to LUKSO's.",
-    pubVerifyBad: (v) => `⚠️ Transaction confirmed, but the re-read does not match: ${v.what}. Read the profile again in a moment.`,
-    pubError: (v) => `Error: ${v.err}`,
-    pubCancelled: "Cancelled in the wallet: no transaction sent.",
-    pubNoGas: (v) => `❌ ${v.addr} holds ${v.bal} ${v.cur} on this network; about ${v.cost} is needed for gas. Nothing sent: add a little ${v.cur || "of the network's currency"} to this account, or connect another controller that has some.`,
-    pubGasOk: (v) => `Estimated gas: about ${v.cost} ${v.cur}, paid by ${v.addr} (balance ${v.bal} ${v.cur}).`,
-    panel5Title: "5 · Tokens and NFTs",
-    panel5Note: "What the UP holds on each network: the network's currency, LUKSO tokens and NFTs (LSP7, LSP8) from the UP's <b>LSP5ReceivedAssets</b> list, read from the chain, and the other tokens and NFTs (ERC-20, ERC-721, ERC-1155) from an <b>indexer</b> (Alchemy or Blockscout), which can be incomplete. Contracts flagged as spam are grouped apart. No token here is verified as genuine: a name or symbol can imitate another token's.",
-    assetsReading: "Reading tokens and NFTs...",
-    assetsFail: (v) => `Tokens and NFTs not read: ${v.err}`,
-    nativeBal: (v) => `${v.amount} ${v.cur}`,
-    nativeFail: (v) => `${v.cur} balance not read: ${v.err}`,
-    assetsNone: "No tokens or NFTs found.",
-    nftCount: (v) => `${v.n} NFT${v.n === "1" ? "" : "s"}`,
-    nftIds: (v) => `IDs: ${v.ids}${v.more ? " …" : ""}`,
-    unreadable: "balance not readable",
-    spamSummary: (v) => `Likely spam (${v.n})`,
-    srcLsp5: (v) => `The UP's LSP5 (chain): ${v.n} contracts registered${v.cut ? `, first ${v.max} read` : ""}.`,
-    srcLsp5Fail: (v) => `LSP5 not read: ${v.err}`,
-    srcIndexer: (v) => `${v.name} (indexer): ${v.n} entries.`,
-    srcIndexerFail: (v) => `${v.name} not reachable: ${v.err}. Only the currency and LSP5 are shown.`,
-    srcNoIndexer: "No indexer for this network: only the currency and LSP5 (LUKSO tokens) are shown. ERC-20 and NFTs need a network covered by Alchemy or Blockscout.",
-    footerHtml: `Data &amp; blockchain integration consulting by ChainIntegrate <a href="https://www.linkedin.com/company/chainintegrate" target="_blank" rel="noopener" aria-label="LinkedIn" class="footer-li"><svg width="20" height="20" viewBox="0 0 20 20"><rect width="20" height="20" rx="4" fill="#0A66C2"/><text x="10" y="15" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#fff">in</text></svg></a> · <a href="https://t.me/Simone_1977_2" target="_blank" rel="noopener">Support via Telegram</a> · <a href="https://github.com/ChainIntegrate/Cross_Chain" target="_blank" rel="noopener">Source code on GitHub</a>`,
-  },
-};
-function t(key, vars) { const v = I18N[LANG][key]; return typeof v === "function" ? v(vars || {}) : v; }
-function applyI18n() {
-  document.documentElement.lang = LANG;
-  document.title = t("pageTitle");
-  document.querySelectorAll("[data-i18n]").forEach(el => { el.textContent = t(el.getAttribute("data-i18n")); });
-  document.querySelectorAll("[data-i18n-html]").forEach(el => { el.innerHTML = t(el.getAttribute("data-i18n-html")); });
-  document.querySelectorAll("[data-i18n-placeholder]").forEach(el => { el.placeholder = t(el.getAttribute("data-i18n-placeholder")); });
-  $("langToggle").textContent = t("langToggleBtn");
-  if (last) render(last);
-}
-$("langToggle").addEventListener("click", () => { LANG = LANG === "it" ? "en" : "it"; applyI18n(); });
+  <div class="panel" id="pubPanel" hidden>
+    <h2 data-i18n="panel6Title">6 · Allinea il profilo a LUKSO su questa rete</h2>
+    <div class="note" data-i18n-html="panel6Note"></div>
+    <div class="status" id="pubState"></div>
+    <button id="pubConnect" class="secondary" data-i18n="pubConnectBtn">Connetti il controller della UP
+      (MetaMask)</button>
+    <div class="status" id="pubSigner"></div>
+    <button id="pubBtn" class="danger" disabled data-i18n="pubBtn">Pubblica il profilo di LUKSO su questa rete (una
+      transazione)</button>
+    <div id="pubLog"></div>
+  </div>
 
-// ==================== CONSTANTS ====================
-const LSP3_KEY = "0x5ef83ad9559033e6e941db7d7c495acdce616347d28e90c7ce47cbfcfcad3bc5"; // keccak256("LSP3Profile")
-const KECCAK_UTF8 = "0x6f357c6a"; // LSP2 verification method keccak256(utf8)
-const LUKSO = { key: "lukso", name: "LUKSO", chainId: 42, rpc: "https://rpc.mainnet.lukso.network", explorerBase: "https://explorer.execution.mainnet.lukso.network", currency: "LYX" };
-// LUKSO's gateway first (it serves the profiles' files), then ChainIntegrate's node (it serves only what it
-// pins), then a public gateway. Each file and each image is tried on them in this order.
-const IPFS_GATEWAYS = ["https://api.universalprofile.cloud/ipfs/", "https://ipfs.chainintegrate.it/ipfs/", "https://ipfs.io/ipfs/"];
-const UP_ABI = ["function getData(bytes32) view returns (bytes)"];
+  <div class="panel" id="assetPanel" hidden>
+    <h2 data-i18n="panel5Title">5 · Token e NFT</h2>
+    <div class="note" data-i18n-html="panel5Note"></div>
+    <div class="cols" style="margin-top:12px;">
+      <div class="assets" id="assetsNet"></div>
+      <div class="assets" id="assetsLukso"></div>
+    </div>
+  </div>
 
-// ==================== NETWORK ====================
-const networkSelectEl = $("network");
-function renderNetworkOptions(filter) {
-  const f = (filter || "").toLowerCase();
-  networkSelectEl.innerHTML = "";
-  CHAINS.filter(c => c.name.toLowerCase().includes(f)).forEach(c => {
-    const opt = document.createElement("option");
-    opt.value = c.key;
-    opt.textContent = c.chainId ? `${c.name} (chainId ${c.chainId})` : c.name;
-    networkSelectEl.appendChild(opt);
-  });
-}
-renderNetworkOptions("");
-{
-  const q = new URLSearchParams(location.search);
-  if (q.get("network") && CHAINS.some(c => c.key === q.get("network"))) networkSelectEl.value = q.get("network");
-  if (q.get("up") && ethers.isAddress(q.get("up"))) $("upAddress").value = ethers.getAddress(q.get("up"));
-}
-$("networkFilter").addEventListener("input", (e) => { renderNetworkOptions(e.target.value); onNetwork(); });
-networkSelectEl.addEventListener("change", onNetwork);
-function onNetwork() { $("customRpcWrap").style.display = networkSelectEl.value === "custom" ? "block" : "none"; }
-function getNetwork() {
-  const c = CHAINS.find(x => x.key === networkSelectEl.value);
-  if (!c) return null;
-  if (c.key === "custom") return { key: "custom", name: t("customNetName"), chainId: null, rpc: $("customRpc").value.trim() };
-  return { ...c };
-}
-onNetwork();
+  <div class="site-footer">
+    <div class="footer-row">
+      <img src="logo.png" alt="ChainIntegrate" class="footer-logo" onerror="this.style.display='none'">
+      <div class="footer-text" data-i18n-html="footerHtml"></div>
+    </div>
+  </div>
 
-$("connectUp").addEventListener("click", async () => {
-  if (!window.lukso) { setStatus("status", t("extNotFound"), "line-err"); return; }
-  try { const a = await window.lukso.request({ method: "eth_requestAccounts" }); $("upAddress").value = a[0]; } catch (e) { /* rejected */ }
-});
+  <script>
+    const $ = (id) => document.getElementById(id);
 
-// ==================== LSP2 VerifiableURI ====================
-// New format: 0x0000 + method (4) + hash length (2) + hash + URI. Old JSONURL: method (4) + hash (32) + URI.
-function decodeVerifiableUri(value) {
-  if (!value || value === "0x") return null;
-  const b = ethers.getBytes(value);
-  let method, hash, uriBytes;
-  if (b.length >= 8 && b[0] === 0 && b[1] === 0) {
-    method = ethers.hexlify(b.slice(2, 6));
-    const len = (b[6] << 8) | b[7];
-    hash = ethers.hexlify(b.slice(8, 8 + len));
-    uriBytes = b.slice(8 + len);
-  } else if (b.length >= 36) {
-    method = ethers.hexlify(b.slice(0, 4));
-    hash = ethers.hexlify(b.slice(4, 36));
-    uriBytes = b.slice(36);
-  } else return { bad: true };
-  let uri;
-  try { uri = ethers.toUtf8String(uriBytes); } catch (e) { return { bad: true }; }
-  return { method, hash, uri };
-}
-// Resolves ipfs:// and https:// to the URLs to try, in order. Anything else is not fetched.
-function urlsFor(uri) {
-  if (/^ipfs:\/\//i.test(uri)) { const p = uri.replace(/^ipfs:\/\//i, "").replace(/^ipfs\//, ""); return IPFS_GATEWAYS.map(g => g + p); }
-  if (/^https:\/\//i.test(uri)) return [uri];
-  return [];
-}
-async function fetchBytes(uri) {
-  if (/^data:/i.test(uri)) {
-    const m = uri.match(/^data:[^,]*?(;base64)?,(.*)$/is);
-    if (!m) throw new Error("data URI");
-    return m[1] ? ethers.decodeBase64(m[2]) : ethers.toUtf8Bytes(decodeURIComponent(m[2]));
-  }
-  const urls = urlsFor(uri);
-  if (!urls.length) throw new Error(uri);
-  let lastErr = null;
-  for (const u of urls) {
-    try {
-      const ctl = new AbortController(); const tm = setTimeout(() => ctl.abort(), 15000);
-      const r = await fetch(u, { signal: ctl.signal, referrerPolicy: "no-referrer" });
-      clearTimeout(tm);
-      if (!r.ok) { lastErr = new Error(`HTTP ${r.status}`); continue; }
-      return new Uint8Array(await r.arrayBuffer());
-    } catch (e) { lastErr = e; }
-  }
-  throw lastErr || new Error("fetch");
-}
-// Images: tried on each gateway in turn; the first that loads becomes the element's background.
-// Only ipfs:// (through a gateway) and https:// are used, set through the DOM, never as HTML.
-function setImage(elem, uri, onOk) {
-  const urls = /^data:image\//i.test(uri || "") ? [uri] : urlsFor(uri || "");
-  const next = (i) => {
-    if (i >= urls.length) return;
-    const img = new Image();
-    img.referrerPolicy = "no-referrer";
-    img.onload = () => { elem.style.backgroundImage = `url("${encodeURI(urls[i])}")`; if (onOk) onOk(); };
-    img.onerror = () => next(i + 1);
-    img.src = urls[i];
-  };
-  next(0);
-}
-
-// Reads LSP3Profile on one network: { state: "noUp" | "none" | "bad" | "fetchFail" | "ok" | "hashBad", ... }
-async function readProfile(net, up) {
-  const provider = new ethers.JsonRpcProvider(net.rpc, undefined, { batchMaxCount: 1 });
-  const id = Number(await provider.send("eth_chainId", []));
-  if (net.chainId && id !== net.chainId) return { state: "rpc", id };
-  if ((await provider.getCode(up)) === "0x") return { state: "noUp", provider, chainId: id };
-  const raw = await new ethers.Contract(up, UP_ABI, provider).getData(LSP3_KEY);
-  const v = decodeVerifiableUri(raw);
-  if (!v) return { state: "none", provider, chainId: id, raw };
-  if (v.bad) return { state: "bad", provider, chainId: id, raw };
-  let bytes;
-  try { bytes = await fetchBytes(v.uri); } catch (e) { return { state: "fetchFail", err: e.message || String(e), provider, chainId: id, raw, ...v }; }
-  const known = v.method.toLowerCase() === KECCAK_UTF8;
-  const verified = known && ethers.keccak256(bytes).toLowerCase() === v.hash.toLowerCase();
-  if (known && !verified) return { state: "hashBad", provider, chainId: id, raw, ...v };
-  let json = null;
-  try { json = JSON.parse(ethers.toUtf8String(bytes)); } catch (e) { return { state: "bad", provider, chainId: id, raw, ...v }; }
-  return { state: "ok", verified, provider, chainId: id, raw, json: json && json.LSP3Profile ? json.LSP3Profile : json, ...v };
-}
-
-// ==================== RENDERING ====================
-function setStatus(id, text, cls) { const el = $(id); el.className = "status " + (cls || ""); el.textContent = text; }
-function el(tag, cls, text) { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
-function pickImage(list, want) {
-  if (!Array.isArray(list) || !list.length) return null;
-  const sorted = [...list].filter(i => i && typeof i.url === "string").sort((a, b) => Math.abs((a.width || want) - want) - Math.abs((b.width || want) - want));
-  return sorted.length ? sorted[0].url : null;
-}
-function renderCard(box, where, p) {
-  box.innerHTML = "";
-  const bg = el("div", "bg"), body = el("div", "body");
-  box.append(bg, body);
-  const av = el("div", "avatar");
-  body.append(av, el("div", "where", where));
-  if (!p || p.state === "noUp") { body.append(el("div", "desc", p && p.lukso ? t("luksoNone") : t("noProfile"))); return; }
-  if (p.state === "none") { body.append(el("div", "desc", t("noProfile"))); return; }
-  if (p.state === "bad") { body.append(el("div", "desc", t("badValue"))); return; }
-  if (p.state === "fetchFail") { body.append(el("div", "desc", t("fetchFail", { err: p.err })), el("div", "meta", t("source", { uri: p.uri }))); return; }
-  if (p.state === "hashBad") { body.append(el("div", "desc line-err", t("hashBad")), el("div", "meta", t("source", { uri: p.uri }))); return; }
-  const j = p.json || {};
-  const bgUrl = pickImage(j.backgroundImage, 800), avUrl = pickImage(j.profileImage, 256);
-  if (bgUrl) setImage(bg, bgUrl);
-  if (avUrl) setImage(av, avUrl);
-  body.append(el("div", "name", typeof j.name === "string" && j.name ? j.name : t("noName")));
-  if (typeof j.description === "string" && j.description) body.append(el("div", "desc", j.description.slice(0, 2000)));
-  if (Array.isArray(j.links) && j.links.length) {
-    const ls = el("div", "links");
-    j.links.slice(0, 20).forEach(l => {
-      if (!l || typeof l.url !== "string" || !/^https?:\/\//i.test(l.url)) return;
-      const a = el("a", "", typeof l.title === "string" && l.title ? l.title : l.url);
-      a.href = l.url; a.target = "_blank"; a.rel = "noopener noreferrer";
-      ls.appendChild(a);
-    });
-    body.append(ls);
-  }
-  if (Array.isArray(j.tags) && j.tags.length) {
-    const ts = el("div", "tags");
-    j.tags.slice(0, 30).forEach(tg => { if (typeof tg === "string") ts.appendChild(el("span", "", tg)); });
-    body.append(ts);
-  }
-  body.append(el("div", "meta " + (p.verified ? "line-ok" : "line-warn"), p.verified ? t("hashOk") : t("hashUnknown")));
-  body.append(el("div", "meta", t("source", { uri: p.uri })));
-}
-
-let last = null, readSeq = 0;
-function render(r) {
-  $("resultPanel").hidden = false;
-  renderCard($("cardNet"), t("where", { net: r.netName }), r.net);
-  renderCard($("cardLukso"), t("whereLukso"), r.lukso);
-  const hasNet = r.net && !["none", "noUp"].includes(r.net.state), hasLukso = r.lukso && !["none", "noUp"].includes(r.lukso.state);
-  if (hasNet && hasLukso && r.net.raw && r.lukso.raw) setStatus("compare", r.net.raw.toLowerCase() === r.lukso.raw.toLowerCase() ? t("same") : t("diff"), r.net.raw.toLowerCase() === r.lukso.raw.toLowerCase() ? "line-ok" : "line-warn");
-  else if (!hasNet && hasLukso) setStatus("compare", t("netEmpty"), "line-dim");
-  else if (hasNet && !hasLukso) setStatus("compare", t("luksoEmptyOnly"), "line-dim");
-  else setStatus("compare", "", "");
-  if (r.ctrl) renderCtrl(r.ctrl);
-  if (r.ctrl || (r.net && r.net.state === "noUp")) renderPub();
-  const a = assets.seq === r.seq ? assets : {};
-  renderAssets($("assetsNet"), t("where", { net: r.netName }), r.netDef, a.net);
-  renderAssets($("assetsLukso"), t("whereLukso"), LUKSO, a.lukso);
-}
-// One column of section 5. `a` is undefined while reading, null when there is no UP on that network.
-function renderAssets(box, where, net, a) {
-  box.innerHTML = "";
-  box.append(el("div", "where", where));
-  if (a === undefined) { box.append(el("div", "line-dim", t("assetsReading"))); return; }
-  if (a === null) { box.append(el("div", "line-dim", t("notDeployed", { net: net.name }))); return; }
-  if (a.failed) { box.append(el("div", "line-err", t("assetsFail", { err: a.failed }))); return; }
-  const cur = net.currency || "";
-  if (a.native !== null) box.append(el("div", "native", t("nativeBal", { amount: ethers.formatEther(a.native), cur })));
-  else box.append(el("div", "line-err", t("nativeFail", { cur, err: a.errors.native })));
-  const row = (r) => {
-    const d = el("div", "asset");
-    const thumb = el("div", "thumb", (r.symbol || r.type || "?").slice(0, 4));
-    d.append(thumb);
-    const info = el("div", "info");
-    d.append(info);
-    showThumb(thumb, r);
-    const head = el("div");
-    head.append(el("span", "kind", r.type));
-    const title = [r.name, r.symbol ? `(${r.symbol})` : ""].filter(Boolean).join(" ") || "?";
-    head.append(document.createTextNode(title));
-    info.append(head);
-    if (r.unreadable) info.append(el("div", "line-warn", t("unreadable")));
-    else if (r.amount !== undefined) info.append(el("div", "", r.amount + (r.symbol ? " " + r.symbol : "")));
-    else {
-      info.append(el("div", "", t("nftCount", { n: r.count })));
-      if (r.ids && r.ids.length) info.append(el("div", "line-dim", t("nftIds", { ids: r.ids.join(", "), more: Number(r.count) > r.ids.length })));
-    }
-    const ad = el("div", "addr");
-    const url = getExplorerUrl(net, "/address/", r.address);
-    if (url) { const l = el("a", "", r.address); l.href = url; l.target = "_blank"; l.rel = "noopener noreferrer"; ad.append(l); } else ad.textContent = r.address;
-    info.append(ad);
-    return d;
-  };
-  const good = a.rows.filter(r => !r.spam), spam = a.rows.filter(r => r.spam);
-  if (!a.rows.length) box.append(el("div", "line-dim", t("assetsNone")));
-  good.forEach(r => box.append(row(r)));
-  if (spam.length) {
-    const det = el("details"); det.append(el("summary", "", t("spamSummary", { n: spam.length })));
-    spam.forEach(r => det.append(row(r)));
-    box.append(det);
-  }
-  const src = [];
-  src.push(a.errors.lsp5 ? [t("srcLsp5Fail", { err: a.errors.lsp5 }), "line-warn"]
-    : [t("srcLsp5", { n: a.lsp5Total, cut: a.lsp5Total > AssetList.MAX_ASSETS, max: AssetList.MAX_ASSETS }), "line-dim"]);
-  const ixName = a.indexer && (a.indexer.kind === "alchemy" ? "Alchemy" : "Blockscout");
-  if (!a.indexer) src.push([t("srcNoIndexer"), "line-dim"]);
-  else if (a.indexer.err) src.push([t("srcIndexerFail", { name: ixName, err: a.indexer.err }), "line-warn"]);
-  else src.push([t("srcIndexer", { name: ixName, n: a.indexer.rows.length }), "line-dim"]);
-  src.forEach(([txt, cls]) => { const m = el("div", "meta " + cls, txt); m.style.cssText = "font-size:11.5px; margin-top:8px;"; box.append(m); });
-}
-function renderCtrl(c) {
-  $("ctrlPanel").hidden = false;
-  if (last) renderCaps(last.caps, last.netDef, last.up);
-  if (c.err) { setStatus("ctrlStatus", t("ctrlFail", { err: c.err }), "line-err"); $("ctrlList").innerHTML = ""; return; }
-  setStatus("ctrlStatus", c.hasBackup ? t("ctrlBackupOk") : t("ctrlBackupNo"), c.hasBackup ? "line-ok" : "line-warn");
-  const box = $("ctrlList"); box.innerHTML = "";
-  c.controllers.forEach(x => {
-    const d = el("div", "ctrl");
-    d.append(el("div", "addr", `[${x.index}] ${x.address || "?"}`));
-    const admin = (x.perms & BackupCheck.ADMIN) === BackupCheck.ADMIN;
-    const role = x.role === "entrypoint" ? t("roleEp") : x.role === "urd" ? t("roleUrd") : x.role === "malformed" ? t("roleBad") : admin ? t("roleAdmin") : t("roleLimited");
-    d.append(el("div", "line-dim", `${role} · 0x${x.perms.toString(16)}`));
-    box.appendChild(d);
-  });
-}
-
-// Section 5: both networks read in parallel; each column fills in when its read finishes.
-// Token and collection images. Indexer rows carry a URL; LSP7/LSP8 rows carry the asset's LSP4Metadata
-// value, resolved here like LSP3 (file downloaded, hash checked when the method is known, a mismatch
-// shows no image): the collection icon first, else the first image. One resolution per asset per read.
-const lsp4Images = new Map();
-function lsp4Image(raw) {
-  if (!lsp4Images.has(raw)) lsp4Images.set(raw, (async () => {
-    const v = decodeVerifiableUri(raw);
-    if (!v || v.bad) return null;
-    const bytes = await fetchBytes(v.uri);
-    if (v.method.toLowerCase() === KECCAK_UTF8 && ethers.keccak256(bytes).toLowerCase() !== v.hash.toLowerCase()) return null;
-    const j = JSON.parse(ethers.toUtf8String(bytes));
-    const m = (j && j.LSP4Metadata) || j || {};
-    return pickImage(m.icon, 64) || (Array.isArray(m.images) && Array.isArray(m.images[0]) ? pickImage(m.images[0], 128) : null);
-  })().catch(() => null));
-  return lsp4Images.get(raw);
-}
-function showThumb(thumb, r) {
-  const set = (url) => { if (url) setImage(thumb, url, () => thumb.classList.add("has-img")); };
-  if (r.image) { set(r.image); return; }
-  if (r.lsp4Metadata) lsp4Image(r.lsp4Metadata).then(url => { if (url) { r.image = url; set(url); } });
-}
-
-// Results are kept by read (seq), so a column that finishes before the profile is rendered is not lost.
-let assets = { seq: 0 };
-function loadAssets(my, net, rn, rl, up) {
-  $("assetPanel").hidden = false;
-  assets = { seq: my };
-  const one = (side, p, key) => {
-    const done = (a) => {
-      if (assets.seq !== my) return;
-      assets[side] = a;
-      if (last && last.seq === my) render(last);
+    // ==================== I18N ====================
+    let LANG = "en";
+    const I18N = {
+      it: {
+        pageTitle: "UP Identity Cross-Chain — ChainIntegrate",
+        h1: "Identità della UP su altre reti",
+        subtitle: "Il profilo LSP3 (nome, descrizione, immagini, link) di una Universal Profile, letto sulla rete che scegli e confrontato con quello attuale su LUKSO, con i token e gli NFT della UP. La lettura non usa wallet né firme; solo la sezione 6, se la usi, scrive il profilo con una transazione firmata dal tuo controller.",
+        langToggleBtn: "English",
+        panel0Title: "0 · Cos'è",
+        panel0Note: "La tua Universal Profile esiste allo stesso indirizzo su ogni rete dove l'hai deployata. I suoi dati di identità stanno nella chiave <b>LSP3Profile</b> della UP: un riferimento a un file JSON (di solito su IPFS) con il suo hash. Questa pagina legge quella chiave sulla rete scelta e su LUKSO, scarica il file, <b>controlla che l'hash corrisponda</b> e mostra il profilo. Un deploy su un'altra rete copia solo i dati della creazione originale: lì il profilo è quello del giorno della creazione, oppure manca, e la pagina te lo dice.",
+        disclaimer: "<b>È una lettura fatta da ChainIntegrate</b> dei dati ERC725Y della UP, secondo gli standard LUKSO (LSP2, LSP3). Base, Polygon e le altre reti non \"sanno\" cos'è una Universal Profile: nessuna pretesa che la rete, i suoi explorer o altri servizi riconoscano questo profilo.",
+        panel1Title: "1 · Rete",
+        networkFilterPlaceholder: "Filtra per nome...",
+        customRpcLabel: "RPC URL custom",
+        customNetName: "Rete custom",
+        panel2Title: "2 · Universal Profile",
+        connectUpBtn: "Leggi l'indirizzo dall'estensione UP",
+        upAddressLabel: "Indirizzo della UP",
+        readBtn: "Leggi il profilo",
+        panel3Title: "3 · Profilo",
+        panel4Title: "4 · Chi controlla la UP su questa rete",
+        panel4Note: "I controller della UP sulla rete scelta, con a cosa servono, e se c'è un controller di backup.",
+        extNotFound: "Estensione Universal Profile non trovata in questo browser.",
+        needAddr: "Inserisci un indirizzo valido.",
+        needNet: "Scegli la rete.",
+        reading: "Lettura in corso...",
+        rpcWrong: (v) => `L'RPC risponde con chainId ${v.id}, non ${v.exp}.`,
+        notDeployed: (v) => `A questo indirizzo non c'è una UP su ${v.net}.`,
+        luksoNone: "Su LUKSO a questo indirizzo non c'è una UP.",
+        where: (v) => `Su ${v.net}`,
+        whereLukso: "Su LUKSO (attuale)",
+        noProfile: "Nessun profilo LSP3 impostato.",
+        badValue: "Valore di LSP3Profile non riconosciuto.",
+        fetchFail: (v) => `File del profilo non scaricabile: ${v.err}`,
+        hashOk: "✅ hash verificato",
+        hashBad: "❌ hash diverso da quello dichiarato: contenuto non attendibile, non mostrato",
+        hashUnknown: "⚠️ metodo di verifica non riconosciuto: contenuto non verificato",
+        source: (v) => `File: ${v.uri}`,
+        noName: "(senza nome)",
+        same: "✅ Il profilo su questa rete è identico a quello attuale su LUKSO.",
+        diff: "⚠️ Il profilo su questa rete è diverso da quello attuale su LUKSO: probabilmente è quello del giorno della creazione. Puoi allinearlo nella sezione 6.",
+        netEmpty: "ℹ️ Su questa rete la UP non ha un profilo LSP3: il deploy ha copiato solo i dati della creazione, che non lo includevano.",
+        luksoEmptyOnly: "ℹ️ Su LUKSO la UP non ha un profilo LSP3.",
+        ctrlReading: "Lettura dei controller...",
+        ctrlFail: (v) => `Lettura dei controller non riuscita: ${v.err}`,
+        ctrlBackupOk: "✅ C'è un controller di backup (due controller amministratori con gli stessi permessi).",
+        ctrlBackupNo: "⚠️ Nessun controller di backup su questa rete: se perdi la chiave del controller, perdi l'accesso. Si aggiunge dalla pagina di deploy, sezione 5.",
+        roleEp: "EntryPoint 4337 (gas relay): esegue operazioni firmate da un tuo controller, non può cambiare dati o controller",
+        roleUrd: "Universal Receiver Delegate: tiene la lista dei token e NFT LUKSO ricevuti, non può spostare fondi",
+        roleAdmin: "controller amministratore: firma qualsiasi operazione e gestisce i controller",
+        roleLimited: "controller con permessi limitati",
+        roleBad: "voce non valida",
+        capTitle: "Cosa può fare la UP su questa rete",
+        capNote: "Letto dai dati della UP su questa rete: ogni funzione si attiva una volta per rete, dalla pagina indicata.",
+        capReading: "Lettura...",
+        capFail: (v) => `Non letto: ${v.err}`,
+        capLspT: "Token e NFT LUKSO (LSP7, LSP8)",
+        capLspOk: "✅ Sì: il Universal Receiver Delegate registra i token ricevuti nella lista LSP5 della UP.",
+        capLspNo: "⚠️ Nessun Universal Receiver Delegate: i token LSP7/LSP8 arrivano lo stesso, ma la UP non li registra nella sua lista.",
+        capNftT: "NFT ERC-721 ed ERC-1155",
+        capNftOk: "✅ Sì: estensione di ricezione 0x7F68…C03e registrata, con codice verificato.",
+        capNftOther: (v) => `⚠️ Sì, ma con un'altra estensione (${v.addr}), non verificata da questa pagina.`,
+        capNftPartial: (v) => `⚠️ Solo in parte: manca ${v.missing}. Rifalla dalla pagina NFT.`,
+        capNftNo: "❌ No: un NFT ERC-721 inviato con safeTransferFrom, o un ERC-1155, viene rifiutato. Gli acquisti su OpenSea falliscono.",
+        capNftLink: "→ Attiva la ricezione degli NFT (pagina NFT)",
+        capGasT: "Gas pagato dal sito (ERC-4337)",
+        capGasNo: "Non configurato su questa rete: il controller paga il gas di ogni operazione.",
+        capGasOk: (v) => `✅ UP configurata: Extension4337 registrata, EntryPoint con esattamente 0x500 (chiamate e invii, niente dati né permessi). Firmano: ${v.signers}.`,
+        capGasNoSigner: "⚠️ Extension4337 ed EntryPoint a posto, ma nessun controller ha il permesso 4337: nessuno può firmare.",
+        capGasEpBad: (v) => `❌ L'EntryPoint ha permessi ${v.p}, non esattamente 0x500: controlla subito dalla pagina gas relay (AUDIT G-M2).`,
+        capGasPartial: (v) => `⚠️ Configurazione incompleta: ${v.what}.`,
+        capGasWhatExt: "Extension4337 mancante o diversa",
+        capGasWhatEp: "EntryPoint non tra i controller",
+        capGasReady: (v) => `✅ Il sito paga il gas su questa rete: la UP è nella lista del gestore (paymaster ${v.pm}, tetto ${v.cap} per operazione, deposito ${v.dep}).`,
+        capGasSub: (v) => `✅ Il sito paga il gas su questa rete: iscrizione attiva, saldo ${v.bal} USDC (${v.price} USDC per operazione qui).`,
+        capGasSponsored: "✅ Il sito paga il gas su questa rete.",
+        capGasEmpty: (v) => `⚠️ Iscrizione attiva, ma il saldo (${v.balance} USDC) non basta per un'operazione: ricarica.`,
+        capGasPaid: "⚠️ Pagamento dell'iscrizione ricevuto, in attesa di attivazione (riceverai un'email).",
+        capGasNotSub: "Il sito non paga ancora il gas di questa UP: serve un'iscrizione.",
+        capSubLink: "→ Iscrizione, saldo e ricariche (pagina Iscrizione)",
+        capGasNotReady: (v) => `⚠️ La UP è nella lista del paymaster ${v.pm}, ma: ${v.why}.`,
+        capGasNoRelay: "Il sito non paga il gas di questa UP su questa rete (rete non servita, o iscrizioni non ancora aperte).",
+        capGasLink: "→ Configura la UP (pagina Gas pagato dal sito)",
+        panel6Title: "6 · Allinea il profilo a LUKSO su questa rete",
+        panel6Note: "Copia su questa rete il profilo che la UP ha oggi su LUKSO: <b>una transazione</b> firmata da un controller della UP su questa rete, che paga il gas. Scrive solo la chiave <b>LSP3Profile</b>, con lo stesso valore di LUKSO: lo stesso file e lo stesso hash. Non cambia l'indirizzo della UP né i controller. Non è automatico: se poi cambi il profilo su LUKSO, qui resta questa versione finché non ripubblichi. Serve un controller con il permesso SUPER_SETDATA, oppure SETDATA con la chiave LSP3Profile tra quelle consentite.",
+        pubConnectBtn: "Connetti il controller della UP (MetaMask)",
+        pubBtn: "Pubblica il profilo di LUKSO su questa rete (una transazione)",
+        pubNeedLukso: "Su LUKSO non c'è un profilo verificato da copiare (serve un profilo LSP3 con hash verificato).",
+        pubSame: "✅ Già allineato: su questa rete il profilo è identico a quello di LUKSO.",
+        pubReady: "Su questa rete il profilo è diverso da quello di LUKSO, o manca: si può allineare.",
+        pubSignerNone: "Nessun wallet connesso.",
+        pubNoWallet: "Nessun wallet trovato (serve MetaMask o un wallet simile).",
+        pubRejected: "Connessione rifiutata.",
+        pubSignerOk: (v) => `Firmerà ${v.addr}: controller della UP su questa rete, può scrivere LSP3Profile (${v.why}).`,
+        pubSignerNot: (v) => `${v.addr} non è un controller di questa UP su questa rete: connetti la chiave di genesi o il backup.`,
+        pubSignerNoPerm: (v) => `${v.addr} è un controller, ma non può scrivere LSP3Profile (manca SUPER_SETDATA, e SETDATA non la consente).`,
+        pubWhySuper: "SUPER_SETDATA",
+        pubWhyAllowed: "SETDATA, chiave consentita",
+        pubStart: (v) => `—— ${v.time} · UP ${v.up} · ${v.net} ——`,
+        pubChanged: "Il profilo su LUKSO o su questa rete è cambiato dall'ultima lettura: premi di nuovo \"Leggi il profilo\".",
+        pubWrongChain: (v) => `Il wallet è sulla rete con chainId ${v.got}, non su ${v.net} (chainId ${v.exp}): cambia rete nel wallet e riprova.`,
+        pubPlan: (v) => `Piano (una transazione, firmata da ${v.signer} tramite il Key Manager ${v.km}):\n- LSP3Profile su ${v.net} → il valore di LUKSO (file ${v.uri})`,
+        pubSimulating: "Simulazione...",
+        pubSimFail: (v) => `❌ Simulazione fallita, niente inviato: ${v.err}`,
+        pubSimOk: "✅ Simulazione riuscita. Conferma la transazione nel wallet.",
+        pubSignerChanged: (v) => `Il wallet ora firma con ${v.now}, non con ${v.checked}: riconnetti e riprova.`,
+        pubTx: (v) => `Tx: ${v.hash}`,
+        pubWaiting: "In attesa di conferma...",
+        pubTxFailed: "❌ La transazione è stata inclusa ma è fallita: il profilo non è cambiato.",
+        pubNoReceipt: "⚠️ Nessuna conferma entro un minuto. La transazione può ancora essere inclusa: controlla sull'explorer prima di riprovare.",
+        pubOk: "✅ Profilo pubblicato: su questa rete LSP3Profile ora è identico a quello di LUKSO.",
+        pubVerifyBad: (v) => `⚠️ Transazione confermata, ma la rilettura non corrisponde: ${v.what}. Rileggi il profilo tra poco.`,
+        pubError: (v) => `Errore: ${v.err}`,
+        pubCancelled: "Annullato nel wallet: nessuna transazione inviata.",
+        pubNoGas: (v) => `❌ ${v.addr} ha ${v.bal} ${v.cur} su questa rete, ne servono circa ${v.cost} per il gas. Niente inviato: aggiungi un po' di ${v.cur || "valuta della rete"} a questo account, oppure connetti un altro controller che ne abbia.`,
+        pubGasOk: (v) => `Gas stimato: circa ${v.cost} ${v.cur}, pagato da ${v.addr} (saldo ${v.bal} ${v.cur}).`,
+        panel5Title: "5 · Token e NFT",
+        panel5Note: "Quello che la UP possiede su ciascuna rete: la valuta della rete, i token e NFT LUKSO (LSP7, LSP8) dalla lista <b>LSP5ReceivedAssets</b> della UP, letta dalla blockchain, e gli altri token e NFT (ERC-20, ERC-721, ERC-1155) da un <b>indicizzatore</b> (Alchemy o Blockscout), che può essere incompleto. I contratti segnalati come spam sono raccolti a parte. Nessun token qui è stato verificato come autentico: un nome o un simbolo può imitare quello di un altro token.",
+        assetsReading: "Lettura di token e NFT...",
+        assetsFail: (v) => `Token e NFT non letti: ${v.err}`,
+        nativeBal: (v) => `${v.amount} ${v.cur}`,
+        nativeFail: (v) => `Saldo ${v.cur} non letto: ${v.err}`,
+        assetsNone: "Nessun token o NFT trovato.",
+        nftCount: (v) => `${v.n} NFT`,
+        nftIds: (v) => `ID: ${v.ids}${v.more ? " …" : ""}`,
+        unreadable: "saldo non leggibile",
+        spamSummary: (v) => `Probabile spam (${v.n})`,
+        srcLsp5: (v) => `LSP5 della UP (blockchain): ${v.n} contratti registrati${v.cut ? `, letti i primi ${v.max}` : ""}.`,
+        srcLsp5Fail: (v) => `LSP5 non letto: ${v.err}`,
+        srcIndexer: (v) => `${v.name} (indicizzatore): ${v.n} voci.`,
+        srcIndexerFail: (v) => `${v.name} non raggiungibile: ${v.err}. Si vedono solo valuta e LSP5.`,
+        srcNoIndexer: "Nessun indicizzatore per questa rete: si vedono solo valuta e LSP5 (token LUKSO). Per ERC-20 e NFT serve una rete coperta da Alchemy o Blockscout.",
+        footerHtml: `Servizi di consulenza in integrazione dati &amp; blockchain a cura di ChainIntegrate <a href="https://www.linkedin.com/company/chainintegrate" target="_blank" rel="noopener" aria-label="LinkedIn" class="footer-li"><svg width="20" height="20" viewBox="0 0 20 20"><rect width="20" height="20" rx="4" fill="#0A66C2"/><text x="10" y="15" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#fff">in</text></svg></a> · <a href="https://t.me/Simone_1977_2" target="_blank" rel="noopener">Assistenza via Telegram</a> · <a href="https://github.com/ChainIntegrate/Cross_Chain" target="_blank" rel="noopener">Codice sorgente su GitHub</a>`,
+      },
+      en: {
+        pageTitle: "UP Identity Cross-Chain — ChainIntegrate",
+        h1: "The UP's identity on other networks",
+        subtitle: "A Universal Profile's LSP3 profile (name, description, images, links), read on the network you choose and compared with the current one on LUKSO, with the UP's tokens and NFTs. Reading needs no wallet and no signature; only section 6, if you use it, writes the profile with a transaction signed by your controller.",
+        langToggleBtn: "Italiano",
+        panel0Title: "0 · What this is",
+        panel0Note: "Your Universal Profile exists at the same address on every network where you deployed it. Its identity data sits in the UP's <b>LSP3Profile</b> key: a reference to a JSON file (usually on IPFS) with its hash. This page reads that key on the chosen network and on LUKSO, downloads the file, <b>checks that the hash matches</b> and shows the profile. A deploy on another network copies only the original creation data: there the profile is the one from the day of creation, or missing, and the page tells you.",
+        disclaimer: "<b>This is ChainIntegrate's reading</b> of the UP's ERC725Y data, following the LUKSO standards (LSP2, LSP3). Base, Polygon and the other networks do not \"know\" what a Universal Profile is: no claim that the network, its explorers or other services recognise this profile.",
+        panel1Title: "1 · Network",
+        networkFilterPlaceholder: "Filter by name...",
+        customRpcLabel: "Custom RPC URL",
+        customNetName: "Custom network",
+        panel2Title: "2 · Universal Profile",
+        connectUpBtn: "Read the address from the UP extension",
+        upAddressLabel: "UP address",
+        readBtn: "Read the profile",
+        panel3Title: "3 · Profile",
+        panel4Title: "4 · Who controls the UP on this network",
+        panel4Note: "The UP's controllers on the chosen network, what each is for, and whether there is a backup controller.",
+        extNotFound: "Universal Profile extension not found in this browser.",
+        needAddr: "Enter a valid address.",
+        needNet: "Choose the network.",
+        reading: "Reading...",
+        rpcWrong: (v) => `The RPC answers with chainId ${v.id}, not ${v.exp}.`,
+        notDeployed: (v) => `There is no UP at this address on ${v.net}.`,
+        luksoNone: "There is no UP at this address on LUKSO.",
+        where: (v) => `On ${v.net}`,
+        whereLukso: "On LUKSO (current)",
+        noProfile: "No LSP3 profile set.",
+        badValue: "LSP3Profile value not recognised.",
+        fetchFail: (v) => `Profile file could not be downloaded: ${v.err}`,
+        hashOk: "✅ hash verified",
+        hashBad: "❌ hash differs from the declared one: content not trustworthy, not shown",
+        hashUnknown: "⚠️ verification method not recognised: content not verified",
+        source: (v) => `File: ${v.uri}`,
+        noName: "(no name)",
+        same: "✅ The profile on this network is identical to the current one on LUKSO.",
+        diff: "⚠️ The profile on this network differs from the current one on LUKSO: probably the one from the day of creation. You can align it in section 6.",
+        netEmpty: "ℹ️ On this network the UP has no LSP3 profile: the deploy copied only the creation data, which did not include it.",
+        luksoEmptyOnly: "ℹ️ On LUKSO the UP has no LSP3 profile.",
+        ctrlReading: "Reading the controllers...",
+        ctrlFail: (v) => `Reading the controllers failed: ${v.err}`,
+        ctrlBackupOk: "✅ There is a backup controller (two admin controllers with the same permissions).",
+        ctrlBackupNo: "⚠️ No backup controller on this network: if you lose the controller key, you lose access. Add one from the deploy page, section 5.",
+        roleEp: "4337 EntryPoint (gas relay): runs operations signed by one of your controllers, cannot change data or controllers",
+        roleUrd: "Universal Receiver Delegate: keeps the list of received LUKSO tokens and NFTs, cannot move funds",
+        roleAdmin: "admin controller: signs any operation and manages the controllers",
+        roleLimited: "controller with limited permissions",
+        roleBad: "invalid entry",
+        capTitle: "What the UP can do on this network",
+        capNote: "Read from the UP's data on this network: each feature is enabled once per network, from the page shown.",
+        capReading: "Reading...",
+        capFail: (v) => `Not read: ${v.err}`,
+        capLspT: "LUKSO tokens and NFTs (LSP7, LSP8)",
+        capLspOk: "✅ Yes: the Universal Receiver Delegate records received tokens in the UP's LSP5 list.",
+        capLspNo: "⚠️ No Universal Receiver Delegate: LSP7/LSP8 tokens still arrive, but the UP does not record them in its list.",
+        capNftT: "ERC-721 and ERC-1155 NFTs",
+        capNftOk: "✅ Yes: receiver extension 0x7F68…C03e registered, code verified.",
+        capNftOther: (v) => `⚠️ Yes, but with another extension (${v.addr}), not verified by this page.`,
+        capNftPartial: (v) => `⚠️ Only partly: ${v.missing} missing. Redo it from the NFT page.`,
+        capNftNo: "❌ No: an ERC-721 sent with safeTransferFrom, or an ERC-1155, is refused. OpenSea purchases fail.",
+        capNftLink: "→ Enable NFT reception (NFT page)",
+        capGasT: "Gas paid by the site (ERC-4337)",
+        capGasNo: "Not set up on this network: the controller pays the gas of every operation.",
+        capGasOk: (v) => `✅ UP set up: Extension4337 registered, EntryPoint with exactly 0x500 (calls and transfers, no data or permissions). Signers: ${v.signers}.`,
+        capGasNoSigner: "⚠️ Extension4337 and EntryPoint are fine, but no controller has the 4337 permission: nobody can sign.",
+        capGasEpBad: (v) => `❌ The EntryPoint has permissions ${v.p}, not exactly 0x500: check it now from the gas relay page (AUDIT G-M2).`,
+        capGasPartial: (v) => `⚠️ Incomplete setup: ${v.what}.`,
+        capGasWhatExt: "Extension4337 missing or different",
+        capGasWhatEp: "EntryPoint not among the controllers",
+        capGasReady: (v) => `✅ The site pays the gas on this network: the UP is on the operator's list (paymaster ${v.pm}, cap ${v.cap} per operation, deposit ${v.dep}).`,
+        capGasSub: (v) => `✅ The site pays the gas on this network: subscription active, balance ${v.bal} USDC (${v.price} USDC per operation here).`,
+        capGasSponsored: "✅ The site pays the gas on this network.",
+        capGasEmpty: (v) => `⚠️ Subscription active, but the balance (${v.balance} USDC) does not cover an operation: top up.`,
+        capGasPaid: "⚠️ Subscription payment received, waiting for activation (you will get an e-mail).",
+        capGasNotSub: "The site does not pay this UP's gas yet: it needs a subscription.",
+        capSubLink: "→ Subscription, balance and top-ups (Subscription page)",
+        capGasNotReady: (v) => `⚠️ The UP is on paymaster ${v.pm}'s list, but: ${v.why}.`,
+        capGasNoRelay: "The site does not pay this UP's gas on this network (network not served, or subscriptions not open yet).",
+        capGasLink: "→ Set up the UP (Gas paid by the site page)",
+        panel6Title: "6 · Align the profile with LUKSO on this network",
+        panel6Note: "Copies to this network the profile the UP has on LUKSO today: <b>one transaction</b> signed by a controller of the UP on this network, which pays the gas. It writes only the <b>LSP3Profile</b> key, with the same value as on LUKSO: the same file and the same hash. It changes neither the UP's address nor its controllers. It is not automatic: if you later change the profile on LUKSO, this network keeps this version until you publish again. It needs a controller with SUPER_SETDATA, or SETDATA with the LSP3Profile key among the allowed ones.",
+        pubConnectBtn: "Connect the UP's controller (MetaMask)",
+        pubBtn: "Publish LUKSO's profile on this network (one transaction)",
+        pubNeedLukso: "There is no verified profile on LUKSO to copy (an LSP3 profile with a verified hash is needed).",
+        pubSame: "✅ Already aligned: on this network the profile is identical to LUKSO's.",
+        pubReady: "On this network the profile differs from LUKSO's, or is missing: it can be aligned.",
+        pubSignerNone: "No wallet connected.",
+        pubNoWallet: "No wallet found (MetaMask or a similar wallet is needed).",
+        pubRejected: "Connection rejected.",
+        pubSignerOk: (v) => `${v.addr} will sign: a controller of the UP on this network, allowed to write LSP3Profile (${v.why}).`,
+        pubSignerNot: (v) => `${v.addr} is not a controller of this UP on this network: connect the genesis key or the backup.`,
+        pubSignerNoPerm: (v) => `${v.addr} is a controller but cannot write LSP3Profile (no SUPER_SETDATA, and SETDATA does not allow it).`,
+        pubWhySuper: "SUPER_SETDATA",
+        pubWhyAllowed: "SETDATA, key allowed",
+        pubStart: (v) => `—— ${v.time} · UP ${v.up} · ${v.net} ——`,
+        pubChanged: "The profile on LUKSO or on this network changed since the last read: press \"Read the profile\" again.",
+        pubWrongChain: (v) => `The wallet is on chainId ${v.got}, not on ${v.net} (chainId ${v.exp}): switch network in the wallet and try again.`,
+        pubPlan: (v) => `Plan (one transaction, signed by ${v.signer} through the Key Manager ${v.km}):\n- LSP3Profile on ${v.net} → LUKSO's value (file ${v.uri})`,
+        pubSimulating: "Simulating...",
+        pubSimFail: (v) => `❌ Simulation failed, nothing sent: ${v.err}`,
+        pubSimOk: "✅ Simulation succeeded. Confirm the transaction in the wallet.",
+        pubSignerChanged: (v) => `The wallet now signs with ${v.now}, not ${v.checked}: reconnect and try again.`,
+        pubTx: (v) => `Tx: ${v.hash}`,
+        pubWaiting: "Waiting for confirmation...",
+        pubTxFailed: "❌ The transaction was included but failed: the profile did not change.",
+        pubNoReceipt: "⚠️ No confirmation within a minute. The transaction can still be included: check the explorer before trying again.",
+        pubOk: "✅ Profile published: on this network LSP3Profile is now identical to LUKSO's.",
+        pubVerifyBad: (v) => `⚠️ Transaction confirmed, but the re-read does not match: ${v.what}. Read the profile again in a moment.`,
+        pubError: (v) => `Error: ${v.err}`,
+        pubCancelled: "Cancelled in the wallet: no transaction sent.",
+        pubNoGas: (v) => `❌ ${v.addr} holds ${v.bal} ${v.cur} on this network; about ${v.cost} is needed for gas. Nothing sent: add a little ${v.cur || "of the network's currency"} to this account, or connect another controller that has some.`,
+        pubGasOk: (v) => `Estimated gas: about ${v.cost} ${v.cur}, paid by ${v.addr} (balance ${v.bal} ${v.cur}).`,
+        panel5Title: "5 · Tokens and NFTs",
+        panel5Note: "What the UP holds on each network: the network's currency, LUKSO tokens and NFTs (LSP7, LSP8) from the UP's <b>LSP5ReceivedAssets</b> list, read from the chain, and the other tokens and NFTs (ERC-20, ERC-721, ERC-1155) from an <b>indexer</b> (Alchemy or Blockscout), which can be incomplete. Contracts flagged as spam are grouped apart. No token here is verified as genuine: a name or symbol can imitate another token's.",
+        assetsReading: "Reading tokens and NFTs...",
+        assetsFail: (v) => `Tokens and NFTs not read: ${v.err}`,
+        nativeBal: (v) => `${v.amount} ${v.cur}`,
+        nativeFail: (v) => `${v.cur} balance not read: ${v.err}`,
+        assetsNone: "No tokens or NFTs found.",
+        nftCount: (v) => `${v.n} NFT${v.n === "1" ? "" : "s"}`,
+        nftIds: (v) => `IDs: ${v.ids}${v.more ? " …" : ""}`,
+        unreadable: "balance not readable",
+        spamSummary: (v) => `Likely spam (${v.n})`,
+        srcLsp5: (v) => `The UP's LSP5 (chain): ${v.n} contracts registered${v.cut ? `, first ${v.max} read` : ""}.`,
+        srcLsp5Fail: (v) => `LSP5 not read: ${v.err}`,
+        srcIndexer: (v) => `${v.name} (indexer): ${v.n} entries.`,
+        srcIndexerFail: (v) => `${v.name} not reachable: ${v.err}. Only the currency and LSP5 are shown.`,
+        srcNoIndexer: "No indexer for this network: only the currency and LSP5 (LUKSO tokens) are shown. ERC-20 and NFTs need a network covered by Alchemy or Blockscout.",
+        footerHtml: `Data &amp; blockchain integration consulting by ChainIntegrate <a href="https://www.linkedin.com/company/chainintegrate" target="_blank" rel="noopener" aria-label="LinkedIn" class="footer-li"><svg width="20" height="20" viewBox="0 0 20 20"><rect width="20" height="20" rx="4" fill="#0A66C2"/><text x="10" y="15" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#fff">in</text></svg></a> · <a href="https://t.me/Simone_1977_2" target="_blank" rel="noopener">Support via Telegram</a> · <a href="https://github.com/ChainIntegrate/Cross_Chain" target="_blank" rel="noopener">Source code on GitHub</a>`,
+      },
     };
-    if (p.state === "noUp") { done(null); return; }
-    if (!p.provider) { done({ failed: p.err || "RPC" }); return; }
-    AssetList.list(p.provider, up, key).then(done, (e) => done({ failed: e.message }));
-  };
-  one("net", rn, net.key);
-  one("lukso", rl, LUKSO.key);
-}
-
-// ==================== WHAT THE UP CAN DO (section 4) ====================
-// Read-only, from the UP's ERC725Y data on the chosen network: LSP7/LSP8 recording (URD), ERC-721/1155
-// reception (LSP17 extension), gas relay (Extension4337, EntryPoint permissions, 4337 signers) and
-// whether the site relayer and one of its paymasters serve this UP.
-const NFT_EXT = "0x7F68e74483867058C806218aa05aB5527984C03e";
-const NFT_EXT_HASH = "0xed365f94b64256c4c81311071c739de4a006d09676dc9e2bd5cd49b346ddb955";
-const NFT_SELECTORS = [["0x150b7a02", "onERC721Received"], ["0xf23a6e61", "onERC1155Received"], ["0xbc197c81", "onERC1155BatchReceived"]];
-const EXT_4337 = "0x6D375232863E179Ba1B3348C9087E30d5D5ed4B2";
-const EXT_4337_HASH = "0x91968b95ee6f8e01a554060b775c13e8df3f0173d87a55a48ed54b8ff02c052d";
-const VALIDATE_USER_OP_SEL = "0x3a871cdd";
-const LSP17 = (sel) => "0xcee78b4094da860110960000" + sel.slice(2) + "00".repeat(16);
-const ERC4337_BIT = 1n << 23n;
-async function readCaps(provider, up, chainId, ctrl) {
-  const upC = new ethers.Contract(up, UP_W_IFACE, provider);
-  const keys = NFT_SELECTORS.map(([sel]) => LSP17(sel)).concat([LSP17(VALIDATE_USER_OP_SEL)]);
-  const vals = await upC.getDataBatch(keys);
-  const addrOf = (v) => (v && ethers.dataLength(v) === 20 ? ethers.getAddress(v) : null);
-  const hashOf = async (a) => { const c = await provider.getCode(a); return c === "0x" ? null : ethers.keccak256(c); };
-  const out = {};
-  // LSP7/LSP8: the URD is read by BackupCheck (key LSP1UniversalReceiverDelegate).
-  out.lsp = !!(ctrl && ctrl.urd && (await provider.getCode(ctrl.urd)) !== "0x");
-  // ERC-721 / ERC-1155
-  const nft = NFT_SELECTORS.map(([, name], i) => ({ name, addr: addrOf(vals[i]) }));
-  const set = nft.filter(x => x.addr);
-  if (!set.length) out.nft = { state: "no" };
-  else if (set.length < nft.length) out.nft = { state: "partial", missing: nft.filter(x => !x.addr).map(x => x.name).join(", ") };
-  else if (set.every(x => x.addr === NFT_EXT) && (await hashOf(NFT_EXT)) === NFT_EXT_HASH) out.nft = { state: "ok" };
-  else out.nft = { state: "other", addr: [...new Set(set.map(x => x.addr))].join(", ") };
-  // Gas relay: the UP side
-  const ext = addrOf(vals[3]);
-  const extOk = ext === EXT_4337 && (await hashOf(EXT_4337)) === EXT_4337_HASH;
-  const ep = ctrl && ctrl.controllers ? ctrl.controllers.find(c => c.role === "entrypoint") : null;
-  const signers = ctrl && ctrl.controllers ? ctrl.controllers.filter(c => c.role === "controller" && (c.perms & ERC4337_BIT)).map(c => c.address) : [];
-  if (!ext && !ep) out.gas = { state: "no" };
-  else if (ep && ep.perms !== 0x500n) out.gas = { state: "epBad", p: "0x" + ep.perms.toString(16) };
-  else if (!extOk || !ep) out.gas = { state: "partial", what: [!extOk ? t("capGasWhatExt") : null, !ep ? t("capGasWhatEp") : null].filter(Boolean).join("; ") };
-  else out.gas = { state: signers.length ? "ok" : "noSigner", signers };
-  // Gas relay: the site's relayer and paymaster (only meaningful once the UP side exists)
-  if (out.gas.state !== "no") {
-    try {
-      const r = await GasRelayClient.check(provider, { chainId, up, signer: null });
-      const why = (r.reasons || []).filter(x => x[0] !== "noSigner").map(x => GasRelayClient.text(x[0], x[1]));
-      out.relay = r.state === "none" ? { state: "none" } : why.length ? { state: "notReady", pm: r.pm, why: why.join("; ") } : { state: "ready", pm: r.pm, sponsor: r.sponsor || null };
-      // Not paid by the site: what the subscription service says (not subscribed, balance used up, waiting)
-      if (out.relay.state !== "ready" && out.gas.state === "ok") { const st = await GasRelayClient.sponsorStatus(chainId, up); out.relay.sub = st && st.subscription ? { status: st.subscription.status, balance: st.balance || "0" } : null; }
-      if (out.relay.state === "ready" && !out.relay.sponsor) {
-        const pm = new ethers.Contract(r.pm, ["function maxCostPerOp() view returns (uint256)"], provider);
-        const ep6 = new ethers.Contract(GasRelayClient.ENTRY_POINT, ["function balanceOf(address) view returns (uint256)"], provider);
-        [out.relay.cap, out.relay.dep] = await Promise.all([pm.maxCostPerOp(), ep6.balanceOf(r.pm)]);
-      }
-    } catch (e) { out.relay = { state: "none" }; }
-  }
-  return out;
-}
-function renderCaps(c, netDef, up) {
-  const box = $("capList"); box.innerHTML = "";
-  if (!c) { box.append(el("div", "line-dim", t("capReading"))); return; }
-  if (c.err) { box.append(el("div", "line-err", t("capFail", { err: c.err }))); return; }
-  const cur = netDef.currency && netDef.currency !== "?" ? " " + netDef.currency : "";
-  const q = new URLSearchParams({ up }); if (netDef.key && netDef.key !== "custom") q.set("network", netDef.key);
-  const item = (title, lines, link) => {
-    const d = el("div", "cap"); d.append(el("div", "t", title));
-    lines.forEach(([txt, cls]) => d.append(el("div", cls || "", txt)));
-    if (link) { const a = el("a", "", link[0]); a.href = link[1] + "?" + q.toString(); a.target = "_blank"; a.rel = "noopener"; d.append(a); }
-    box.append(d);
-  };
-  item(t("capLspT"), [[c.lsp ? t("capLspOk") : t("capLspNo"), c.lsp ? "line-ok" : "line-warn"]]);
-  const n = c.nft;
-  item(t("capNftT"), [[n.state === "ok" ? t("capNftOk") : n.state === "other" ? t("capNftOther", n) : n.state === "partial" ? t("capNftPartial", n) : t("capNftNo"),
-    n.state === "ok" ? "line-ok" : n.state === "no" ? "line-err" : "line-warn"]], n.state === "ok" ? null : [t("capNftLink"), "up-nft-receiver.html"]);
-  const g = c.gas, lines = [];
-  if (g.state === "no") lines.push([t("capGasNo"), "line-dim"]);
-  else if (g.state === "epBad") lines.push([t("capGasEpBad", g), "line-err"]);
-  else if (g.state === "partial") lines.push([t("capGasPartial", g), "line-warn"]);
-  else if (g.state === "noSigner") lines.push([t("capGasNoSigner"), "line-warn"]);
-  else lines.push([t("capGasOk", { signers: g.signers.join(", ") }), "line-ok"]);
-  if (c.relay) {
-    const r = c.relay;
-    if (r.state === "ready" && r.sponsor) lines.push([r.sponsor.balance ? t("capGasSub", { bal: r.sponsor.balance, price: r.sponsor.price }) : t("capGasSponsored"), "line-ok"]);
-    else if (r.state === "ready") lines.push([t("capGasReady", { pm: r.pm, cap: ethers.formatEther(r.cap) + cur, dep: ethers.formatEther(r.dep) + cur }), "line-ok"]);
-    else if (r.sub && r.sub.status === "active") lines.push([t("capGasEmpty", r.sub), "line-warn"]);
-    else if (r.sub && r.sub.status === "paid") lines.push([t("capGasPaid"), "line-warn"]);
-    else if (r.sub) lines.push([t("capGasNotSub"), "line-warn"]);
-    else if (r.state === "notReady") lines.push([t("capGasNotReady", r), "line-warn"]);
-    else lines.push([t("capGasNoRelay"), "line-dim"]);
-  }
-  // The UP side to fix: the setup page. Set up: the subscription page (subscribe, balance, top-ups),
-  // except for a UP on the operator's list, which needs nothing.
-  const onList = c.relay && c.relay.state === "ready" && !c.relay.sponsor;
-  item(t("capGasT"), lines, g.state !== "ok" ? [t("capGasLink"), "up-gas-relay.html"] : onList ? null : [t("capSubLink"), "up-subscribe.html"]);
-}
-
-// ==================== 6. PUBLISH (align LSP3Profile with LUKSO) ====================
-// One Key Manager transaction: UP.setData(LSP3Profile, <LUKSO's value>), signed by a controller on
-// the chosen network. Only LUKSO's value, verified on this read (hash checked), is ever written;
-// everything is read again right before signing, simulated, and checked after confirmation.
-const SUPER_SETDATA = 1n << 17n, SETDATA = 1n << 18n;
-const KM_IFACE = new ethers.Interface(["function execute(bytes) payable returns (bytes)"]);
-const UP_W_IFACE = new ethers.Interface(["function setData(bytes32,bytes)", "function getData(bytes32) view returns (bytes)", "function getDataBatch(bytes32[]) view returns (bytes[])", "function owner() view returns (address)"]);
-let pubWallet = null, pubAddr = null, pubBusy = false;
-const discovered = [];
-window.addEventListener("eip6963:announceProvider", (e) => discovered.push(e.detail));
-window.dispatchEvent(new Event("eip6963:requestProvider"));
-
-function pubLog(msg, cls) { const d = el("div", cls || "", msg); $("pubLog").appendChild(d); }
-// Can `addr` write LSP3Profile on this UP? { ok, why } or { ctrl: false } / { ctrl: true, ok: false }.
-async function lsp3Permission(provider, up, addr) {
-  const [perm, keys] = await new ethers.Contract(up, UP_W_IFACE, provider).getDataBatch([BackupCheck.permKey(addr), BackupCheck.dataKeysKey(addr)]);
-  const p = perm && perm !== "0x" ? BigInt(perm) : 0n;
-  if (p === 0n) return { ctrl: false };
-  if (p & SUPER_SETDATA) return { ctrl: true, ok: true, why: t("pubWhySuper") };
-  if (p & SETDATA) {
-    // AllowedERC725YDataKeys: a CompactBytesArray of keys or key prefixes (2-byte length + bytes).
-    const b = keys && keys !== "0x" ? ethers.getBytes(keys) : new Uint8Array();
-    for (let i = 0; i + 2 <= b.length;) {
-      const n = (b[i] << 8) | b[i + 1];
-      const k = ethers.hexlify(b.slice(i + 2, i + 2 + n)).toLowerCase();
-      if (n >= 1 && n <= 32 && LSP3_KEY.startsWith(k)) return { ctrl: true, ok: true, why: t("pubWhyAllowed") };
-      i += 2 + n;
+    function t(key, vars) { const v = I18N[LANG][key]; return typeof v === "function" ? v(vars || {}) : v; }
+    function applyI18n() {
+      document.documentElement.lang = LANG;
+      document.title = t("pageTitle");
+      document.querySelectorAll("[data-i18n]").forEach(el => { el.textContent = t(el.getAttribute("data-i18n")); });
+      document.querySelectorAll("[data-i18n-html]").forEach(el => { el.innerHTML = t(el.getAttribute("data-i18n-html")); });
+      document.querySelectorAll("[data-i18n-placeholder]").forEach(el => { el.placeholder = t(el.getAttribute("data-i18n-placeholder")); });
+      $("langToggle").textContent = t("langToggleBtn");
+      if (last) render(last);
     }
-  }
-  return { ctrl: true, ok: false };
-}
-// The state of section 6 for the current read: what can be done, and with which signer.
-async function renderPub() {
-  const r = last;
-  const show = !!(r && r.net && r.net.provider && r.net.state !== "noUp" && r.net.chainId !== LUKSO.chainId);
-  $("pubPanel").hidden = !show;
-  if (!show) return;
-  const src = r.lukso;
-  const ready = src && src.state === "ok" && src.verified;
-  const same = ready && r.net.raw && r.net.raw.toLowerCase() === src.raw.toLowerCase();
-  setStatus("pubState", !ready ? t("pubNeedLukso") : same ? t("pubSame") : t("pubReady"), !ready ? "line-warn" : same ? "line-ok" : "line-dim");
-  let can = false;
-  if (!pubAddr) setStatus("pubSigner", t("pubSignerNone"), "line-dim");
-  else {
-    try {
-      const perm = await lsp3Permission(r.net.provider, r.up, pubAddr);
-      if (r !== last) return;
-      if (!perm.ctrl) setStatus("pubSigner", t("pubSignerNot", { addr: pubAddr }), "line-err");
-      else if (!perm.ok) setStatus("pubSigner", t("pubSignerNoPerm", { addr: pubAddr }), "line-err");
-      else { setStatus("pubSigner", t("pubSignerOk", { addr: pubAddr, why: perm.why }), "line-ok"); can = true; }
-    } catch (e) { setStatus("pubSigner", t("pubError", { err: e.shortMessage || e.message }), "line-err"); }
-  }
-  $("pubBtn").disabled = pubBusy || !ready || same || !can;
-  $("pubConnect").disabled = pubBusy;
-}
-$("pubConnect").addEventListener("click", async () => {
-  const w = discovered.find(p => !/lukso|universal profile/i.test(p.info.name))?.provider || (window.ethereum && window.ethereum !== window.lukso ? window.ethereum : null);
-  if (!w) { setStatus("pubSigner", t("pubNoWallet"), "line-err"); return; }
-  try {
-    // The wallet's account picker every time, so the signer can be chosen (genesis key or backup).
-    try { await w.request({ method: "wallet_requestPermissions", params: [{ eth_accounts: {} }] }); } catch (e) { if (e && e.code === 4001) throw e; }
-    const accs = await w.request({ method: "eth_requestAccounts" });
-    pubWallet = w; pubAddr = ethers.getAddress(accs[0]);
-    if (typeof w.on === "function" && !w.__idWatched) {
-      w.__idWatched = true;
-      w.on("accountsChanged", (a) => { pubAddr = a && a[0] ? ethers.getAddress(a[0]) : null; renderPub(); });
+    $("langToggle").addEventListener("click", () => { LANG = LANG === "it" ? "en" : "it"; applyI18n(); });
+
+    // ==================== CONSTANTS ====================
+    const LSP3_KEY = "0x5ef83ad9559033e6e941db7d7c495acdce616347d28e90c7ce47cbfcfcad3bc5"; // keccak256("LSP3Profile")
+    const KECCAK_UTF8 = "0x6f357c6a"; // LSP2 verification method keccak256(utf8)
+    const LUKSO = { key: "lukso", name: "LUKSO", chainId: 42, rpc: "https://rpc.mainnet.lukso.network", explorerBase: "https://explorer.execution.mainnet.lukso.network", currency: "LYX" };
+    // LUKSO's gateway first (it serves the profiles' files), then ChainIntegrate's node (it serves only what it
+    // pins), then a public gateway. Each file and each image is tried on them in this order.
+    const IPFS_GATEWAYS = ["https://api.universalprofile.cloud/ipfs/", "https://ipfs.chainintegrate.it/ipfs/", "https://ipfs.io/ipfs/"];
+    const UP_ABI = ["function getData(bytes32) view returns (bytes)"];
+
+    // ==================== NETWORK ====================
+    const networkSelectEl = $("network");
+    function renderNetworkOptions(filter) {
+      const f = (filter || "").toLowerCase();
+      networkSelectEl.innerHTML = "";
+      CHAINS.filter(c => c.name.toLowerCase().includes(f)).forEach(c => {
+        const opt = document.createElement("option");
+        opt.value = c.key;
+        opt.textContent = c.chainId ? `${c.name} (chainId ${c.chainId})` : c.name;
+        networkSelectEl.appendChild(opt);
+      });
     }
-  } catch (e) { setStatus("pubSigner", t("pubRejected"), "line-err"); return; }
-  renderPub();
-});
-$("pubBtn").addEventListener("click", async () => {
-  const r = last;
-  if (pubBusy || !r || !pubWallet || !pubAddr) return;
-  pubBusy = true; $("pubBtn").disabled = true; $("pubConnect").disabled = true; $("readBtn").disabled = true;
-  const provider = r.net.provider, up = r.up, value = r.lukso.raw;
-  let reread = false;
-  pubLog(t("pubStart", { time: new Date().toLocaleTimeString(), up, net: r.netName }), "line-dim");
-  try {
-    // Read again: LUKSO's value and this network's must still be the ones shown.
-    const luksoNow = await new ethers.Contract(up, UP_W_IFACE, r.lukso.provider).getData(LSP3_KEY);
-    const netNow = await new ethers.Contract(up, UP_W_IFACE, provider).getData(LSP3_KEY);
-    if (luksoNow.toLowerCase() !== value.toLowerCase() || (netNow || "0x").toLowerCase() !== (r.net.raw || "0x").toLowerCase()) { pubLog(t("pubChanged"), "line-err"); return; }
-    const walletChain = parseInt(await pubWallet.request({ method: "eth_chainId" }), 16);
-    if (walletChain !== r.net.chainId) { pubLog(t("pubWrongChain", { got: walletChain, net: r.netName, exp: r.net.chainId }), "line-err"); return; }
-    const perm = await lsp3Permission(provider, up, pubAddr);
-    if (!perm.ok) { pubLog(perm.ctrl ? t("pubSignerNoPerm", { addr: pubAddr }) : t("pubSignerNot", { addr: pubAddr }), "line-err"); return; }
-    const km = ethers.getAddress(await new ethers.Contract(up, UP_W_IFACE, provider).owner());
-    const data = KM_IFACE.encodeFunctionData("execute", [UP_W_IFACE.encodeFunctionData("setData", [LSP3_KEY, value])]);
-    pubLog(t("pubPlan", { signer: pubAddr, km, net: r.netName, uri: r.lukso.uri }), "line-dim");
-    pubLog(t("pubSimulating"), "line-dim");
-    try { await provider.call({ from: pubAddr, to: km, data }); }
-    catch (e) { pubLog(t("pubSimFail", { err: e.shortMessage || e.reason || e.message }), "line-err"); return; }
-    // The signer pays the gas: check its balance before the wallet opens (a fresh backup key often
-    // holds nothing on this network, and the wallet then shows only a generic fee alert).
-    const cur = r.netDef.currency && r.netDef.currency !== "?" ? r.netDef.currency : "";
-    try {
-      const [gas, fee, bal] = await Promise.all([provider.estimateGas({ from: pubAddr, to: km, data }), provider.getFeeData(), provider.getBalance(pubAddr)]);
-      const price = fee.maxFeePerGas || fee.gasPrice;
-      if (price) {
-        const cost = gas * price;
-        const v = { addr: pubAddr, bal: ethers.formatEther(bal), cost: ethers.formatEther(cost), cur };
-        if (bal < cost) { pubLog(t("pubNoGas", v), "line-err"); return; }
-        pubLog(t("pubGasOk", v), "line-dim");
+    renderNetworkOptions("");
+    {
+      const q = new URLSearchParams(location.search);
+      if (q.get("network") && CHAINS.some(c => c.key === q.get("network"))) networkSelectEl.value = q.get("network");
+      if (q.get("up") && ethers.isAddress(q.get("up"))) $("upAddress").value = ethers.getAddress(q.get("up"));
+    }
+    $("networkFilter").addEventListener("input", (e) => { renderNetworkOptions(e.target.value); onNetwork(); });
+    networkSelectEl.addEventListener("change", onNetwork);
+    function onNetwork() { $("customRpcWrap").style.display = networkSelectEl.value === "custom" ? "block" : "none"; }
+    function getNetwork() {
+      const c = CHAINS.find(x => x.key === networkSelectEl.value);
+      if (!c) return null;
+      if (c.key === "custom") return { key: "custom", name: t("customNetName"), chainId: null, rpc: $("customRpc").value.trim() };
+      return { ...c };
+    }
+    onNetwork();
+
+    $("connectUp").addEventListener("click", async () => {
+      if (!window.lukso) { setStatus("status", t("extNotFound"), "line-err"); return; }
+      try { const a = await window.lukso.request({ method: "eth_requestAccounts" }); $("upAddress").value = a[0]; } catch (e) { /* rejected */ }
+    });
+
+    // ==================== LSP2 VerifiableURI ====================
+    // New format: 0x0000 + method (4) + hash length (2) + hash + URI. Old JSONURL: method (4) + hash (32) + URI.
+    function decodeVerifiableUri(value) {
+      if (!value || value === "0x") return null;
+      const b = ethers.getBytes(value);
+      let method, hash, uriBytes;
+      if (b.length >= 8 && b[0] === 0 && b[1] === 0) {
+        method = ethers.hexlify(b.slice(2, 6));
+        const len = (b[6] << 8) | b[7];
+        hash = ethers.hexlify(b.slice(8, 8 + len));
+        uriBytes = b.slice(8 + len);
+      } else if (b.length >= 36) {
+        method = ethers.hexlify(b.slice(0, 4));
+        hash = ethers.hexlify(b.slice(4, 36));
+        uriBytes = b.slice(36);
+      } else return { bad: true };
+      let uri;
+      try { uri = ethers.toUtf8String(uriBytes); } catch (e) { return { bad: true }; }
+      return { method, hash, uri };
+    }
+    // Resolves ipfs:// and https:// to the URLs to try, in order. Anything else is not fetched.
+    function urlsFor(uri) {
+      if (/^ipfs:\/\//i.test(uri)) { const p = uri.replace(/^ipfs:\/\//i, "").replace(/^ipfs\//, ""); return IPFS_GATEWAYS.map(g => g + p); }
+      if (/^https:\/\//i.test(uri)) return [uri];
+      return [];
+    }
+    async function fetchBytes(uri) {
+      if (/^data:/i.test(uri)) {
+        const m = uri.match(/^data:[^,]*?(;base64)?,(.*)$/is);
+        if (!m) throw new Error("data URI");
+        return m[1] ? ethers.decodeBase64(m[2]) : ethers.toUtf8Bytes(decodeURIComponent(m[2]));
       }
-    } catch (e) { /* no estimate: the wallet still shows its own fee */ }
-    pubLog(t("pubSimOk"), "line-ok");
-    const signer = await new ethers.BrowserProvider(pubWallet).getSigner();
-    if (signer.address.toLowerCase() !== pubAddr.toLowerCase()) { pubLog(t("pubSignerChanged", { now: signer.address, checked: pubAddr }), "line-err"); return; }
-    const tx = await signer.sendTransaction({ to: km, data, chainId: r.net.chainId });
-    pubLog(t("pubTx", { hash: tx.hash }), "line-dim");
-    const url = getExplorerUrl(r.netDef, "/tx/", tx.hash);
-    if (url) pubLog(url, "line-dim");
-    pubLog(t("pubWaiting"), "line-dim");
-    const receipt = await waitReceipt(provider, tx.hash, signer.provider);
-    if (!receipt) { pubLog(t("pubNoReceipt"), "line-warn"); return; }
-    if (receipt.status !== 1) { pubLog(t("pubTxFailed"), "line-err"); return; }
-    // Public RPCs are load-balanced: read at the receipt's block, retrying while a node lags behind.
-    let got = null;
-    for (let i = 0; i < 6; i++) {
-      if (i) await new Promise(res => setTimeout(res, 1500));
-      // At the receipt's block; if the RPC refuses a read at a past block, at the latest one.
+      const urls = urlsFor(uri);
+      if (!urls.length) throw new Error(uri);
+      let lastErr = null;
+      for (const u of urls) {
+        try {
+          const ctl = new AbortController(); const tm = setTimeout(() => ctl.abort(), 15000);
+          const r = await fetch(u, { signal: ctl.signal, referrerPolicy: "no-referrer" });
+          clearTimeout(tm);
+          if (!r.ok) { lastErr = new Error(`HTTP ${r.status}`); continue; }
+          return new Uint8Array(await r.arrayBuffer());
+        } catch (e) { lastErr = e; }
+      }
+      throw lastErr || new Error("fetch");
+    }
+    // Images: tried on each gateway in turn; the first that loads becomes the element's background.
+    // Only ipfs:// (through a gateway) and https:// are used, set through the DOM, never as HTML.
+    function setImage(elem, uri, onOk) {
+      const urls = /^data:image\//i.test(uri || "") ? [uri] : urlsFor(uri || "");
+      const next = (i) => {
+        if (i >= urls.length) return;
+        const img = new Image();
+        img.referrerPolicy = "no-referrer";
+        img.onload = () => { elem.style.backgroundImage = `url("${encodeURI(urls[i])}")`; if (onOk) onOk(); };
+        img.onerror = () => next(i + 1);
+        img.src = urls[i];
+      };
+      next(0);
+    }
+
+    // Reads LSP3Profile on one network: { state: "noUp" | "none" | "bad" | "fetchFail" | "ok" | "hashBad", ... }
+    async function readProfile(net, up) {
+      const provider = new ethers.JsonRpcProvider(net.rpc, undefined, { batchMaxCount: 1 });
+      const id = Number(await provider.send("eth_chainId", []));
+      if (net.chainId && id !== net.chainId) return { state: "rpc", id };
+      if ((await provider.getCode(up)) === "0x") return { state: "noUp", provider, chainId: id };
+      const raw = await new ethers.Contract(up, UP_ABI, provider).getData(LSP3_KEY);
+      const v = decodeVerifiableUri(raw);
+      if (!v) return { state: "none", provider, chainId: id, raw };
+      if (v.bad) return { state: "bad", provider, chainId: id, raw };
+      let bytes;
+      try { bytes = await fetchBytes(v.uri); } catch (e) { return { state: "fetchFail", err: e.message || String(e), provider, chainId: id, raw, ...v }; }
+      const known = v.method.toLowerCase() === KECCAK_UTF8;
+      const verified = known && ethers.keccak256(bytes).toLowerCase() === v.hash.toLowerCase();
+      if (known && !verified) return { state: "hashBad", provider, chainId: id, raw, ...v };
+      let json = null;
+      try { json = JSON.parse(ethers.toUtf8String(bytes)); } catch (e) { return { state: "bad", provider, chainId: id, raw, ...v }; }
+      return { state: "ok", verified, provider, chainId: id, raw, json: json && json.LSP3Profile ? json.LSP3Profile : json, ...v };
+    }
+
+    // ==================== RENDERING ====================
+    function setStatus(id, text, cls) { const el = $(id); el.className = "status " + (cls || ""); el.textContent = text; }
+    function el(tag, cls, text) { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+    function pickImage(list, want) {
+      if (!Array.isArray(list) || !list.length) return null;
+      const sorted = [...list].filter(i => i && typeof i.url === "string").sort((a, b) => Math.abs((a.width || want) - want) - Math.abs((b.width || want) - want));
+      return sorted.length ? sorted[0].url : null;
+    }
+    function renderCard(box, where, p) {
+      box.innerHTML = "";
+      const bg = el("div", "bg"), body = el("div", "body");
+      box.append(bg, body);
+      const av = el("div", "avatar");
+      body.append(av, el("div", "where", where));
+      if (!p || p.state === "noUp") { body.append(el("div", "desc", p && p.lukso ? t("luksoNone") : t("noProfile"))); return; }
+      if (p.state === "none") { body.append(el("div", "desc", t("noProfile"))); return; }
+      if (p.state === "bad") { body.append(el("div", "desc", t("badValue"))); return; }
+      if (p.state === "fetchFail") { body.append(el("div", "desc", t("fetchFail", { err: p.err })), el("div", "meta", t("source", { uri: p.uri }))); return; }
+      if (p.state === "hashBad") { body.append(el("div", "desc line-err", t("hashBad")), el("div", "meta", t("source", { uri: p.uri }))); return; }
+      const j = p.json || {};
+      const bgUrl = pickImage(j.backgroundImage, 800), avUrl = pickImage(j.profileImage, 256);
+      if (bgUrl) setImage(bg, bgUrl);
+      if (avUrl) setImage(av, avUrl);
+      body.append(el("div", "name", typeof j.name === "string" && j.name ? j.name : t("noName")));
+      if (typeof j.description === "string" && j.description) body.append(el("div", "desc", j.description.slice(0, 2000)));
+      if (Array.isArray(j.links) && j.links.length) {
+        const ls = el("div", "links");
+        j.links.slice(0, 20).forEach(l => {
+          if (!l || typeof l.url !== "string" || !/^https?:\/\//i.test(l.url)) return;
+          const a = el("a", "", typeof l.title === "string" && l.title ? l.title : l.url);
+          a.href = l.url; a.target = "_blank"; a.rel = "noopener noreferrer";
+          ls.appendChild(a);
+        });
+        body.append(ls);
+      }
+      if (Array.isArray(j.tags) && j.tags.length) {
+        const ts = el("div", "tags");
+        j.tags.slice(0, 30).forEach(tg => { if (typeof tg === "string") ts.appendChild(el("span", "", tg)); });
+        body.append(ts);
+      }
+      body.append(el("div", "meta " + (p.verified ? "line-ok" : "line-warn"), p.verified ? t("hashOk") : t("hashUnknown")));
+      body.append(el("div", "meta", t("source", { uri: p.uri })));
+    }
+
+    let last = null, readSeq = 0;
+    function render(r) {
+      $("resultPanel").hidden = false;
+      renderCard($("cardNet"), t("where", { net: r.netName }), r.net);
+      renderCard($("cardLukso"), t("whereLukso"), r.lukso);
+      const hasNet = r.net && !["none", "noUp"].includes(r.net.state), hasLukso = r.lukso && !["none", "noUp"].includes(r.lukso.state);
+      if (hasNet && hasLukso && r.net.raw && r.lukso.raw) setStatus("compare", r.net.raw.toLowerCase() === r.lukso.raw.toLowerCase() ? t("same") : t("diff"), r.net.raw.toLowerCase() === r.lukso.raw.toLowerCase() ? "line-ok" : "line-warn");
+      else if (!hasNet && hasLukso) setStatus("compare", t("netEmpty"), "line-dim");
+      else if (hasNet && !hasLukso) setStatus("compare", t("luksoEmptyOnly"), "line-dim");
+      else setStatus("compare", "", "");
+      if (r.ctrl) renderCtrl(r.ctrl);
+      if (r.ctrl || (r.net && r.net.state === "noUp")) renderPub();
+      const a = assets.seq === r.seq ? assets : {};
+      renderAssets($("assetsNet"), t("where", { net: r.netName }), r.netDef, a.net);
+      renderAssets($("assetsLukso"), t("whereLukso"), LUKSO, a.lukso);
+    }
+    // One column of section 5. `a` is undefined while reading, null when there is no UP on that network.
+    function renderAssets(box, where, net, a) {
+      box.innerHTML = "";
+      box.append(el("div", "where", where));
+      if (a === undefined) { box.append(el("div", "line-dim", t("assetsReading"))); return; }
+      if (a === null) { box.append(el("div", "line-dim", t("notDeployed", { net: net.name }))); return; }
+      if (a.failed) { box.append(el("div", "line-err", t("assetsFail", { err: a.failed }))); return; }
+      const cur = net.currency || "";
+      if (a.native !== null) box.append(el("div", "native", t("nativeBal", { amount: ethers.formatEther(a.native), cur })));
+      else box.append(el("div", "line-err", t("nativeFail", { cur, err: a.errors.native })));
+      const row = (r) => {
+        const d = el("div", "asset");
+        const thumb = el("div", "thumb", (r.symbol || r.type || "?").slice(0, 4));
+        d.append(thumb);
+        const info = el("div", "info");
+        d.append(info);
+        showThumb(thumb, r);
+        const head = el("div");
+        head.append(el("span", "kind", r.type));
+        const title = [r.name, r.symbol ? `(${r.symbol})` : ""].filter(Boolean).join(" ") || "?";
+        head.append(document.createTextNode(title));
+        info.append(head);
+        if (r.unreadable) info.append(el("div", "line-warn", t("unreadable")));
+        else if (r.amount !== undefined) info.append(el("div", "", r.amount + (r.symbol ? " " + r.symbol : "")));
+        else {
+          info.append(el("div", "", t("nftCount", { n: r.count })));
+          if (r.ids && r.ids.length) info.append(el("div", "line-dim", t("nftIds", { ids: r.ids.join(", "), more: Number(r.count) > r.ids.length })));
+        }
+        const ad = el("div", "addr");
+        const url = getExplorerUrl(net, "/address/", r.address);
+        if (url) { const l = el("a", "", r.address); l.href = url; l.target = "_blank"; l.rel = "noopener noreferrer"; ad.append(l); } else ad.textContent = r.address;
+        info.append(ad);
+        return d;
+      };
+      const good = a.rows.filter(r => !r.spam), spam = a.rows.filter(r => r.spam);
+      if (!a.rows.length) box.append(el("div", "line-dim", t("assetsNone")));
+      good.forEach(r => box.append(row(r)));
+      if (spam.length) {
+        const det = el("details"); det.append(el("summary", "", t("spamSummary", { n: spam.length })));
+        spam.forEach(r => det.append(row(r)));
+        box.append(det);
+      }
+      const src = [];
+      src.push(a.errors.lsp5 ? [t("srcLsp5Fail", { err: a.errors.lsp5 }), "line-warn"]
+        : [t("srcLsp5", { n: a.lsp5Total, cut: a.lsp5Total > AssetList.MAX_ASSETS, max: AssetList.MAX_ASSETS }), "line-dim"]);
+      const ixName = a.indexer && (a.indexer.kind === "alchemy" ? "Alchemy" : "Blockscout");
+      if (!a.indexer) src.push([t("srcNoIndexer"), "line-dim"]);
+      else if (a.indexer.err) src.push([t("srcIndexerFail", { name: ixName, err: a.indexer.err }), "line-warn"]);
+      else src.push([t("srcIndexer", { name: ixName, n: a.indexer.rows.length }), "line-dim"]);
+      src.forEach(([txt, cls]) => { const m = el("div", "meta " + cls, txt); m.style.cssText = "font-size:11.5px; margin-top:8px;"; box.append(m); });
+    }
+    function renderCtrl(c) {
+      $("ctrlPanel").hidden = false;
+      if (last) renderCaps(last.caps, last.netDef, last.up);
+      if (c.err) { setStatus("ctrlStatus", t("ctrlFail", { err: c.err }), "line-err"); $("ctrlList").innerHTML = ""; return; }
+      setStatus("ctrlStatus", c.hasBackup ? t("ctrlBackupOk") : t("ctrlBackupNo"), c.hasBackup ? "line-ok" : "line-warn");
+      const box = $("ctrlList"); box.innerHTML = "";
+      c.controllers.forEach(x => {
+        const d = el("div", "ctrl");
+        d.append(el("div", "addr", `[${x.index}] ${x.address || "?"}`));
+        const admin = (x.perms & BackupCheck.ADMIN) === BackupCheck.ADMIN;
+        const role = x.role === "entrypoint" ? t("roleEp") : x.role === "urd" ? t("roleUrd") : x.role === "malformed" ? t("roleBad") : admin ? t("roleAdmin") : t("roleLimited");
+        d.append(el("div", "line-dim", `${role} · 0x${x.perms.toString(16)}`));
+        box.appendChild(d);
+      });
+    }
+
+    // Section 5: both networks read in parallel; each column fills in when its read finishes.
+    // Token and collection images. Indexer rows carry a URL; LSP7/LSP8 rows carry the asset's LSP4Metadata
+    // value, resolved here like LSP3 (file downloaded, hash checked when the method is known, a mismatch
+    // shows no image): the collection icon first, else the first image. One resolution per asset per read.
+    const lsp4Images = new Map();
+    function lsp4Image(raw) {
+      if (!lsp4Images.has(raw)) lsp4Images.set(raw, (async () => {
+        const v = decodeVerifiableUri(raw);
+        if (!v || v.bad) return null;
+        const bytes = await fetchBytes(v.uri);
+        if (v.method.toLowerCase() === KECCAK_UTF8 && ethers.keccak256(bytes).toLowerCase() !== v.hash.toLowerCase()) return null;
+        const j = JSON.parse(ethers.toUtf8String(bytes));
+        const m = (j && j.LSP4Metadata) || j || {};
+        return pickImage(m.icon, 64) || (Array.isArray(m.images) && Array.isArray(m.images[0]) ? pickImage(m.images[0], 128) : null);
+      })().catch(() => null));
+      return lsp4Images.get(raw);
+    }
+    function showThumb(thumb, r) {
+      const set = (url) => { if (url) setImage(thumb, url, () => thumb.classList.add("has-img")); };
+      if (r.image) { set(r.image); return; }
+      if (r.lsp4Metadata) lsp4Image(r.lsp4Metadata).then(url => { if (url) { r.image = url; set(url); } });
+    }
+
+    // Results are kept by read (seq), so a column that finishes before the profile is rendered is not lost.
+    let assets = { seq: 0 };
+    function loadAssets(my, net, rn, rl, up) {
+      $("assetPanel").hidden = false;
+      assets = { seq: my };
+      const one = (side, p, key) => {
+        const done = (a) => {
+          if (assets.seq !== my) return;
+          assets[side] = a;
+          if (last && last.seq === my) render(last);
+        };
+        if (p.state === "noUp") { done(null); return; }
+        if (!p.provider) { done({ failed: p.err || "RPC" }); return; }
+        AssetList.list(p.provider, up, key).then(done, (e) => done({ failed: e.message }));
+      };
+      one("net", rn, net.key);
+      one("lukso", rl, LUKSO.key);
+    }
+
+    // ==================== WHAT THE UP CAN DO (section 4) ====================
+    // Read-only, from the UP's ERC725Y data on the chosen network: LSP7/LSP8 recording (URD), ERC-721/1155
+    // reception (LSP17 extension), gas relay (Extension4337, EntryPoint permissions, 4337 signers) and
+    // whether the site relayer and one of its paymasters serve this UP.
+    const NFT_EXT = "0x7F68e74483867058C806218aa05aB5527984C03e";
+    const NFT_EXT_HASH = "0xed365f94b64256c4c81311071c739de4a006d09676dc9e2bd5cd49b346ddb955";
+    const NFT_SELECTORS = [["0x150b7a02", "onERC721Received"], ["0xf23a6e61", "onERC1155Received"], ["0xbc197c81", "onERC1155BatchReceived"]];
+    const EXT_4337 = "0x6D375232863E179Ba1B3348C9087E30d5D5ed4B2";
+    const EXT_4337_HASH = "0x91968b95ee6f8e01a554060b775c13e8df3f0173d87a55a48ed54b8ff02c052d";
+    const VALIDATE_USER_OP_SEL = "0x3a871cdd";
+    const LSP17 = (sel) => "0xcee78b4094da860110960000" + sel.slice(2) + "00".repeat(16);
+    const ERC4337_BIT = 1n << 23n;
+    async function readCaps(provider, up, chainId, ctrl) {
       const upC = new ethers.Contract(up, UP_W_IFACE, provider);
-      try { got = await upC.getData(LSP3_KEY, { blockTag: receipt.blockNumber }); } catch (e) { got = await upC.getData(LSP3_KEY).catch(() => null); }
-      if (got && got.toLowerCase() === value.toLowerCase()) break;
+      const keys = NFT_SELECTORS.map(([sel]) => LSP17(sel)).concat([LSP17(VALIDATE_USER_OP_SEL)]);
+      const vals = await upC.getDataBatch(keys);
+      const addrOf = (v) => (v && ethers.dataLength(v) === 20 ? ethers.getAddress(v) : null);
+      const hashOf = async (a) => { const c = await provider.getCode(a); return c === "0x" ? null : ethers.keccak256(c); };
+      const out = {};
+      // LSP7/LSP8: the URD is read by BackupCheck (key LSP1UniversalReceiverDelegate).
+      out.lsp = !!(ctrl && ctrl.urd && (await provider.getCode(ctrl.urd)) !== "0x");
+      // ERC-721 / ERC-1155
+      const nft = NFT_SELECTORS.map(([, name], i) => ({ name, addr: addrOf(vals[i]) }));
+      const set = nft.filter(x => x.addr);
+      if (!set.length) out.nft = { state: "no" };
+      else if (set.length < nft.length) out.nft = { state: "partial", missing: nft.filter(x => !x.addr).map(x => x.name).join(", ") };
+      else if (set.every(x => x.addr === NFT_EXT) && (await hashOf(NFT_EXT)) === NFT_EXT_HASH) out.nft = { state: "ok" };
+      else out.nft = { state: "other", addr: [...new Set(set.map(x => x.addr))].join(", ") };
+      // Gas relay: the UP side
+      const ext = addrOf(vals[3]);
+      const extOk = ext === EXT_4337 && (await hashOf(EXT_4337)) === EXT_4337_HASH;
+      const ep = ctrl && ctrl.controllers ? ctrl.controllers.find(c => c.role === "entrypoint") : null;
+      const signers = ctrl && ctrl.controllers ? ctrl.controllers.filter(c => c.role === "controller" && (c.perms & ERC4337_BIT)).map(c => c.address) : [];
+      if (!ext && !ep) out.gas = { state: "no" };
+      else if (ep && ep.perms !== 0x500n) out.gas = { state: "epBad", p: "0x" + ep.perms.toString(16) };
+      else if (!extOk || !ep) out.gas = { state: "partial", what: [!extOk ? t("capGasWhatExt") : null, !ep ? t("capGasWhatEp") : null].filter(Boolean).join("; ") };
+      else out.gas = { state: signers.length ? "ok" : "noSigner", signers };
+      // Gas relay: the site's relayer and paymaster (only meaningful once the UP side exists)
+      if (out.gas.state !== "no") {
+        try {
+          const r = await GasRelayClient.check(provider, { chainId, up, signer: null });
+          const why = (r.reasons || []).filter(x => x[0] !== "noSigner").map(x => GasRelayClient.text(x[0], x[1]));
+          out.relay = r.state === "none" ? { state: "none" } : why.length ? { state: "notReady", pm: r.pm, why: why.join("; ") } : { state: "ready", pm: r.pm, sponsor: r.sponsor || null };
+          // Not paid by the site: what the subscription service says (not subscribed, balance used up, waiting)
+          if (out.relay.state !== "ready" && out.gas.state === "ok") { const st = await GasRelayClient.sponsorStatus(chainId, up); out.relay.sub = st && st.subscription ? { status: st.subscription.status, balance: st.balance || "0" } : null; }
+          if (out.relay.state === "ready" && !out.relay.sponsor) {
+            const pm = new ethers.Contract(r.pm, ["function maxCostPerOp() view returns (uint256)"], provider);
+            const ep6 = new ethers.Contract(GasRelayClient.ENTRY_POINT, ["function balanceOf(address) view returns (uint256)"], provider);
+            [out.relay.cap, out.relay.dep] = await Promise.all([pm.maxCostPerOp(), ep6.balanceOf(r.pm)]);
+          }
+        } catch (e) { out.relay = { state: "none" }; }
+      }
+      return out;
     }
-    if (got && got.toLowerCase() === value.toLowerCase()) pubLog(t("pubOk"), "line-ok");
-    else pubLog(t("pubVerifyBad", { what: `LSP3Profile ${got ? got.slice(0, 20) + "…" : "?"}` }), "line-warn");
-    reread = true;
-  } catch (e) {
-    if (e && (e.code === "ACTION_REJECTED" || e.code === 4001 || (e.info && e.info.error && e.info.error.code === 4001))) pubLog(t("pubCancelled"), "line-warn");
-    else pubLog(t("pubError", { err: e.shortMessage || e.message }), "line-err");
-  } finally {
-    pubBusy = false; $("readBtn").disabled = false;
-    // After a confirmed transaction, read everything again: the cards then show the aligned profile.
-    if (reread) $("readBtn").click(); else renderPub();
-  }
-});
-
-$("readBtn").addEventListener("click", async () => {
-  const my = ++readSeq;
-  const net = getNetwork();
-  const raw = $("upAddress").value.trim();
-  if (!net || !net.rpc) { setStatus("status", t("needNet"), "line-err"); return; }
-  if (!ethers.isAddress(raw)) { setStatus("status", t("needAddr"), "line-err"); return; }
-  const up = ethers.getAddress(raw);
-  $("readBtn").disabled = true;
-  setStatus("status", t("reading"), "line-dim");
-  try {
-    const [rn, rl] = await Promise.all([
-      readProfile(net, up).catch(e => ({ state: "fetchFail", err: e.shortMessage || e.message })),
-      readProfile(LUKSO, up).catch(e => ({ state: "fetchFail", err: e.shortMessage || e.message })),
-    ]);
-    if (my !== readSeq) return;
-    if (rn.state === "rpc") { setStatus("status", t("rpcWrong", { id: rn.id, exp: net.chainId }), "line-err"); return; }
-    if (rl.state === "noUp") rl.lukso = true;
-    const netName = net.chainId ? net.name : `${t("customNetName")} (chainId ${rn.chainId})`;
-    const netDef = { ...net, name: netName };
-    loadAssets(my, net, rn, rl, up);
-    if (rn.state === "noUp") { setStatus("status", t("notDeployed", { net: netName }), "line-err"); last = { seq: my, up, netName, netDef, net: rn, lukso: rl }; render(last); $("ctrlPanel").hidden = true; return; }
-    setStatus("status", "", "");
-    let ctrl;
-    try { ctrl = await BackupCheck.read(rn.provider, up); } catch (e) { ctrl = { err: e.shortMessage || e.message }; }
-    if (my !== readSeq) return;
-    last = { seq: my, up, netName, netDef, net: rn, lukso: rl, ctrl, caps: null };
-    render(last);
-    if (!ctrl.err) {
-      let caps;
-      try { caps = await readCaps(rn.provider, up, rn.chainId, ctrl); } catch (e) { caps = { err: e.shortMessage || e.message }; }
-      if (my !== readSeq || !last || last.seq !== my) return;
-      last.caps = caps; renderCaps(caps, netDef, up);
+    function renderCaps(c, netDef, up) {
+      const box = $("capList"); box.innerHTML = "";
+      if (!c) { box.append(el("div", "line-dim", t("capReading"))); return; }
+      if (c.err) { box.append(el("div", "line-err", t("capFail", { err: c.err }))); return; }
+      const cur = netDef.currency && netDef.currency !== "?" ? " " + netDef.currency : "";
+      const q = new URLSearchParams({ up }); if (netDef.key && netDef.key !== "custom") q.set("network", netDef.key);
+      const item = (title, lines, link) => {
+        const d = el("div", "cap"); d.append(el("div", "t", title));
+        lines.forEach(([txt, cls]) => d.append(el("div", cls || "", txt)));
+        if (link) { const a = el("a", "", link[0]); a.href = link[1] + "?" + q.toString(); a.target = "_blank"; a.rel = "noopener"; d.append(a); }
+        box.append(d);
+      };
+      item(t("capLspT"), [[c.lsp ? t("capLspOk") : t("capLspNo"), c.lsp ? "line-ok" : "line-warn"]]);
+      const n = c.nft;
+      item(t("capNftT"), [[n.state === "ok" ? t("capNftOk") : n.state === "other" ? t("capNftOther", n) : n.state === "partial" ? t("capNftPartial", n) : t("capNftNo"),
+      n.state === "ok" ? "line-ok" : n.state === "no" ? "line-err" : "line-warn"]], n.state === "ok" ? null : [t("capNftLink"), "up-nft-receiver.html"]);
+      const g = c.gas, lines = [];
+      if (g.state === "no") lines.push([t("capGasNo"), "line-dim"]);
+      else if (g.state === "epBad") lines.push([t("capGasEpBad", g), "line-err"]);
+      else if (g.state === "partial") lines.push([t("capGasPartial", g), "line-warn"]);
+      else if (g.state === "noSigner") lines.push([t("capGasNoSigner"), "line-warn"]);
+      else lines.push([t("capGasOk", { signers: g.signers.join(", ") }), "line-ok"]);
+      if (c.relay) {
+        const r = c.relay;
+        if (r.state === "ready" && r.sponsor) lines.push([r.sponsor.balance ? t("capGasSub", { bal: r.sponsor.balance, price: r.sponsor.price }) : t("capGasSponsored"), "line-ok"]);
+        else if (r.state === "ready") lines.push([t("capGasReady", { pm: r.pm, cap: ethers.formatEther(r.cap) + cur, dep: ethers.formatEther(r.dep) + cur }), "line-ok"]);
+        else if (r.sub && r.sub.status === "active") lines.push([t("capGasEmpty", r.sub), "line-warn"]);
+        else if (r.sub && r.sub.status === "paid") lines.push([t("capGasPaid"), "line-warn"]);
+        else if (r.sub) lines.push([t("capGasNotSub"), "line-warn"]);
+        else if (r.state === "notReady") lines.push([t("capGasNotReady", r), "line-warn"]);
+        else lines.push([t("capGasNoRelay"), "line-dim"]);
+      }
+      // The UP side to fix: the setup page. Set up: the subscription page (subscribe, balance, top-ups),
+      // except for a UP on the operator's list, which needs nothing.
+      const onList = c.relay && c.relay.state === "ready" && !c.relay.sponsor;
+      item(t("capGasT"), lines, g.state !== "ok" ? [t("capGasLink"), "up-gas-relay.html"] : onList ? null : [t("capSubLink"), "up-subscribe.html"]);
     }
-  } finally {
-    if (my === readSeq) $("readBtn").disabled = false;
-  }
-});
 
-applyI18n();
-</script>
+    // ==================== 6. PUBLISH (align LSP3Profile with LUKSO) ====================
+    // One Key Manager transaction: UP.setData(LSP3Profile, <LUKSO's value>), signed by a controller on
+    // the chosen network. Only LUKSO's value, verified on this read (hash checked), is ever written;
+    // everything is read again right before signing, simulated, and checked after confirmation.
+    const SUPER_SETDATA = 1n << 17n, SETDATA = 1n << 18n;
+    const KM_IFACE = new ethers.Interface(["function execute(bytes) payable returns (bytes)"]);
+    const UP_W_IFACE = new ethers.Interface(["function setData(bytes32,bytes)", "function getData(bytes32) view returns (bytes)", "function getDataBatch(bytes32[]) view returns (bytes[])", "function owner() view returns (address)"]);
+    let pubWallet = null, pubAddr = null, pubBusy = false;
+    const discovered = [];
+    window.addEventListener("eip6963:announceProvider", (e) => discovered.push(e.detail));
+    window.dispatchEvent(new Event("eip6963:requestProvider"));
+
+    function pubLog(msg, cls) { const d = el("div", cls || "", msg); $("pubLog").appendChild(d); }
+    // Can `addr` write LSP3Profile on this UP? { ok, why } or { ctrl: false } / { ctrl: true, ok: false }.
+    async function lsp3Permission(provider, up, addr) {
+      const [perm, keys] = await new ethers.Contract(up, UP_W_IFACE, provider).getDataBatch([BackupCheck.permKey(addr), BackupCheck.dataKeysKey(addr)]);
+      const p = perm && perm !== "0x" ? BigInt(perm) : 0n;
+      if (p === 0n) return { ctrl: false };
+      if (p & SUPER_SETDATA) return { ctrl: true, ok: true, why: t("pubWhySuper") };
+      if (p & SETDATA) {
+        // AllowedERC725YDataKeys: a CompactBytesArray of keys or key prefixes (2-byte length + bytes).
+        const b = keys && keys !== "0x" ? ethers.getBytes(keys) : new Uint8Array();
+        for (let i = 0; i + 2 <= b.length;) {
+          const n = (b[i] << 8) | b[i + 1];
+          const k = ethers.hexlify(b.slice(i + 2, i + 2 + n)).toLowerCase();
+          if (n >= 1 && n <= 32 && LSP3_KEY.startsWith(k)) return { ctrl: true, ok: true, why: t("pubWhyAllowed") };
+          i += 2 + n;
+        }
+      }
+      return { ctrl: true, ok: false };
+    }
+    // The state of section 6 for the current read: what can be done, and with which signer.
+    async function renderPub() {
+      const r = last;
+      const show = !!(r && r.net && r.net.provider && r.net.state !== "noUp" && r.net.chainId !== LUKSO.chainId);
+      $("pubPanel").hidden = !show;
+      if (!show) return;
+      const src = r.lukso;
+      const ready = src && src.state === "ok" && src.verified;
+      const same = ready && r.net.raw && r.net.raw.toLowerCase() === src.raw.toLowerCase();
+      setStatus("pubState", !ready ? t("pubNeedLukso") : same ? t("pubSame") : t("pubReady"), !ready ? "line-warn" : same ? "line-ok" : "line-dim");
+      let can = false;
+      if (!pubAddr) setStatus("pubSigner", t("pubSignerNone"), "line-dim");
+      else {
+        try {
+          const perm = await lsp3Permission(r.net.provider, r.up, pubAddr);
+          if (r !== last) return;
+          if (!perm.ctrl) setStatus("pubSigner", t("pubSignerNot", { addr: pubAddr }), "line-err");
+          else if (!perm.ok) setStatus("pubSigner", t("pubSignerNoPerm", { addr: pubAddr }), "line-err");
+          else { setStatus("pubSigner", t("pubSignerOk", { addr: pubAddr, why: perm.why }), "line-ok"); can = true; }
+        } catch (e) { setStatus("pubSigner", t("pubError", { err: e.shortMessage || e.message }), "line-err"); }
+      }
+      $("pubBtn").disabled = pubBusy || !ready || same || !can;
+      $("pubConnect").disabled = pubBusy;
+    }
+    $("pubConnect").addEventListener("click", async () => {
+      const w = discovered.find(p => !/lukso|universal profile/i.test(p.info.name))?.provider || (window.ethereum && window.ethereum !== window.lukso ? window.ethereum : null);
+      if (!w) { setStatus("pubSigner", t("pubNoWallet"), "line-err"); return; }
+      try {
+        // The wallet's account picker every time, so the signer can be chosen (genesis key or backup).
+        try { await w.request({ method: "wallet_requestPermissions", params: [{ eth_accounts: {} }] }); } catch (e) { if (e && e.code === 4001) throw e; }
+        const accs = await w.request({ method: "eth_requestAccounts" });
+        pubWallet = w; pubAddr = ethers.getAddress(accs[0]);
+        if (typeof w.on === "function" && !w.__idWatched) {
+          w.__idWatched = true;
+          w.on("accountsChanged", (a) => { pubAddr = a && a[0] ? ethers.getAddress(a[0]) : null; renderPub(); });
+        }
+      } catch (e) { setStatus("pubSigner", t("pubRejected"), "line-err"); return; }
+      renderPub();
+    });
+    $("pubBtn").addEventListener("click", async () => {
+      const r = last;
+      if (pubBusy || !r || !pubWallet || !pubAddr) return;
+      pubBusy = true; $("pubBtn").disabled = true; $("pubConnect").disabled = true; $("readBtn").disabled = true;
+      const provider = r.net.provider, up = r.up, value = r.lukso.raw;
+      let reread = false;
+      pubLog(t("pubStart", { time: new Date().toLocaleTimeString(), up, net: r.netName }), "line-dim");
+      try {
+        // Read again: LUKSO's value and this network's must still be the ones shown.
+        const luksoNow = await new ethers.Contract(up, UP_W_IFACE, r.lukso.provider).getData(LSP3_KEY);
+        const netNow = await new ethers.Contract(up, UP_W_IFACE, provider).getData(LSP3_KEY);
+        if (luksoNow.toLowerCase() !== value.toLowerCase() || (netNow || "0x").toLowerCase() !== (r.net.raw || "0x").toLowerCase()) { pubLog(t("pubChanged"), "line-err"); return; }
+        const walletChain = parseInt(await pubWallet.request({ method: "eth_chainId" }), 16);
+        if (walletChain !== r.net.chainId) { pubLog(t("pubWrongChain", { got: walletChain, net: r.netName, exp: r.net.chainId }), "line-err"); return; }
+        const perm = await lsp3Permission(provider, up, pubAddr);
+        if (!perm.ok) { pubLog(perm.ctrl ? t("pubSignerNoPerm", { addr: pubAddr }) : t("pubSignerNot", { addr: pubAddr }), "line-err"); return; }
+        const km = ethers.getAddress(await new ethers.Contract(up, UP_W_IFACE, provider).owner());
+        const data = KM_IFACE.encodeFunctionData("execute", [UP_W_IFACE.encodeFunctionData("setData", [LSP3_KEY, value])]);
+        pubLog(t("pubPlan", { signer: pubAddr, km, net: r.netName, uri: r.lukso.uri }), "line-dim");
+        pubLog(t("pubSimulating"), "line-dim");
+        try { await provider.call({ from: pubAddr, to: km, data }); }
+        catch (e) { pubLog(t("pubSimFail", { err: e.shortMessage || e.reason || e.message }), "line-err"); return; }
+        // The signer pays the gas: check its balance before the wallet opens (a fresh backup key often
+        // holds nothing on this network, and the wallet then shows only a generic fee alert).
+        const cur = r.netDef.currency && r.netDef.currency !== "?" ? r.netDef.currency : "";
+        try {
+          const [gas, fee, bal] = await Promise.all([provider.estimateGas({ from: pubAddr, to: km, data }), provider.getFeeData(), provider.getBalance(pubAddr)]);
+          const price = fee.maxFeePerGas || fee.gasPrice;
+          if (price) {
+            const cost = gas * price;
+            const v = { addr: pubAddr, bal: ethers.formatEther(bal), cost: ethers.formatEther(cost), cur };
+            if (bal < cost) { pubLog(t("pubNoGas", v), "line-err"); return; }
+            pubLog(t("pubGasOk", v), "line-dim");
+          }
+        } catch (e) { /* no estimate: the wallet still shows its own fee */ }
+        pubLog(t("pubSimOk"), "line-ok");
+        const signer = await new ethers.BrowserProvider(pubWallet).getSigner();
+        if (signer.address.toLowerCase() !== pubAddr.toLowerCase()) { pubLog(t("pubSignerChanged", { now: signer.address, checked: pubAddr }), "line-err"); return; }
+        const tx = await signer.sendTransaction({ to: km, data, chainId: r.net.chainId });
+        pubLog(t("pubTx", { hash: tx.hash }), "line-dim");
+        const url = getExplorerUrl(r.netDef, "/tx/", tx.hash);
+        if (url) pubLog(url, "line-dim");
+        pubLog(t("pubWaiting"), "line-dim");
+        const receipt = await waitReceipt(provider, tx.hash, signer.provider);
+        if (!receipt) { pubLog(t("pubNoReceipt"), "line-warn"); return; }
+        if (receipt.status !== 1) { pubLog(t("pubTxFailed"), "line-err"); return; }
+        // Public RPCs are load-balanced: read at the receipt's block, retrying while a node lags behind.
+        let got = null;
+        for (let i = 0; i < 6; i++) {
+          if (i) await new Promise(res => setTimeout(res, 1500));
+          // At the receipt's block; if the RPC refuses a read at a past block, at the latest one.
+          const upC = new ethers.Contract(up, UP_W_IFACE, provider);
+          try { got = await upC.getData(LSP3_KEY, { blockTag: receipt.blockNumber }); } catch (e) { got = await upC.getData(LSP3_KEY).catch(() => null); }
+          if (got && got.toLowerCase() === value.toLowerCase()) break;
+        }
+        if (got && got.toLowerCase() === value.toLowerCase()) pubLog(t("pubOk"), "line-ok");
+        else pubLog(t("pubVerifyBad", { what: `LSP3Profile ${got ? got.slice(0, 20) + "…" : "?"}` }), "line-warn");
+        reread = true;
+      } catch (e) {
+        if (e && (e.code === "ACTION_REJECTED" || e.code === 4001 || (e.info && e.info.error && e.info.error.code === 4001))) pubLog(t("pubCancelled"), "line-warn");
+        else pubLog(t("pubError", { err: e.shortMessage || e.message }), "line-err");
+      } finally {
+        pubBusy = false; $("readBtn").disabled = false;
+        // After a confirmed transaction, read everything again: the cards then show the aligned profile.
+        if (reread) $("readBtn").click(); else renderPub();
+      }
+    });
+
+    $("readBtn").addEventListener("click", async () => {
+      const my = ++readSeq;
+      const net = getNetwork();
+      const raw = $("upAddress").value.trim();
+      if (!net || !net.rpc) { setStatus("status", t("needNet"), "line-err"); return; }
+      if (!ethers.isAddress(raw)) { setStatus("status", t("needAddr"), "line-err"); return; }
+      const up = ethers.getAddress(raw);
+      $("readBtn").disabled = true;
+      setStatus("status", t("reading"), "line-dim");
+      try {
+        const [rn, rl] = await Promise.all([
+          readProfile(net, up).catch(e => ({ state: "fetchFail", err: e.shortMessage || e.message })),
+          readProfile(LUKSO, up).catch(e => ({ state: "fetchFail", err: e.shortMessage || e.message })),
+        ]);
+        if (my !== readSeq) return;
+        if (rn.state === "rpc") { setStatus("status", t("rpcWrong", { id: rn.id, exp: net.chainId }), "line-err"); return; }
+        if (rl.state === "noUp") rl.lukso = true;
+        const netName = net.chainId ? net.name : `${t("customNetName")} (chainId ${rn.chainId})`;
+        const netDef = { ...net, name: netName };
+        loadAssets(my, net, rn, rl, up);
+        if (rn.state === "noUp") { setStatus("status", t("notDeployed", { net: netName }), "line-err"); last = { seq: my, up, netName, netDef, net: rn, lukso: rl }; render(last); $("ctrlPanel").hidden = true; return; }
+        setStatus("status", "", "");
+        let ctrl;
+        try { ctrl = await BackupCheck.read(rn.provider, up); } catch (e) { ctrl = { err: e.shortMessage || e.message }; }
+        if (my !== readSeq) return;
+        last = { seq: my, up, netName, netDef, net: rn, lukso: rl, ctrl, caps: null };
+        render(last);
+        if (!ctrl.err) {
+          let caps;
+          try { caps = await readCaps(rn.provider, up, rn.chainId, ctrl); } catch (e) { caps = { err: e.shortMessage || e.message }; }
+          if (my !== readSeq || !last || last.seq !== my) return;
+          last.caps = caps; renderCaps(caps, netDef, up);
+        }
+      } finally {
+        if (my === readSeq) $("readBtn").disabled = false;
+      }
+    });
+
+    applyI18n();
+  </script>
 </body>
+
 </html>

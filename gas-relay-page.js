@@ -59,11 +59,11 @@ const PERM_KEY = (a) => "0x4b80742de2bf82acb3630000" + a.slice(2).toLowerCase();
 const ARRAY_KEY = "0xdf30dba06db6a30e65354d9a64c609861f089545ca58c6b4dbe31a5f338cb0e3"; // AddressPermissions[]
 const ARRAY_INDEX_KEY = (i) => ARRAY_KEY.slice(0, 34) + ethers.toBeHex(i, 16).slice(2);
 const PERMISSION_BITS = [
-  "CHANGEOWNER","ADDCONTROLLER","EDITPERMISSIONS","ADDEXTENSIONS","CHANGEEXTENSIONS",
-  "ADDUNIVERSALRECEIVERDELEGATE","CHANGEUNIVERSALRECEIVERDELEGATE","REENTRANCY",
-  "SUPER_TRANSFERVALUE","TRANSFERVALUE","SUPER_CALL","CALL","SUPER_STATICCALL","STATICCALL",
-  "SUPER_DELEGATECALL","DELEGATECALL","DEPLOY","SUPER_SETDATA","SETDATA","ENCRYPT","DECRYPT",
-  "SIGN","EXECUTE_RELAY_CALL","ERC4337"
+  "CHANGEOWNER", "ADDCONTROLLER", "EDITPERMISSIONS", "ADDEXTENSIONS", "CHANGEEXTENSIONS",
+  "ADDUNIVERSALRECEIVERDELEGATE", "CHANGEUNIVERSALRECEIVERDELEGATE", "REENTRANCY",
+  "SUPER_TRANSFERVALUE", "TRANSFERVALUE", "SUPER_CALL", "CALL", "SUPER_STATICCALL", "STATICCALL",
+  "SUPER_DELEGATECALL", "DELEGATECALL", "DEPLOY", "SUPER_SETDATA", "SETDATA", "ENCRYPT", "DECRYPT",
+  "SIGN", "EXECUTE_RELAY_CALL", "ERC4337"
 ];
 const P = Object.fromEntries(PERMISSION_BITS.map((n, i) => [n, 1n << BigInt(i)]));
 const permNames = (perms) => PERMISSION_BITS.filter((n) => perms & P[n]).join(", ") || "—";
@@ -90,7 +90,7 @@ async function arbL1Gas(provider, data) {
 const UO_TUPLE = "tuple(address,uint256,bytes,bytes,uint256,uint256,uint256,uint256,uint256,bytes,bytes)";
 
 // ==================== I18N ====================
-let LANG = "it";
+let LANG = "en";
 const I18N = {
   it: {
     pageTitle: "Gas pagato dal paymaster — ChainIntegrate",
@@ -657,7 +657,7 @@ function revertReason(e) {
 async function preVerificationGas(provider, op, maxFee) {
   const probe = { ...op, preVerificationGas: 100000n, signature: "0x" + "ff".repeat(65) };
   const packed = ethers.getBytes(enc([UO_TUPLE], [[probe.sender, probe.nonce, probe.initCode, probe.callData, probe.callGasLimit,
-    probe.verificationGasLimit, probe.preVerificationGas, probe.maxFeePerGas, probe.maxPriorityFeePerGas, probe.paymasterAndData, probe.signature]]));
+  probe.verificationGasLimit, probe.preVerificationGas, probe.maxFeePerGas, probe.maxPriorityFeePerGas, probe.paymasterAndData, probe.signature]]));
   let calldata = 0n;
   for (const b of packed) calldata += b === 0 ? 4n : 16n;
   let pvg = 21000n + 18300n + 4n * BigInt(Math.ceil(packed.length / 32)) + calldata;
@@ -784,7 +784,7 @@ function autoCheckConfig(s) {
   const key = `${s.chainId}|${upRaw.toLowerCase()}|${$("ownerAddress").value.trim().toLowerCase()}`;
   if (key === autoCfg.key && Date.now() - autoCfg.at < 15000) return;
   autoCfg = { key, at: Date.now(), running: true };
-  checkConfig({ auto: true, given: s }).catch(() => {}).finally(() => { autoCfg.running = false; });
+  checkConfig({ auto: true, given: s }).catch(() => { }).finally(() => { autoCfg.running = false; });
 }
 // A check started meanwhile (e.g. by a confirmation or an account switch) makes runCheck return null:
 // retry, so a request is never dropped silently.
@@ -1293,8 +1293,10 @@ $("signOpBtn").addEventListener("click", () => guarded(async () => {
   // EntryPoint's answer through the RPC is only a cross-check (AUDIT 2026-10-02 H-1).
   const hash = GasRelayClient.userOpHash(op, s.chainId);
   if ((await ep.getUserOpHash(op)).toLowerCase() !== hash.toLowerCase()) { log(GasRelayClient.text("hashMismatch"), "line-err"); return; }
-  const text = t("opPlan", { ep: ENTRY_POINT, up: s.upAddr, amount: fmt(amount, s.cur), to: ethers.getAddress(to), nonce: op.nonce.toString(), pm: s.pmAddr, pvg: op.preVerificationGas.toString(),
-    maxCost: fmt(maxCost, s.cur), cap: fmt(s.cap, s.cur), deposit: fmt(s.deposit, s.cur), hash });
+  const text = t("opPlan", {
+    ep: ENTRY_POINT, up: s.upAddr, amount: fmt(amount, s.cur), to: ethers.getAddress(to), nonce: op.nonce.toString(), pm: s.pmAddr, pvg: op.preVerificationGas.toString(),
+    maxCost: fmt(maxCost, s.cur), cap: fmt(s.cap, s.cur), deposit: fmt(s.deposit, s.cur), hash
+  });
   setStatus("opBox", text, "");
   log(text, "line-compare");
   log(t("signAsk"), "line-warn");
@@ -1381,9 +1383,11 @@ async function relaySigned() {
     try { const raw = await s.provider.send("eth_getTransactionReceipt", [hash]); if (raw && raw.l1Fee) l1Fee = BigInt(raw.l1Fee); } catch (e) { /* not available */ }
     const relGas = rc.gasUsed * (rc.gasPrice || rc.effectiveGasPrice || 0n) + l1Fee;
     const relNet = ev ? ev.args.actualGasCost - relGas : null;
-    log(t("result", { success: ev && ev.args.success ? t("resultOk") : t("resultFail"), cost: ev ? fmt(ev.args.actualGasCost, s.cur) : "?",
+    log(t("result", {
+      success: ev && ev.args.success ? t("resultOk") : t("resultFail"), cost: ev ? fmt(ev.args.actualGasCost, s.cur) : "?",
       depBefore: fmt(depBefore, s.cur), depAfter: fmt(depAfter, s.cur), relBefore: fmt(relBefore, s.cur), relAfter: fmt(relAfter, s.cur), relGas: fmt(relGas, s.cur),
-      ctlBefore: fmt(ctlBefore, s.cur), ctlAfter: fmt(ctlAfter, s.cur), recv: fmt(recvAfter - recvBefore, s.cur) }), ev && ev.args.success ? "line-ok" : "line-err");
+      ctlBefore: fmt(ctlBefore, s.cur), ctlAfter: fmt(ctlAfter, s.cur), recv: fmt(recvAfter - recvBefore, s.cur)
+    }), ev && ev.args.success ? "line-ok" : "line-err");
     if (relNet !== null) log(t("relayerNet", { net: (relNet >= 0n ? "+" : "−") + fmt(relNet >= 0n ? relNet : -relNet, s.cur) }), relNet >= 0n ? "line-ok" : "line-warn");
     if (why) log(t("revertReason", { r: revertReason({ data: why }) }), "line-warn");
   } catch (e) { log(t("genericError", { err: revertReason(e) }), "line-err"); }

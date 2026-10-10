@@ -1,582 +1,792 @@
 <!DOCTYPE html>
 <html lang="it">
+
 <head>
-<meta charset="UTF-8">
-<script src="theme.js"></script>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="referrer" content="no-referrer">
-<title data-i18n="pageTitle">UP Deploy — Sola Verifica — ChainIntegrate</title>
-<meta name="description" content="Verifica in sola lettura se la tua LUKSO Universal Profile può essere rideployata correttamente su un'altra rete — nessuna connessione wallet richiesta.">
-<link rel="icon" href="favicon.ico">
-<meta property="og:type" content="website">
-<meta property="og:title" content="UP Deploy — Sola Verifica — ChainIntegrate">
-<meta property="og:description" content="Verifica in sola lettura se la tua LUKSO Universal Profile può essere rideployata correttamente su un'altra rete.">
-<meta property="og:image" content="https://crosschain-lukso.chainintegrate.it/banner.png">
-<meta property="og:url" content="https://crosschain-lukso.chainintegrate.it/up-verify-only.html">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="UP Deploy — Sola Verifica — ChainIntegrate">
-<meta name="twitter:description" content="Verifica in sola lettura se la tua LUKSO Universal Profile può essere rideployata correttamente su un'altra rete.">
-<meta name="twitter:image" content="https://crosschain-lukso.chainintegrate.it/banner.png">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.4/ethers.umd.min.js" integrity="sha384-6Zl0Pc8zjSz8KvmNeXRvUQgY4ryFb+BwDvKCmLYcBME0joAaru491tQgi9B7zsMM" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script src="chains.js"></script>
-<script src="deploy-check.js"></script>
-<style>
-  :root {
-    --bg: #0f1115; --panel: #171a21; --border: #2a2f3a; --field: #10131a; --chip: #2a2f3a; --disabled: #3a3f4b; --raised: #1d2330;
-    --text: #e6e8ec; --text-dim: #9aa1ad;
-    --accent: #5b8cff; --ok: #3fbf6f; --warn: #e0a83c; --err: #e05a5a;
-  }
-  * { box-sizing: border-box; }
-  body { background: var(--bg); color: var(--text); font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
-         max-width: 820px; margin: 0 auto; padding: 32px 20px 80px; }
-  h1 { font-size: 20px; margin-bottom: 4px; }
-  .subtitle { color: var(--text-dim); font-size: 13px; margin-bottom: 28px; }
-  .panel { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 20px; margin-bottom: 20px; }
-  .panel h2 { font-size: 14px; margin: 0 0 14px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.03em; }
-  .note { font-size: 12.5px; color: var(--text-dim); line-height: 1.5; margin-bottom: 12px; }
-  label { display: block; font-size: 13px; color: var(--text-dim); margin: 14px 0 6px; }
-  label:first-child { margin-top: 0; }
-  select, input, textarea { width: 100%; background: var(--field); border: 1px solid var(--border); color: var(--text);
-                  border-radius: 6px; padding: 10px 12px; font-size: 13.5px; font-family: inherit; }
-  textarea { font-family: monospace; font-size: 11.5px; min-height: 90px; resize: vertical; word-break: break-all; }
-  button { width: 100%; background: var(--accent); color: white; border: none; border-radius: 6px;
-           padding: 12px; font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 12px; }
-  button.secondary { background: var(--chip); }
-  .status-box { background: var(--field); border: 1px solid var(--border); border-radius: 6px; padding: 12px;
-                font-family: monospace; font-size: 12.5px; margin-top: 12px; }
-  .status-box .empty { color: var(--text-dim); }
-  .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-family: monospace; }
-  .badge.ok { background: rgba(63,191,111,0.15); color: var(--ok); }
-  .badge.err { background: rgba(224,90,90,0.15); color: var(--err); }
-  #log { font-family: monospace; font-size: 12.5px; white-space: pre-wrap; word-break: break-all; line-height: 1.6; margin-top: 10px; }
-  .line-ok { color: var(--ok); } .line-warn { color: var(--warn); } .line-err { color: var(--err); } .line-dim { color: var(--text-dim); }
-  .brand-row { margin-bottom: 24px; }
-  .brand-logo { display: block; width: 100%; height: auto; border-radius: 10px; }
-  .top-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
-  .lang-btn { width: auto; background: var(--chip); padding: 6px 14px; font-size: 12px; margin-top: 0; flex-shrink: 0; }
-  .site-footer { margin-top: 40px; padding: 18px 20px; background: #f5f6f8; border: 1px solid #e3e5ea; border-radius: 10px; color: #4b4f58; }
-  .footer-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
-  .footer-logo { height: 48px; width: auto; flex-shrink: 0; }
-  .footer-text { font-size: 13px; line-height: 1.6; }
-  .footer-li { display: inline-flex; vertical-align: middle; margin: 0 2px; }
-  .site-footer a { color: #2563eb; text-decoration: none; font-weight: 600; }
-  .site-footer a:hover { text-decoration: underline; }
-</style>
+  <meta charset="UTF-8">
+  <script src="theme.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <title data-i18n="pageTitle">UP Deploy — Sola Verifica — ChainIntegrate</title>
+  <meta name="description"
+    content="Verifica in sola lettura se la tua LUKSO Universal Profile può essere rideployata correttamente su un'altra rete — nessuna connessione wallet richiesta.">
+  <link rel="icon" href="favicon.ico">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="UP Deploy — Sola Verifica — ChainIntegrate">
+  <meta property="og:description"
+    content="Verifica in sola lettura se la tua LUKSO Universal Profile può essere rideployata correttamente su un'altra rete.">
+  <meta property="og:image" content="https://crosschain-lukso.chainintegrate.it/banner.png">
+  <meta property="og:url" content="https://crosschain-lukso.chainintegrate.it/up-verify-only.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="UP Deploy — Sola Verifica — ChainIntegrate">
+  <meta name="twitter:description"
+    content="Verifica in sola lettura se la tua LUKSO Universal Profile può essere rideployata correttamente su un'altra rete.">
+  <meta name="twitter:image" content="https://crosschain-lukso.chainintegrate.it/banner.png">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.4/ethers.umd.min.js"
+    integrity="sha384-6Zl0Pc8zjSz8KvmNeXRvUQgY4ryFb+BwDvKCmLYcBME0joAaru491tQgi9B7zsMM" crossorigin="anonymous"
+    referrerpolicy="no-referrer"></script>
+  <script src="chains.js"></script>
+  <script src="deploy-check.js"></script>
+  <style>
+    :root {
+      --bg: #0f1115;
+      --panel: #171a21;
+      --border: #2a2f3a;
+      --field: #10131a;
+      --chip: #2a2f3a;
+      --disabled: #3a3f4b;
+      --raised: #1d2330;
+      --text: #e6e8ec;
+      --text-dim: #9aa1ad;
+      --accent: #5b8cff;
+      --ok: #3fbf6f;
+      --warn: #e0a83c;
+      --err: #e05a5a;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 32px 20px 80px;
+    }
+
+    h1 {
+      font-size: 20px;
+      margin-bottom: 4px;
+    }
+
+    .subtitle {
+      color: var(--text-dim);
+      font-size: 13px;
+      margin-bottom: 28px;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .panel h2 {
+      font-size: 14px;
+      margin: 0 0 14px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .note {
+      font-size: 12.5px;
+      color: var(--text-dim);
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      color: var(--text-dim);
+      margin: 14px 0 6px;
+    }
+
+    label:first-child {
+      margin-top: 0;
+    }
+
+    select,
+    input,
+    textarea {
+      width: 100%;
+      background: var(--field);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 6px;
+      padding: 10px 12px;
+      font-size: 13.5px;
+      font-family: inherit;
+    }
+
+    textarea {
+      font-family: monospace;
+      font-size: 11.5px;
+      min-height: 90px;
+      resize: vertical;
+      word-break: break-all;
+    }
+
+    button {
+      width: 100%;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 12px;
+    }
+
+    button.secondary {
+      background: var(--chip);
+    }
+
+    .status-box {
+      background: var(--field);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 12px;
+      font-family: monospace;
+      font-size: 12.5px;
+      margin-top: 12px;
+    }
+
+    .status-box .empty {
+      color: var(--text-dim);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-family: monospace;
+    }
+
+    .badge.ok {
+      background: rgba(63, 191, 111, 0.15);
+      color: var(--ok);
+    }
+
+    .badge.err {
+      background: rgba(224, 90, 90, 0.15);
+      color: var(--err);
+    }
+
+    #log {
+      font-family: monospace;
+      font-size: 12.5px;
+      white-space: pre-wrap;
+      word-break: break-all;
+      line-height: 1.6;
+      margin-top: 10px;
+    }
+
+    .line-ok {
+      color: var(--ok);
+    }
+
+    .line-warn {
+      color: var(--warn);
+    }
+
+    .line-err {
+      color: var(--err);
+    }
+
+    .line-dim {
+      color: var(--text-dim);
+    }
+
+    .brand-row {
+      margin-bottom: 24px;
+    }
+
+    .brand-logo {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 10px;
+    }
+
+    .top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .lang-btn {
+      width: auto;
+      background: var(--chip);
+      padding: 6px 14px;
+      font-size: 12px;
+      margin-top: 0;
+      flex-shrink: 0;
+    }
+
+    .site-footer {
+      margin-top: 40px;
+      padding: 18px 20px;
+      background: #f5f6f8;
+      border: 1px solid #e3e5ea;
+      border-radius: 10px;
+      color: #4b4f58;
+    }
+
+    .footer-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .footer-logo {
+      height: 48px;
+      width: auto;
+      flex-shrink: 0;
+    }
+
+    .footer-text {
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .footer-li {
+      display: inline-flex;
+      vertical-align: middle;
+      margin: 0 2px;
+    }
+
+    .site-footer a {
+      color: #2563eb;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .site-footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
 </head>
+
 <body>
 
-<div class="brand-row">
-  <img src="banner.png" alt="ChainIntegrate" class="brand-logo" onerror="this.style.display='none'">
-</div>
-
-<div class="top-row">
-  <div>
-    <h1 data-i18n="h1">UP Deploy — Sola Verifica</h1>
-    <div class="subtitle" data-i18n="subtitle">Controlla, senza firmare né spendere nulla, se una Universal Profile risulta correttamente deployata su una rete a partire dalla sua calldata originale. Solo lettura — nessuna firma richiesta.</div>
+  <div class="brand-row">
+    <img src="banner.png" alt="ChainIntegrate" class="brand-logo" onerror="this.style.display='none'">
   </div>
-  <button class="lang-btn" id="langToggle" data-i18n="langToggleBtn">English</button>
-</div>
 
-<div class="panel">
-  <h2 data-i18n="panel0Title">0 · Come funziona questa pagina</h2>
-  <div class="note" data-i18n-html="panel0Note"></div>
-</div>
-
-<div class="panel">
-  <h2 data-i18n="panel1Title">1 · Dati</h2>
-  <button id="connectUp" class="secondary" data-i18n="connectUpBtn">Connetti la tua Universal Profile</button>
-  <div class="status-box" id="upStatus"><span class="empty" data-i18n="notConnected">Non connesso.</span></div>
-  <div class="note" style="margin-top:10px;" data-i18n="connectUpNote">
-    Serve solo per compilare comodamente il campo sotto con il tuo indirizzo — nessuna firma o transazione viene fatta a questo punto. Puoi anche inserire qualsiasi indirizzo a mano, senza connettere nulla.
+  <div class="top-row">
+    <div>
+      <h1 data-i18n="h1">UP Deploy — Sola Verifica</h1>
+      <div class="subtitle" data-i18n="subtitle">Controlla, senza firmare né spendere nulla, se una Universal Profile
+        risulta correttamente deployata su una rete a partire dalla sua calldata originale. Solo lettura — nessuna firma
+        richiesta.</div>
+    </div>
+    <button class="lang-btn" id="langToggle" data-i18n="langToggleBtn">English</button>
   </div>
-  <label data-i18n="expectedAddressLabel">Indirizzo UP atteso</label>
-  <input type="text" id="expectedAddress" placeholder="0x...">
-  <label data-i18n="calldataLabel">Calldata di deploy originale (0x6a66a753...)</label>
-  <textarea id="calldataInput" placeholder="0x6a66a753..."></textarea>
-  <button id="fetchCalldataBtn" class="secondary" data-i18n="fetchCalldataBtn">Recupera la calldata da LUKSO</button>
-  <div class="note" id="fetchStatus" style="margin-top:8px;"></div>
-</div>
 
-<div class="panel">
-  <h2 data-i18n="panel2Title">2 · Rete da controllare</h2>
-  <input type="text" id="networkFilter" data-i18n-placeholder="networkFilterPlaceholder" placeholder="Filtra per nome...">
-  <select id="network" style="margin-top:8px;"></select>
-  <div id="customRpcWrap" style="display:none;">
-    <label data-i18n="customRpcLabel">RPC URL custom</label>
-    <input type="text" id="customRpc" placeholder="https://...">
+  <div class="panel">
+    <h2 data-i18n="panel0Title">0 · Come funziona questa pagina</h2>
+    <div class="note" data-i18n-html="panel0Note"></div>
   </div>
-</div>
 
-<div class="panel">
-  <h2 data-i18n="panel3Title">3 · Verifica</h2>
-  <button id="verifyBtn" data-i18n="verifyBtn">Verifica deploy</button>
-  <div id="log" class="line-dim"><span data-i18n="logInitial">In attesa dei dati sopra.</span></div>
-</div>
-
-<div class="site-footer">
-  <div class="footer-row">
-    <img src="logo.png" alt="ChainIntegrate" class="footer-logo" onerror="this.style.display='none'">
-    <div class="footer-text" data-i18n-html="footerHtml"></div>
+  <div class="panel">
+    <h2 data-i18n="panel1Title">1 · Dati</h2>
+    <button id="connectUp" class="secondary" data-i18n="connectUpBtn">Connetti la tua Universal Profile</button>
+    <div class="status-box" id="upStatus"><span class="empty" data-i18n="notConnected">Non connesso.</span></div>
+    <div class="note" style="margin-top:10px;" data-i18n="connectUpNote">
+      Serve solo per compilare comodamente il campo sotto con il tuo indirizzo — nessuna firma o transazione viene fatta
+      a questo punto. Puoi anche inserire qualsiasi indirizzo a mano, senza connettere nulla.
+    </div>
+    <label data-i18n="expectedAddressLabel">Indirizzo UP atteso</label>
+    <input type="text" id="expectedAddress" placeholder="0x...">
+    <label data-i18n="calldataLabel">Calldata di deploy originale (0x6a66a753...)</label>
+    <textarea id="calldataInput" placeholder="0x6a66a753..."></textarea>
+    <button id="fetchCalldataBtn" class="secondary" data-i18n="fetchCalldataBtn">Recupera la calldata da LUKSO</button>
+    <div class="note" id="fetchStatus" style="margin-top:8px;"></div>
   </div>
-</div>
 
-<script>
-const $ = (id) => document.getElementById(id);
-// Every value that did not originate in this file (user input, wallet responses, RPC or
-// library error messages) must be escaped before being interpolated into innerHTML.
-const escapeHtml = (v) => String(v).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  <div class="panel">
+    <h2 data-i18n="panel2Title">2 · Rete da controllare</h2>
+    <input type="text" id="networkFilter" data-i18n-placeholder="networkFilterPlaceholder"
+      placeholder="Filtra per nome...">
+    <select id="network" style="margin-top:8px;"></select>
+    <div id="customRpcWrap" style="display:none;">
+      <label data-i18n="customRpcLabel">RPC URL custom</label>
+      <input type="text" id="customRpc" placeholder="https://...">
+    </div>
+  </div>
 
-// ==================== I18N ====================
-let LANG = "it";
+  <div class="panel">
+    <h2 data-i18n="panel3Title">3 · Verifica</h2>
+    <button id="verifyBtn" data-i18n="verifyBtn">Verifica deploy</button>
+    <div id="log" class="line-dim"><span data-i18n="logInitial">In attesa dei dati sopra.</span></div>
+  </div>
 
-const I18N = {
-  it: {
-    pageTitle: "UP Deploy — Sola Verifica — ChainIntegrate",
-    h1: "UP Deploy — Sola Verifica",
-    subtitle: "Controlla, senza firmare né spendere nulla, se una Universal Profile risulta correttamente deployata su una rete a partire dalla sua calldata originale. Solo lettura — nessuna firma richiesta.",
-    langToggleBtn: "English",
-    customNetName: "Rete custom",
+  <div class="site-footer">
+    <div class="footer-row">
+      <img src="logo.png" alt="ChainIntegrate" class="footer-logo" onerror="this.style.display='none'">
+      <div class="footer-text" data-i18n-html="footerHtml"></div>
+    </div>
+  </div>
 
-    panel0Title: "0 · Come funziona questa pagina",
-    panel0Note: "Questa pagina non firma né invia mai nessuna transazione: interroga solo un RPC pubblico in lettura per dirti se, a partire da una certa calldata, esiste già un deploy valido su una data rete. Connettere la tua Universal Profile qui sotto è <b>facoltativo</b> — serve solo a comodità, per compilare automaticamente il campo \"Indirizzo UP atteso\" con il tuo indirizzo, invece di doverlo copiare a mano da un explorer o dall'estensione. Puoi anche lasciarlo vuoto, o inserire qualsiasi altro indirizzo, per controllare il deploy di un profilo diverso dal tuo.",
+  <script>
+    const $ = (id) => document.getElementById(id);
+    // Every value that did not originate in this file (user input, wallet responses, RPC or
+    // library error messages) must be escaped before being interpolated into innerHTML.
+    const escapeHtml = (v) => String(v).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
-    panel1Title: "1 · Dati",
-    connectUpBtn: "Connetti la tua Universal Profile",
-    notConnected: "Non connesso.",
-    connectUpNote: "Serve solo per compilare comodamente il campo sotto con il tuo indirizzo — nessuna firma o transazione viene fatta a questo punto. Puoi anche inserire qualsiasi indirizzo a mano, senza connettere nulla.",
-    expectedAddressLabel: "Indirizzo UP atteso",
-    calldataLabel: "Calldata di deploy originale (0x6a66a753...)",
-    fetchCalldataBtn: "Recupera la calldata da LUKSO",
-    fetchNeedAddress: "Inserisci prima un indirizzo UP valido.",
-    fetchRunning: "Cerco la transazione di creazione della UP sull'explorer di LUKSO...",
-    fetchOk: "✅ Calldata recuperata dall'explorer di LUKSO e verificata: produce esattamente l'indirizzo della UP.",
-    fetchNoCreationTx: "l'explorer non indica una transazione di creazione per questo indirizzo",
-    fetchNotFound: "nella transazione di creazione non c'è una chiamata deployERC1167Proxies alla factory LSP23",
-    fetchNoMatch: "nessuna calldata trovata produce l'indirizzo di questa UP",
-    fetchFailed: (v) => `Recupero automatico non riuscito: ${v.err}. Puoi copiare la calldata a mano (guida, passo 2).`,
+    // ==================== I18N ====================
+    let LANG = "en";
 
-    panel2Title: "2 · Rete da controllare",
-    networkFilterPlaceholder: "Filtra per nome...",
-    customRpcLabel: "RPC URL custom",
+    const I18N = {
+      it: {
+        pageTitle: "UP Deploy — Sola Verifica — ChainIntegrate",
+        h1: "UP Deploy — Sola Verifica",
+        subtitle: "Controlla, senza firmare né spendere nulla, se una Universal Profile risulta correttamente deployata su una rete a partire dalla sua calldata originale. Solo lettura — nessuna firma richiesta.",
+        langToggleBtn: "English",
+        customNetName: "Rete custom",
 
-    panel3Title: "3 · Verifica",
-    verifyBtn: "Verifica deploy",
-    logInitial: "In attesa dei dati sopra.",
+        panel0Title: "0 · Come funziona questa pagina",
+        panel0Note: "Questa pagina non firma né invia mai nessuna transazione: interroga solo un RPC pubblico in lettura per dirti se, a partire da una certa calldata, esiste già un deploy valido su una data rete. Connettere la tua Universal Profile qui sotto è <b>facoltativo</b> — serve solo a comodità, per compilare automaticamente il campo \"Indirizzo UP atteso\" con il tuo indirizzo, invece di doverlo copiare a mano da un explorer o dall'estensione. Puoi anche lasciarlo vuoto, o inserire qualsiasi altro indirizzo, per controllare il deploy di un profilo diverso dal tuo.",
 
-    extNotFound: "Estensione Universal Profile non trovata in questo browser",
-    connectedBadge: "Connesso",
-    connectionRejected: "Connessione rifiutata o fallita",
+        panel1Title: "1 · Dati",
+        connectUpBtn: "Connetti la tua Universal Profile",
+        notConnected: "Non connesso.",
+        connectUpNote: "Serve solo per compilare comodamente il campo sotto con il tuo indirizzo — nessuna firma o transazione viene fatta a questo punto. Puoi anche inserire qualsiasi indirizzo a mano, senza connettere nulla.",
+        expectedAddressLabel: "Indirizzo UP atteso",
+        calldataLabel: "Calldata di deploy originale (0x6a66a753...)",
+        fetchCalldataBtn: "Recupera la calldata da LUKSO",
+        fetchNeedAddress: "Inserisci prima un indirizzo UP valido.",
+        fetchRunning: "Cerco la transazione di creazione della UP sull'explorer di LUKSO...",
+        fetchOk: "✅ Calldata recuperata dall'explorer di LUKSO e verificata: produce esattamente l'indirizzo della UP.",
+        fetchNoCreationTx: "l'explorer non indica una transazione di creazione per questo indirizzo",
+        fetchNotFound: "nella transazione di creazione non c'è una chiamata deployERC1167Proxies alla factory LSP23",
+        fetchNoMatch: "nessuna calldata trovata produce l'indirizzo di questa UP",
+        fetchFailed: (v) => `Recupero automatico non riuscito: ${v.err}. Puoi copiare la calldata a mano (guida, passo 2).`,
 
-    pasteCalldataErr: "Incolla la calldata.",
-    missingRpcErr: "Manca l'RPC della rete.",
-    predictedUpLog: (v) => `UP predetta: ${v.addr}`,
-    predictedKmLog: (v) => `Key Manager predetto: ${v.addr}`,
-    mismatchExpectedErr: (v) => `❌ La calldata NON produce l'indirizzo atteso (${v.addr}).`,
-    matchExpectedOk: "✅ La calldata produce esattamente l'indirizzo atteso.",
-    queryingLog: (v) => `Interrogo ${v.net}...`,
-    deployVerifiedOk: (v) => `✅✅✅ DEPLOY VERIFICATO su ${v.net}.`,
-    initNotCanonicalErr: (v) => `❌ BLOCCANTE — la calldata produce l'indirizzo giusto, ma inizializza il profilo in modo diverso da quello standard di LUKSO: ${v.what}. L'indirizzo della UP non dipende da questi dati, quindi nascerebbe un profilo diverso da quello che ti aspetti. Usa la calldata originale, presa dall'explorer di LUKSO.`,
-    initWhat_primaryInit: "la UP non è inizializzata con il modulo post-deploy come proprietario",
-    initWhat_secondaryInit: "il Key Manager riceve parametri di inizializzazione",
-    initWhat_addPrimary: "il Key Manager non riceve l'indirizzo della UP",
-    initWhat_extra: "parametri extra per il Key Manager",
-    fundingWarn: (v) => `⚠️ La calldata chiede di inviare ${v.amount} ${v.cur} insieme al deploy, come fondi iniziali della UP o del Key Manager. Li paga il tuo wallet, nella valuta di questa rete. Di solito questo importo è 0.`,
-    linkOk: "✅ Collegamento verificato: la UP appartiene al suo Key Manager, e il Key Manager controlla questa UP.",
-    linkBad: (v) => `❌ ATTENZIONE — il collegamento non è quello atteso: la UP appartiene a ${v.owner} (atteso il Key Manager ${v.km}) e il Key Manager controlla ${v.target} (attesa la UP ${v.up}). Non è il profilo che ti aspetti: non usarlo.`,
-    upLine: (v) => `UP:          ${v.addr}`,
-    kmLine: (v) => `Key Manager: ${v.addr}`,
-    noMatchingDeployErr: (v) => `❌ Non risulta un deploy corrispondente su ${v.net}.`,
-    upDetail: (v) => `UP: ${v.detail}.`,
-    kmDetail: (v) => `Key Manager: ${v.detail}.`,
-    noContractAtAddr: "nessun contratto a questo indirizzo",
-    diffBytecode: "bytecode diverso dall'atteso",
-    checkingInfraLog: "Controllo che i contratti di infrastruttura usati dalla calldata (factory LSP23 e post-deployment module) esistano su questa rete...",
-    infraOkLog: (v) => `✅ ${v.label} presente su questa rete (${v.addr}).`,
-    infraMissingWarn: (v) => `⚠️ ${v.label} (${v.addr}) non esiste su questa rete: finché manca, un deploy qui non può funzionare (non creerebbe nulla, oppure creerebbe una UP senza controller). Se LUKSO l'ha pubblicato tramite la Nick's factory, puoi pubblicarlo tu con il link qui sotto.`,
-    checkingImplLog: "Controllo che le implementazioni referenziate dalla calldata abbiano bytecode su questa rete...",
-    bothImplOk: (v) => `✅ Entrambe le implementazioni (LSP0 ${v.primary}, Key Manager ${v.secondary}) hanno bytecode su questa rete: un eventuale deploy sarebbe funzionante, non solo "presente".`,
-    implWarnHeader: "⚠️ ATTENZIONE — anche se il proxy risultasse deployato all'indirizzo atteso, sarebbe \"muto\" su questa rete:",
-    primaryImplMissing: (v) => `  l'implementazione LSP0 (${v.addr}) non ha bytecode qui — le chiamate alla UP andrebbero a vuoto senza errore.`,
-    secondaryImplMissing: (v) => `  l'implementazione Key Manager (${v.addr}) non ha bytecode qui — le chiamate al Key Manager andrebbero a vuoto senza errore.`,
-    genericErrorLog: (v) => `Errore: ${v.err}`,
-    publishLinkText: "→ Pubblica i contratti mancanti su questa rete",
-    wrongSelectorErr: (v) => `la calldata non inizia con il selettore di deployERC1167Proxies (0x6a66a753), ma con ${v.sel}`,
-    rpcChainMismatchErr: (v) => `❌ L'RPC risponde con chainId ${v.rpcChainId}, ma la rete selezionata è ${v.netName} (chainId ${v.chainId}): il risultato non sarebbe affidabile.`,
-    invalidExpectedErr: "❌ L'indirizzo UP atteso non è un indirizzo valido.",
+        panel2Title: "2 · Rete da controllare",
+        networkFilterPlaceholder: "Filtra per nome...",
+        customRpcLabel: "RPC URL custom",
 
-    footerHtml: `Servizi di consulenza in integrazione dati &amp; blockchain a cura di ChainIntegrate <a href="https://www.linkedin.com/company/chainintegrate" target="_blank" rel="noopener" aria-label="LinkedIn" class="footer-li"><svg width="20" height="20" viewBox="0 0 20 20"><rect width="20" height="20" rx="4" fill="#0A66C2"/><text x="10" y="15" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#fff">in</text></svg></a> · <a href="https://t.me/Simone_1977_2" target="_blank" rel="noopener">Assistenza via Telegram</a> · <a href="https://github.com/ChainIntegrate/Cross_Chain" target="_blank" rel="noopener">Codice sorgente su GitHub</a>`,
-  },
-  en: {
-    pageTitle: "UP Deploy — Verify Only — ChainIntegrate",
-    h1: "UP Deploy — Verify Only",
-    subtitle: "Check, without signing or spending anything, whether a Universal Profile is correctly deployed on a network, starting from its original calldata. Read-only — no signature required.",
-    langToggleBtn: "Italiano",
-    customNetName: "Custom network",
+        panel3Title: "3 · Verifica",
+        verifyBtn: "Verifica deploy",
+        logInitial: "In attesa dei dati sopra.",
 
-    panel0Title: "0 · How this page works",
-    panel0Note: "This page never signs or sends any transaction: it only queries a public RPC in read mode, to tell you whether, starting from a given calldata, a valid deploy already exists on a given network. Connecting your Universal Profile below is <b>optional</b> — it's purely a convenience, to auto-fill the \"Expected UP address\" field with your address instead of copying it by hand from an explorer or the extension. You can also leave it blank, or enter any other address, to check the deploy of a profile that isn't yours.",
+        extNotFound: "Estensione Universal Profile non trovata in questo browser",
+        connectedBadge: "Connesso",
+        connectionRejected: "Connessione rifiutata o fallita",
 
-    panel1Title: "1 · Data",
-    connectUpBtn: "Connect your Universal Profile",
-    notConnected: "Not connected.",
-    connectUpNote: "Only used to conveniently fill the field below with your address — no signature or transaction happens at this point. You can also enter any address manually, without connecting anything.",
-    expectedAddressLabel: "Expected UP address",
-    calldataLabel: "Original deploy calldata (0x6a66a753...)",
-    fetchCalldataBtn: "Fetch the calldata from LUKSO",
-    fetchNeedAddress: "Enter a valid UP address first.",
-    fetchRunning: "Looking up the UP's creation transaction on the LUKSO explorer...",
-    fetchOk: "✅ Calldata fetched from the LUKSO explorer and verified: it produces exactly the UP address.",
-    fetchNoCreationTx: "the explorer reports no creation transaction for this address",
-    fetchNotFound: "the creation transaction contains no deployERC1167Proxies call to the LSP23 factory",
-    fetchNoMatch: "none of the calldata found produces this UP's address",
-    fetchFailed: (v) => `Automatic fetch failed: ${v.err}. You can copy the calldata by hand (guide, step 2).`,
+        pasteCalldataErr: "Incolla la calldata.",
+        missingRpcErr: "Manca l'RPC della rete.",
+        predictedUpLog: (v) => `UP predetta: ${v.addr}`,
+        predictedKmLog: (v) => `Key Manager predetto: ${v.addr}`,
+        mismatchExpectedErr: (v) => `❌ La calldata NON produce l'indirizzo atteso (${v.addr}).`,
+        matchExpectedOk: "✅ La calldata produce esattamente l'indirizzo atteso.",
+        queryingLog: (v) => `Interrogo ${v.net}...`,
+        deployVerifiedOk: (v) => `✅✅✅ DEPLOY VERIFICATO su ${v.net}.`,
+        initNotCanonicalErr: (v) => `❌ BLOCCANTE — la calldata produce l'indirizzo giusto, ma inizializza il profilo in modo diverso da quello standard di LUKSO: ${v.what}. L'indirizzo della UP non dipende da questi dati, quindi nascerebbe un profilo diverso da quello che ti aspetti. Usa la calldata originale, presa dall'explorer di LUKSO.`,
+        initWhat_primaryInit: "la UP non è inizializzata con il modulo post-deploy come proprietario",
+        initWhat_secondaryInit: "il Key Manager riceve parametri di inizializzazione",
+        initWhat_addPrimary: "il Key Manager non riceve l'indirizzo della UP",
+        initWhat_extra: "parametri extra per il Key Manager",
+        fundingWarn: (v) => `⚠️ La calldata chiede di inviare ${v.amount} ${v.cur} insieme al deploy, come fondi iniziali della UP o del Key Manager. Li paga il tuo wallet, nella valuta di questa rete. Di solito questo importo è 0.`,
+        linkOk: "✅ Collegamento verificato: la UP appartiene al suo Key Manager, e il Key Manager controlla questa UP.",
+        linkBad: (v) => `❌ ATTENZIONE — il collegamento non è quello atteso: la UP appartiene a ${v.owner} (atteso il Key Manager ${v.km}) e il Key Manager controlla ${v.target} (attesa la UP ${v.up}). Non è il profilo che ti aspetti: non usarlo.`,
+        upLine: (v) => `UP:          ${v.addr}`,
+        kmLine: (v) => `Key Manager: ${v.addr}`,
+        noMatchingDeployErr: (v) => `❌ Non risulta un deploy corrispondente su ${v.net}.`,
+        upDetail: (v) => `UP: ${v.detail}.`,
+        kmDetail: (v) => `Key Manager: ${v.detail}.`,
+        noContractAtAddr: "nessun contratto a questo indirizzo",
+        diffBytecode: "bytecode diverso dall'atteso",
+        checkingInfraLog: "Controllo che i contratti di infrastruttura usati dalla calldata (factory LSP23 e post-deployment module) esistano su questa rete...",
+        infraOkLog: (v) => `✅ ${v.label} presente su questa rete (${v.addr}).`,
+        infraMissingWarn: (v) => `⚠️ ${v.label} (${v.addr}) non esiste su questa rete: finché manca, un deploy qui non può funzionare (non creerebbe nulla, oppure creerebbe una UP senza controller). Se LUKSO l'ha pubblicato tramite la Nick's factory, puoi pubblicarlo tu con il link qui sotto.`,
+        checkingImplLog: "Controllo che le implementazioni referenziate dalla calldata abbiano bytecode su questa rete...",
+        bothImplOk: (v) => `✅ Entrambe le implementazioni (LSP0 ${v.primary}, Key Manager ${v.secondary}) hanno bytecode su questa rete: un eventuale deploy sarebbe funzionante, non solo "presente".`,
+        implWarnHeader: "⚠️ ATTENZIONE — anche se il proxy risultasse deployato all'indirizzo atteso, sarebbe \"muto\" su questa rete:",
+        primaryImplMissing: (v) => `  l'implementazione LSP0 (${v.addr}) non ha bytecode qui — le chiamate alla UP andrebbero a vuoto senza errore.`,
+        secondaryImplMissing: (v) => `  l'implementazione Key Manager (${v.addr}) non ha bytecode qui — le chiamate al Key Manager andrebbero a vuoto senza errore.`,
+        genericErrorLog: (v) => `Errore: ${v.err}`,
+        publishLinkText: "→ Pubblica i contratti mancanti su questa rete",
+        wrongSelectorErr: (v) => `la calldata non inizia con il selettore di deployERC1167Proxies (0x6a66a753), ma con ${v.sel}`,
+        rpcChainMismatchErr: (v) => `❌ L'RPC risponde con chainId ${v.rpcChainId}, ma la rete selezionata è ${v.netName} (chainId ${v.chainId}): il risultato non sarebbe affidabile.`,
+        invalidExpectedErr: "❌ L'indirizzo UP atteso non è un indirizzo valido.",
 
-    panel2Title: "2 · Network to check",
-    networkFilterPlaceholder: "Filter by name...",
-    customRpcLabel: "Custom RPC URL",
+        footerHtml: `Servizi di consulenza in integrazione dati &amp; blockchain a cura di ChainIntegrate <a href="https://www.linkedin.com/company/chainintegrate" target="_blank" rel="noopener" aria-label="LinkedIn" class="footer-li"><svg width="20" height="20" viewBox="0 0 20 20"><rect width="20" height="20" rx="4" fill="#0A66C2"/><text x="10" y="15" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#fff">in</text></svg></a> · <a href="https://t.me/Simone_1977_2" target="_blank" rel="noopener">Assistenza via Telegram</a> · <a href="https://github.com/ChainIntegrate/Cross_Chain" target="_blank" rel="noopener">Codice sorgente su GitHub</a>`,
+      },
+      en: {
+        pageTitle: "UP Deploy — Verify Only — ChainIntegrate",
+        h1: "UP Deploy — Verify Only",
+        subtitle: "Check, without signing or spending anything, whether a Universal Profile is correctly deployed on a network, starting from its original calldata. Read-only — no signature required.",
+        langToggleBtn: "Italiano",
+        customNetName: "Custom network",
 
-    panel3Title: "3 · Verify",
-    verifyBtn: "Verify deploy",
-    logInitial: "Waiting for the data above.",
+        panel0Title: "0 · How this page works",
+        panel0Note: "This page never signs or sends any transaction: it only queries a public RPC in read mode, to tell you whether, starting from a given calldata, a valid deploy already exists on a given network. Connecting your Universal Profile below is <b>optional</b> — it's purely a convenience, to auto-fill the \"Expected UP address\" field with your address instead of copying it by hand from an explorer or the extension. You can also leave it blank, or enter any other address, to check the deploy of a profile that isn't yours.",
 
-    extNotFound: "Universal Profile extension not found in this browser",
-    connectedBadge: "Connected",
-    connectionRejected: "Connection rejected or failed",
+        panel1Title: "1 · Data",
+        connectUpBtn: "Connect your Universal Profile",
+        notConnected: "Not connected.",
+        connectUpNote: "Only used to conveniently fill the field below with your address — no signature or transaction happens at this point. You can also enter any address manually, without connecting anything.",
+        expectedAddressLabel: "Expected UP address",
+        calldataLabel: "Original deploy calldata (0x6a66a753...)",
+        fetchCalldataBtn: "Fetch the calldata from LUKSO",
+        fetchNeedAddress: "Enter a valid UP address first.",
+        fetchRunning: "Looking up the UP's creation transaction on the LUKSO explorer...",
+        fetchOk: "✅ Calldata fetched from the LUKSO explorer and verified: it produces exactly the UP address.",
+        fetchNoCreationTx: "the explorer reports no creation transaction for this address",
+        fetchNotFound: "the creation transaction contains no deployERC1167Proxies call to the LSP23 factory",
+        fetchNoMatch: "none of the calldata found produces this UP's address",
+        fetchFailed: (v) => `Automatic fetch failed: ${v.err}. You can copy the calldata by hand (guide, step 2).`,
 
-    pasteCalldataErr: "Paste the calldata.",
-    missingRpcErr: "Missing network RPC.",
-    predictedUpLog: (v) => `Predicted UP: ${v.addr}`,
-    predictedKmLog: (v) => `Predicted Key Manager: ${v.addr}`,
-    mismatchExpectedErr: (v) => `❌ The calldata does NOT produce the expected address (${v.addr}).`,
-    matchExpectedOk: "✅ The calldata produces exactly the expected address.",
-    queryingLog: (v) => `Querying ${v.net}...`,
-    deployVerifiedOk: (v) => `✅✅✅ DEPLOY VERIFIED on ${v.net}.`,
-    initNotCanonicalErr: (v) => `❌ BLOCKING — the calldata gives the right address, but it initializes the profile differently from LUKSO's standard: ${v.what}. The UP's address does not depend on these data, so a different profile from the one you expect would be created. Use the original calldata, taken from the LUKSO explorer.`,
-    initWhat_primaryInit: "the UP is not initialized with the post-deployment module as owner",
-    initWhat_secondaryInit: "the Key Manager gets initialization parameters",
-    initWhat_addPrimary: "the Key Manager does not get the UP's address",
-    initWhat_extra: "extra parameters for the Key Manager",
-    fundingWarn: (v) => `⚠️ The calldata asks to send ${v.amount} ${v.cur} with the deploy, as initial funds of the UP or the Key Manager. Your wallet pays them, in this network's currency. Usually this amount is 0.`,
-    linkOk: "✅ Link verified: the UP is owned by its Key Manager, and the Key Manager controls this UP.",
-    linkBad: (v) => `❌ WARNING — the link is not the expected one: the UP is owned by ${v.owner} (expected the Key Manager ${v.km}) and the Key Manager controls ${v.target} (expected the UP ${v.up}). This is not the profile you expect: do not use it.`,
-    upLine: (v) => `UP:          ${v.addr}`,
-    kmLine: (v) => `Key Manager: ${v.addr}`,
-    noMatchingDeployErr: (v) => `❌ No matching deploy found on ${v.net}.`,
-    upDetail: (v) => `UP: ${v.detail}.`,
-    kmDetail: (v) => `Key Manager: ${v.detail}.`,
-    noContractAtAddr: "no contract at this address",
-    diffBytecode: "bytecode differs from expected",
-    checkingInfraLog: "Checking that the infrastructure contracts used by the calldata (LSP23 factory and post-deployment module) exist on this network...",
-    infraOkLog: (v) => `✅ ${v.label} present on this network (${v.addr}).`,
-    infraMissingWarn: (v) => `⚠️ ${v.label} (${v.addr}) does not exist on this network: while it is missing, a deploy here cannot work (it would create nothing, or a UP with no controller). If LUKSO published it through Nick's factory, you can publish it yourself with the link below.`,
-    checkingImplLog: "Checking that the implementations referenced by the calldata have bytecode on this network...",
-    bothImplOk: (v) => `✅ Both implementations (LSP0 ${v.primary}, Key Manager ${v.secondary}) have bytecode on this network: a deploy would actually work, not just be "present".`,
-    implWarnHeader: "⚠️ WARNING — even if the proxy turned out to be deployed at the expected address, it would be \"mute\" on this network:",
-    primaryImplMissing: (v) => `  the LSP0 implementation (${v.addr}) has no bytecode here — calls to the UP would silently do nothing.`,
-    secondaryImplMissing: (v) => `  the Key Manager implementation (${v.addr}) has no bytecode here — calls to the Key Manager would silently do nothing.`,
-    genericErrorLog: (v) => `Error: ${v.err}`,
-    publishLinkText: "→ Publish the missing contracts on this network",
-    wrongSelectorErr: (v) => `the calldata does not start with the deployERC1167Proxies selector (0x6a66a753), but with ${v.sel}`,
-    rpcChainMismatchErr: (v) => `❌ The RPC answers with chainId ${v.rpcChainId}, but the selected network is ${v.netName} (chainId ${v.chainId}): the result would not be reliable.`,
-    invalidExpectedErr: "❌ The expected UP address is not a valid address.",
+        panel2Title: "2 · Network to check",
+        networkFilterPlaceholder: "Filter by name...",
+        customRpcLabel: "Custom RPC URL",
 
-    footerHtml: `Data &amp; blockchain integration consulting by ChainIntegrate <a href="https://www.linkedin.com/company/chainintegrate" target="_blank" rel="noopener" aria-label="LinkedIn" class="footer-li"><svg width="20" height="20" viewBox="0 0 20 20"><rect width="20" height="20" rx="4" fill="#0A66C2"/><text x="10" y="15" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#fff">in</text></svg></a> · <a href="https://t.me/Simone_1977_2" target="_blank" rel="noopener">Support via Telegram</a> · <a href="https://github.com/ChainIntegrate/Cross_Chain" target="_blank" rel="noopener">Source code on GitHub</a>`,
-  },
-};
+        panel3Title: "3 · Verify",
+        verifyBtn: "Verify deploy",
+        logInitial: "Waiting for the data above.",
 
-function t(key, vars) {
-  const entry = I18N[LANG][key];
-  return typeof entry === "function" ? entry(vars || {}) : entry;
-}
+        extNotFound: "Universal Profile extension not found in this browser",
+        connectedBadge: "Connected",
+        connectionRejected: "Connection rejected or failed",
 
-function applyI18n() {
-  document.documentElement.lang = LANG;
-  document.querySelectorAll("[data-i18n]").forEach(el => { el.textContent = t(el.getAttribute("data-i18n")); });
-  document.querySelectorAll("[data-i18n-html]").forEach(el => { el.innerHTML = t(el.getAttribute("data-i18n-html")); });
-  document.querySelectorAll("[data-i18n-placeholder]").forEach(el => { el.placeholder = t(el.getAttribute("data-i18n-placeholder")); });
-}
-applyI18n();
-$("langToggle").addEventListener("click", () => {
-  LANG = LANG === "it" ? "en" : "it";
-  applyI18n();
-});
+        pasteCalldataErr: "Paste the calldata.",
+        missingRpcErr: "Missing network RPC.",
+        predictedUpLog: (v) => `Predicted UP: ${v.addr}`,
+        predictedKmLog: (v) => `Predicted Key Manager: ${v.addr}`,
+        mismatchExpectedErr: (v) => `❌ The calldata does NOT produce the expected address (${v.addr}).`,
+        matchExpectedOk: "✅ The calldata produces exactly the expected address.",
+        queryingLog: (v) => `Querying ${v.net}...`,
+        deployVerifiedOk: (v) => `✅✅✅ DEPLOY VERIFIED on ${v.net}.`,
+        initNotCanonicalErr: (v) => `❌ BLOCKING — the calldata gives the right address, but it initializes the profile differently from LUKSO's standard: ${v.what}. The UP's address does not depend on these data, so a different profile from the one you expect would be created. Use the original calldata, taken from the LUKSO explorer.`,
+        initWhat_primaryInit: "the UP is not initialized with the post-deployment module as owner",
+        initWhat_secondaryInit: "the Key Manager gets initialization parameters",
+        initWhat_addPrimary: "the Key Manager does not get the UP's address",
+        initWhat_extra: "extra parameters for the Key Manager",
+        fundingWarn: (v) => `⚠️ The calldata asks to send ${v.amount} ${v.cur} with the deploy, as initial funds of the UP or the Key Manager. Your wallet pays them, in this network's currency. Usually this amount is 0.`,
+        linkOk: "✅ Link verified: the UP is owned by its Key Manager, and the Key Manager controls this UP.",
+        linkBad: (v) => `❌ WARNING — the link is not the expected one: the UP is owned by ${v.owner} (expected the Key Manager ${v.km}) and the Key Manager controls ${v.target} (expected the UP ${v.up}). This is not the profile you expect: do not use it.`,
+        upLine: (v) => `UP:          ${v.addr}`,
+        kmLine: (v) => `Key Manager: ${v.addr}`,
+        noMatchingDeployErr: (v) => `❌ No matching deploy found on ${v.net}.`,
+        upDetail: (v) => `UP: ${v.detail}.`,
+        kmDetail: (v) => `Key Manager: ${v.detail}.`,
+        noContractAtAddr: "no contract at this address",
+        diffBytecode: "bytecode differs from expected",
+        checkingInfraLog: "Checking that the infrastructure contracts used by the calldata (LSP23 factory and post-deployment module) exist on this network...",
+        infraOkLog: (v) => `✅ ${v.label} present on this network (${v.addr}).`,
+        infraMissingWarn: (v) => `⚠️ ${v.label} (${v.addr}) does not exist on this network: while it is missing, a deploy here cannot work (it would create nothing, or a UP with no controller). If LUKSO published it through Nick's factory, you can publish it yourself with the link below.`,
+        checkingImplLog: "Checking that the implementations referenced by the calldata have bytecode on this network...",
+        bothImplOk: (v) => `✅ Both implementations (LSP0 ${v.primary}, Key Manager ${v.secondary}) have bytecode on this network: a deploy would actually work, not just be "present".`,
+        implWarnHeader: "⚠️ WARNING — even if the proxy turned out to be deployed at the expected address, it would be \"mute\" on this network:",
+        primaryImplMissing: (v) => `  the LSP0 implementation (${v.addr}) has no bytecode here — calls to the UP would silently do nothing.`,
+        secondaryImplMissing: (v) => `  the Key Manager implementation (${v.addr}) has no bytecode here — calls to the Key Manager would silently do nothing.`,
+        genericErrorLog: (v) => `Error: ${v.err}`,
+        publishLinkText: "→ Publish the missing contracts on this network",
+        wrongSelectorErr: (v) => `the calldata does not start with the deployERC1167Proxies selector (0x6a66a753), but with ${v.sel}`,
+        rpcChainMismatchErr: (v) => `❌ The RPC answers with chainId ${v.rpcChainId}, but the selected network is ${v.netName} (chainId ${v.chainId}): the result would not be reliable.`,
+        invalidExpectedErr: "❌ The expected UP address is not a valid address.",
 
-// ==================== APP ====================
+        footerHtml: `Data &amp; blockchain integration consulting by ChainIntegrate <a href="https://www.linkedin.com/company/chainintegrate" target="_blank" rel="noopener" aria-label="LinkedIn" class="footer-li"><svg width="20" height="20" viewBox="0 0 20 20"><rect width="20" height="20" rx="4" fill="#0A66C2"/><text x="10" y="15" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#fff">in</text></svg></a> · <a href="https://t.me/Simone_1977_2" target="_blank" rel="noopener">Support via Telegram</a> · <a href="https://github.com/ChainIntegrate/Cross_Chain" target="_blank" rel="noopener">Source code on GitHub</a>`,
+      },
+    };
 
-const FACTORY_ADDRESS = "0x2300000A84D25dF63081feAa37ba6b62C4c89a30";
-const DEPLOY_SELECTOR = "0x6a66a753"; // deployERC1167Proxies(...) on LSP23LinkedContractsFactory
-
-
-// Link to the publish page, pre-filled with the missing implementations and the network.
-function showPublishLink(net, impls) {
-  const params = new URLSearchParams({ impl: impls.join(",") });
-  if (net.key && net.key !== "custom") params.set("network", net.key);
-  const box = document.createElement("div");
-  box.style.cssText = "margin-top:10px; padding:12px 14px; border:1px solid var(--warn); border-radius:8px; background:rgba(224,168,60,0.1);";
-  const a = document.createElement("a");
-  a.href = "up-publish-implementation.html?" + params.toString();
-  a.target = "_blank";
-  a.rel = "noopener";
-  a.style.cssText = "color: var(--warn); font-weight: 700; text-decoration: none;";
-  a.textContent = t("publishLinkText");
-  box.appendChild(a);
-  $("log").appendChild(box);
-}
-
-function log(msg, cls) {
-  const l = document.createElement("div");
-  if (cls) l.className = cls;
-  l.textContent = msg;
-  $("log").appendChild(l);
-}
-
-// --- Connessione facoltativa alla propria UP, solo per comodità di compilazione ---
-$("connectUp").addEventListener("click", async () => {
-  if (!window.lukso) {
-    $("upStatus").innerHTML = `<span class="badge err">${t("extNotFound")}</span>`;
-    return;
-  }
-  try {
-    const accounts = await window.lukso.request({ method: "eth_requestAccounts" });
-    const upAddress = accounts[0];
-    $("expectedAddress").value = ethers.getAddress(upAddress);
-    $("upStatus").innerHTML = `<span class="badge ok">${t("connectedBadge")}</span> ${escapeHtml(upAddress)}`;
-    if (!$("calldataInput").value.trim()) autoFetchCalldata();
-  } catch (e) {
-    $("upStatus").innerHTML = `<span class="badge err">${t("connectionRejected")}</span>`;
-  }
-});
-
-const networkSelectEl = $("network");
-function renderNetworkOptions(filter) {
-  const f = (filter || "").toLowerCase();
-  networkSelectEl.innerHTML = "";
-  CHAINS.filter(c => c.name.toLowerCase().includes(f)).forEach(c => {
-    const opt = document.createElement("option");
-    opt.value = c.key;
-    opt.textContent = c.name;
-    networkSelectEl.appendChild(opt);
-  });
-}
-renderNetworkOptions("");
-$("networkFilter").addEventListener("input", (e) => {
-  renderNetworkOptions(e.target.value);
-  // Filtering can silently change the selected option: propagate it like a user selection.
-  networkSelectEl.dispatchEvent(new Event("change"));
-});
-networkSelectEl.addEventListener("change", () => {
-  $("customRpcWrap").style.display = networkSelectEl.value === "custom" ? "block" : "none";
-});
-function getNetwork() {
-  const key = networkSelectEl.value;
-  if (key === "custom") return { name: t("customNetName"), rpc: $("customRpc").value.trim() };
-  return CHAINS.find(c => c.key === key);
-}
-
-function minimalProxyInitcode(impl) {
-  return "0x3d602d80600a3d3981f3363d3d373d3d3d363d73" + impl.slice(2).toLowerCase() + "5af43d82803e903d91602b57fd5bf3";
-}
-// Runtime code EIP-1167 reale (senza il preambolo di 10 byte del constructor) — è quello
-// che getCode() restituisce davvero on-chain, a differenza dell'init code sopra.
-function minimalProxyRuntimeCode(impl) {
-  return "0x363d3d373d3d3d363d73" + impl.slice(2).toLowerCase() + "5af43d82803e903d91602b57fd5bf3";
-}
-// LSP23: the secondary proxy is cloned from the implementation named in the calldata,
-// with salt keccak256(abi.encodePacked(primaryAddress)).
-function computeKeyManagerAddress(primaryAddress, secondaryImpl) {
-  const salt = ethers.keccak256(primaryAddress);
-  const initcodeHash = ethers.keccak256(minimalProxyInitcode(secondaryImpl));
-  return ethers.getCreate2Address(FACTORY_ADDRESS, salt, initcodeHash);
-}
-
-function decodeCalldata(calldataHex) {
-  const coder = ethers.AbiCoder.defaultAbiCoder();
-  let data = calldataHex.trim();
-  if (!data.startsWith("0x")) data = "0x" + data;
-  if (!ethers.isHexString(data)) throw new Error("not a hex string");
-  const selector = data.slice(0, 10).toLowerCase();
-  if (selector !== DEPLOY_SELECTOR) throw new Error(t("wrongSelectorErr", { sel: selector }));
-  const body = "0x" + data.slice(10);
-  const outerTypes = ["tuple(bytes32,uint256,address,bytes)", "tuple(uint256,address,bytes,bool,bytes)", "address", "bytes"];
-  const [primaryT, secondaryT, postDeploymentModule, postDeploymentModuleCalldata] = coder.decode(outerTypes, body);
-  const primary = { salt: primaryT[0], fundingAmount: primaryT[1], impl: primaryT[2], initCalldata: primaryT[3] };
-  const secondary = { fundingAmount: secondaryT[0], impl: secondaryT[1], initCalldata: secondaryT[2], addPrimaryContractAddress: secondaryT[3], extraInitParams: secondaryT[4] };
-  const generatedSaltEncoded = coder.encode(
-    ["bytes32", "address", "bytes", "bool", "bytes", "address", "bytes"],
-    [primary.salt, secondary.impl, secondary.initCalldata, secondary.addPrimaryContractAddress, secondary.extraInitParams, postDeploymentModule, postDeploymentModuleCalldata]
-  );
-  const generatedSalt = ethers.keccak256(generatedSaltEncoded);
-  const initcodeHash = ethers.keccak256(minimalProxyInitcode(primary.impl));
-  const predictedPrimary = ethers.getCreate2Address(FACTORY_ADDRESS, generatedSalt, initcodeHash);
-  const predictedSecondary = computeKeyManagerAddress(predictedPrimary, secondary.impl);
-  return { primary, secondary, postDeploymentModule, predictedPrimary, predictedSecondary };
-}
-
-// ==================== Calldata from the LUKSO explorer ====================
-// Finds the UP's creation transaction on the LUKSO explorer and extracts the LSP23
-// deployERC1167Proxies calldata: from the transaction input when it was sent straight to the
-// factory, otherwise from its raw trace (profiles created through a relayer or another contract).
-// The result is untrusted: it is used only if it predicts exactly the UP address.
-const LUKSO_EXPLORER_API = "https://explorer.execution.mainnet.lukso.network/api/v2/";
-const LSP23_FACTORY = "0x2300000a84d25df63081feaa37ba6b62c4c89a30";
-async function explorerGet(path) {
-  const res = await fetch(LUKSO_EXPLORER_API + path, { referrerPolicy: "no-referrer" });
-  if (!res.ok) throw new Error(`explorer HTTP ${res.status}`);
-  return res.json();
-}
-const isDeployCall = (to, input) =>
-  typeof input === "string" && input.toLowerCase().startsWith("0x6a66a753") && String(to || "").toLowerCase() === LSP23_FACTORY;
-async function fetchDeployCalldatas(upAddress) {
-  const addr = await explorerGet("addresses/" + upAddress);
-  const txHash = addr.creation_transaction_hash || addr.creation_tx_hash;
-  if (!txHash) throw new Error(t("fetchNoCreationTx"));
-  const tx = await explorerGet("transactions/" + txHash);
-  const input = tx.raw_input || tx.input;
-  if (isDeployCall(tx.to && tx.to.hash, input)) return [input];
-  const trace = await explorerGet("transactions/" + txHash + "/raw-trace");
-  const found = (Array.isArray(trace) ? trace : [])
-    .map(c => c.action || c)
-    .filter(a => isDeployCall(a.to, a.input))
-    .map(a => a.input);
-  if (!found.length) throw new Error(t("fetchNotFound"));
-  return found;
-}
-function setFetchStatus(text, cls) {
-  const el = $("fetchStatus");
-  el.className = "note " + (cls || "");
-  el.textContent = text;
-}
-
-async function autoFetchCalldata() {
-  const raw = $("expectedAddress").value.trim();
-  if (!ethers.isAddress(raw)) { setFetchStatus(t("fetchNeedAddress"), "line-err"); return; }
-  const up = ethers.getAddress(raw);
-  setFetchStatus(t("fetchRunning"), "line-dim");
-  try {
-    const candidates = await fetchDeployCalldatas(up);
-    const match = candidates.find(c => { try { return decodeCalldata(c).predictedPrimary.toLowerCase() === up.toLowerCase(); } catch (e) { return false; } });
-    if (!match) throw new Error(t("fetchNoMatch"));
-    $("calldataInput").value = match;
-    setFetchStatus(t("fetchOk"), "line-ok");
-  } catch (e) {
-    setFetchStatus(t("fetchFailed", { err: e.message }), "line-err");
-  }
-}
-$("fetchCalldataBtn").addEventListener("click", autoFetchCalldata);
-
-$("verifyBtn").addEventListener("click", async () => {
-  $("log").innerHTML = "";
-  const calldataRaw = $("calldataInput").value.trim();
-  const expected = $("expectedAddress").value.trim();
-  const net = getNetwork();
-
-  if (!calldataRaw) { log(t("pasteCalldataErr"), "line-err"); return; }
-  if (!net || !net.rpc) { log(t("missingRpcErr"), "line-err"); return; }
-
-  try {
-    const d = decodeCalldata(calldataRaw);
-    log(t("predictedUpLog", { addr: d.predictedPrimary }), "line-dim");
-    log(t("predictedKmLog", { addr: d.predictedSecondary }), "line-dim");
-    // The address does not cover the UP's initialization nor the funding (AUDIT M-4).
-    const initBad = DeployCheck.initProblems(d);
-    if (initBad.length) { log(t("initNotCanonicalErr", { what: initBad.map(k => t("initWhat_" + k)).join("; ") }), "line-err"); return; }
-    const fund = DeployCheck.funding(d);
-    if (fund > 0n) log(t("fundingWarn", { amount: ethers.formatEther(fund), cur: net.currency && net.currency !== "?" ? net.currency : "" }), "line-warn");
-
-    if (expected && !ethers.isAddress(expected)) {
-      log(t("invalidExpectedErr"), "line-err");
-      return;
+    function t(key, vars) {
+      const entry = I18N[LANG][key];
+      return typeof entry === "function" ? entry(vars || {}) : entry;
     }
-    if (expected) {
-      if (d.predictedPrimary.toLowerCase() !== expected.toLowerCase()) {
-        log(t("mismatchExpectedErr", { addr: expected }), "line-err");
+
+    function applyI18n() {
+      document.documentElement.lang = LANG;
+      document.querySelectorAll("[data-i18n]").forEach(el => { el.textContent = t(el.getAttribute("data-i18n")); });
+      document.querySelectorAll("[data-i18n-html]").forEach(el => { el.innerHTML = t(el.getAttribute("data-i18n-html")); });
+      document.querySelectorAll("[data-i18n-placeholder]").forEach(el => { el.placeholder = t(el.getAttribute("data-i18n-placeholder")); });
+    }
+    applyI18n();
+    $("langToggle").addEventListener("click", () => {
+      LANG = LANG === "it" ? "en" : "it";
+      applyI18n();
+    });
+
+    // ==================== APP ====================
+
+    const FACTORY_ADDRESS = "0x2300000A84D25dF63081feAa37ba6b62C4c89a30";
+    const DEPLOY_SELECTOR = "0x6a66a753"; // deployERC1167Proxies(...) on LSP23LinkedContractsFactory
+
+
+    // Link to the publish page, pre-filled with the missing implementations and the network.
+    function showPublishLink(net, impls) {
+      const params = new URLSearchParams({ impl: impls.join(",") });
+      if (net.key && net.key !== "custom") params.set("network", net.key);
+      const box = document.createElement("div");
+      box.style.cssText = "margin-top:10px; padding:12px 14px; border:1px solid var(--warn); border-radius:8px; background:rgba(224,168,60,0.1);";
+      const a = document.createElement("a");
+      a.href = "up-publish-implementation.html?" + params.toString();
+      a.target = "_blank";
+      a.rel = "noopener";
+      a.style.cssText = "color: var(--warn); font-weight: 700; text-decoration: none;";
+      a.textContent = t("publishLinkText");
+      box.appendChild(a);
+      $("log").appendChild(box);
+    }
+
+    function log(msg, cls) {
+      const l = document.createElement("div");
+      if (cls) l.className = cls;
+      l.textContent = msg;
+      $("log").appendChild(l);
+    }
+
+    // --- Connessione facoltativa alla propria UP, solo per comodità di compilazione ---
+    $("connectUp").addEventListener("click", async () => {
+      if (!window.lukso) {
+        $("upStatus").innerHTML = `<span class="badge err">${t("extNotFound")}</span>`;
         return;
       }
-      log(t("matchExpectedOk"), "line-ok");
-    }
-
-    const provider = new ethers.JsonRpcProvider(net.rpc, undefined, { batchMaxCount: 1 });
-    const rpcChainId = Number(await provider.send("eth_chainId", []));
-    if (net.chainId && rpcChainId !== net.chainId) {
-      log(t("rpcChainMismatchErr", { rpcChainId, netName: net.name, chainId: net.chainId }), "line-err");
-      return;
-    }
-    // A custom RPC has no name in the chain list: label it with the chainId the RPC reports.
-    if (!net.chainId) net.name = `${t("customNetName")} (chainId ${rpcChainId})`;
-
-    async function getCodeStable(address, attempts, delayMs) {
-      let last = "0x";
-      for (let i = 0; i < attempts; i++) {
-        last = (await provider.getCode(address)).toLowerCase();
-        if (last !== "0x") return last;
-        if (i < attempts - 1) await new Promise(r => setTimeout(r, delayMs));
+      try {
+        const accounts = await window.lukso.request({ method: "eth_requestAccounts" });
+        const upAddress = accounts[0];
+        $("expectedAddress").value = ethers.getAddress(upAddress);
+        $("upStatus").innerHTML = `<span class="badge ok">${t("connectedBadge")}</span> ${escapeHtml(upAddress)}`;
+        if (!$("calldataInput").value.trim()) autoFetchCalldata();
+      } catch (e) {
+        $("upStatus").innerHTML = `<span class="badge err">${t("connectionRejected")}</span>`;
       }
-      return last;
+    });
+
+    const networkSelectEl = $("network");
+    function renderNetworkOptions(filter) {
+      const f = (filter || "").toLowerCase();
+      networkSelectEl.innerHTML = "";
+      CHAINS.filter(c => c.name.toLowerCase().includes(f)).forEach(c => {
+        const opt = document.createElement("option");
+        opt.value = c.key;
+        opt.textContent = c.name;
+        networkSelectEl.appendChild(opt);
+      });
+    }
+    renderNetworkOptions("");
+    $("networkFilter").addEventListener("input", (e) => {
+      renderNetworkOptions(e.target.value);
+      // Filtering can silently change the selected option: propagate it like a user selection.
+      networkSelectEl.dispatchEvent(new Event("change"));
+    });
+    networkSelectEl.addEventListener("change", () => {
+      $("customRpcWrap").style.display = networkSelectEl.value === "custom" ? "block" : "none";
+    });
+    function getNetwork() {
+      const key = networkSelectEl.value;
+      if (key === "custom") return { name: t("customNetName"), rpc: $("customRpc").value.trim() };
+      return CHAINS.find(c => c.key === key);
     }
 
-    log(t("queryingLog", { net: net.name }), "line-dim");
-    const actualPrimaryCode = await getCodeStable(d.predictedPrimary, 4, 2000);
-    const actualSecondaryCode = await getCodeStable(d.predictedSecondary, 4, 2000);
-
-    const expectedPrimaryCode = minimalProxyRuntimeCode(d.primary.impl).toLowerCase();
-    const expectedSecondaryCode = minimalProxyRuntimeCode(d.secondary.impl).toLowerCase();
-
-    const primaryOk = actualPrimaryCode === expectedPrimaryCode;
-    const secondaryOk = actualSecondaryCode === expectedSecondaryCode;
-
-    const lk = primaryOk && secondaryOk ? await DeployCheck.link(provider, d.predictedPrimary, d.predictedSecondary) : null;
-    if (lk && !lk.ok) {
-      log(t("linkBad", { owner: lk.owner || "?", target: lk.target || "?", km: d.predictedSecondary, up: d.predictedPrimary }), "line-err");
-    } else if (primaryOk && secondaryOk) {
-      log(t("deployVerifiedOk", { net: net.name }), "line-ok");
-      log(t("linkOk"), "line-ok");
-      log(t("upLine", { addr: d.predictedPrimary }), "line-ok");
-      log(t("kmLine", { addr: d.predictedSecondary }), "line-ok");
-    } else {
-      log(t("noMatchingDeployErr", { net: net.name }), "line-err");
-      if (!primaryOk) log(t("upDetail", { detail: actualPrimaryCode === "0x" ? t("noContractAtAddr") : t("diffBytecode") }), "line-err");
-      if (!secondaryOk) log(t("kmDetail", { detail: actualSecondaryCode === "0x" ? t("noContractAtAddr") : t("diffBytecode") }), "line-err");
+    function minimalProxyInitcode(impl) {
+      return "0x3d602d80600a3d3981f3363d3d373d3d3d363d73" + impl.slice(2).toLowerCase() + "5af43d82803e903d91602b57fd5bf3";
+    }
+    // Runtime code EIP-1167 reale (senza il preambolo di 10 byte del constructor) — è quello
+    // che getCode() restituisce davvero on-chain, a differenza dell'init code sopra.
+    function minimalProxyRuntimeCode(impl) {
+      return "0x363d3d373d3d3d363d73" + impl.slice(2).toLowerCase() + "5af43d82803e903d91602b57fd5bf3";
+    }
+    // LSP23: the secondary proxy is cloned from the implementation named in the calldata,
+    // with salt keccak256(abi.encodePacked(primaryAddress)).
+    function computeKeyManagerAddress(primaryAddress, secondaryImpl) {
+      const salt = ethers.keccak256(primaryAddress);
+      const initcodeHash = ethers.keccak256(minimalProxyInitcode(secondaryImpl));
+      return ethers.getCreate2Address(FACTORY_ADDRESS, salt, initcodeHash);
     }
 
-    // Controllo aggiuntivo: l'indirizzo del proxy predetto (o già deployato) non dice nulla
-    // sul fatto che l'implementazione a cui punta (LSP0 e Key Manager) abbia davvero bytecode
-    // su questa rete. Se manca, il profilo è — o sarebbe — "muto": ogni delegatecall verso
-    // un indirizzo senza codice ritorna successo senza fare nulla, quindi nessun errore visibile
-    // a deploy avvenuto. Vale la pena segnalarlo sempre, non solo quando il proxy è già presente.
-    // Infrastructure used by a deploy: without the LSP23 factory nothing is created, and without the
-    // post-deployment module the UP would be created with no controller.
-    log(t("checkingInfraLog"), "line-dim");
-    const missingInfra = [];
-    const infra = [["LSP23LinkedContractsFactory", FACTORY_ADDRESS]];
-    if (BigInt(d.postDeploymentModule) !== 0n) infra.push(["Post-deployment module", d.postDeploymentModule]);
-    for (const [label, addr] of infra) {
-      if ((await provider.getCode(addr)) === "0x") {
-        log(t("infraMissingWarn", { label, addr }), "line-warn");
-        missingInfra.push(addr);
-      } else {
-        log(t("infraOkLog", { label, addr }), "line-ok");
+    function decodeCalldata(calldataHex) {
+      const coder = ethers.AbiCoder.defaultAbiCoder();
+      let data = calldataHex.trim();
+      if (!data.startsWith("0x")) data = "0x" + data;
+      if (!ethers.isHexString(data)) throw new Error("not a hex string");
+      const selector = data.slice(0, 10).toLowerCase();
+      if (selector !== DEPLOY_SELECTOR) throw new Error(t("wrongSelectorErr", { sel: selector }));
+      const body = "0x" + data.slice(10);
+      const outerTypes = ["tuple(bytes32,uint256,address,bytes)", "tuple(uint256,address,bytes,bool,bytes)", "address", "bytes"];
+      const [primaryT, secondaryT, postDeploymentModule, postDeploymentModuleCalldata] = coder.decode(outerTypes, body);
+      const primary = { salt: primaryT[0], fundingAmount: primaryT[1], impl: primaryT[2], initCalldata: primaryT[3] };
+      const secondary = { fundingAmount: secondaryT[0], impl: secondaryT[1], initCalldata: secondaryT[2], addPrimaryContractAddress: secondaryT[3], extraInitParams: secondaryT[4] };
+      const generatedSaltEncoded = coder.encode(
+        ["bytes32", "address", "bytes", "bool", "bytes", "address", "bytes"],
+        [primary.salt, secondary.impl, secondary.initCalldata, secondary.addPrimaryContractAddress, secondary.extraInitParams, postDeploymentModule, postDeploymentModuleCalldata]
+      );
+      const generatedSalt = ethers.keccak256(generatedSaltEncoded);
+      const initcodeHash = ethers.keccak256(minimalProxyInitcode(primary.impl));
+      const predictedPrimary = ethers.getCreate2Address(FACTORY_ADDRESS, generatedSalt, initcodeHash);
+      const predictedSecondary = computeKeyManagerAddress(predictedPrimary, secondary.impl);
+      return { primary, secondary, postDeploymentModule, predictedPrimary, predictedSecondary };
+    }
+
+    // ==================== Calldata from the LUKSO explorer ====================
+    // Finds the UP's creation transaction on the LUKSO explorer and extracts the LSP23
+    // deployERC1167Proxies calldata: from the transaction input when it was sent straight to the
+    // factory, otherwise from its raw trace (profiles created through a relayer or another contract).
+    // The result is untrusted: it is used only if it predicts exactly the UP address.
+    const LUKSO_EXPLORER_API = "https://explorer.execution.mainnet.lukso.network/api/v2/";
+    const LSP23_FACTORY = "0x2300000a84d25df63081feaa37ba6b62c4c89a30";
+    async function explorerGet(path) {
+      const res = await fetch(LUKSO_EXPLORER_API + path, { referrerPolicy: "no-referrer" });
+      if (!res.ok) throw new Error(`explorer HTTP ${res.status}`);
+      return res.json();
+    }
+    const isDeployCall = (to, input) =>
+      typeof input === "string" && input.toLowerCase().startsWith("0x6a66a753") && String(to || "").toLowerCase() === LSP23_FACTORY;
+    async function fetchDeployCalldatas(upAddress) {
+      const addr = await explorerGet("addresses/" + upAddress);
+      const txHash = addr.creation_transaction_hash || addr.creation_tx_hash;
+      if (!txHash) throw new Error(t("fetchNoCreationTx"));
+      const tx = await explorerGet("transactions/" + txHash);
+      const input = tx.raw_input || tx.input;
+      if (isDeployCall(tx.to && tx.to.hash, input)) return [input];
+      const trace = await explorerGet("transactions/" + txHash + "/raw-trace");
+      const found = (Array.isArray(trace) ? trace : [])
+        .map(c => c.action || c)
+        .filter(a => isDeployCall(a.to, a.input))
+        .map(a => a.input);
+      if (!found.length) throw new Error(t("fetchNotFound"));
+      return found;
+    }
+    function setFetchStatus(text, cls) {
+      const el = $("fetchStatus");
+      el.className = "note " + (cls || "");
+      el.textContent = text;
+    }
+
+    async function autoFetchCalldata() {
+      const raw = $("expectedAddress").value.trim();
+      if (!ethers.isAddress(raw)) { setFetchStatus(t("fetchNeedAddress"), "line-err"); return; }
+      const up = ethers.getAddress(raw);
+      setFetchStatus(t("fetchRunning"), "line-dim");
+      try {
+        const candidates = await fetchDeployCalldatas(up);
+        const match = candidates.find(c => { try { return decodeCalldata(c).predictedPrimary.toLowerCase() === up.toLowerCase(); } catch (e) { return false; } });
+        if (!match) throw new Error(t("fetchNoMatch"));
+        $("calldataInput").value = match;
+        setFetchStatus(t("fetchOk"), "line-ok");
+      } catch (e) {
+        setFetchStatus(t("fetchFailed", { err: e.message }), "line-err");
       }
     }
+    $("fetchCalldataBtn").addEventListener("click", autoFetchCalldata);
 
-    log(t("checkingImplLog"), "line-dim");
-    const primaryImplCode = await provider.getCode(d.primary.impl);
-    const secondaryImplCode = await provider.getCode(d.secondary.impl);
-    const primaryImplOk = primaryImplCode !== "0x";
-    const secondaryImplOk = secondaryImplCode !== "0x";
-    if (primaryImplOk && secondaryImplOk) {
-      log(t("bothImplOk", { primary: d.primary.impl, secondary: d.secondary.impl }), "line-ok");
-    } else {
-      log(t("implWarnHeader"), "line-warn");
-      if (!primaryImplOk) log(t("primaryImplMissing", { addr: d.primary.impl }), "line-warn");
-      if (!secondaryImplOk) log(t("secondaryImplMissing", { addr: d.secondary.impl }), "line-warn");
-    }
-    const missing = [...missingInfra, !primaryImplOk && d.primary.impl, !secondaryImplOk && d.secondary.impl].filter(Boolean);
-    if (missing.length) showPublishLink(net, missing);
-  } catch (e) {
-    log(t("genericErrorLog", { err: e.shortMessage || e.message }), "line-err");
-  }
-});
-</script>
+    $("verifyBtn").addEventListener("click", async () => {
+      $("log").innerHTML = "";
+      const calldataRaw = $("calldataInput").value.trim();
+      const expected = $("expectedAddress").value.trim();
+      const net = getNetwork();
+
+      if (!calldataRaw) { log(t("pasteCalldataErr"), "line-err"); return; }
+      if (!net || !net.rpc) { log(t("missingRpcErr"), "line-err"); return; }
+
+      try {
+        const d = decodeCalldata(calldataRaw);
+        log(t("predictedUpLog", { addr: d.predictedPrimary }), "line-dim");
+        log(t("predictedKmLog", { addr: d.predictedSecondary }), "line-dim");
+        // The address does not cover the UP's initialization nor the funding (AUDIT M-4).
+        const initBad = DeployCheck.initProblems(d);
+        if (initBad.length) { log(t("initNotCanonicalErr", { what: initBad.map(k => t("initWhat_" + k)).join("; ") }), "line-err"); return; }
+        const fund = DeployCheck.funding(d);
+        if (fund > 0n) log(t("fundingWarn", { amount: ethers.formatEther(fund), cur: net.currency && net.currency !== "?" ? net.currency : "" }), "line-warn");
+
+        if (expected && !ethers.isAddress(expected)) {
+          log(t("invalidExpectedErr"), "line-err");
+          return;
+        }
+        if (expected) {
+          if (d.predictedPrimary.toLowerCase() !== expected.toLowerCase()) {
+            log(t("mismatchExpectedErr", { addr: expected }), "line-err");
+            return;
+          }
+          log(t("matchExpectedOk"), "line-ok");
+        }
+
+        const provider = new ethers.JsonRpcProvider(net.rpc, undefined, { batchMaxCount: 1 });
+        const rpcChainId = Number(await provider.send("eth_chainId", []));
+        if (net.chainId && rpcChainId !== net.chainId) {
+          log(t("rpcChainMismatchErr", { rpcChainId, netName: net.name, chainId: net.chainId }), "line-err");
+          return;
+        }
+        // A custom RPC has no name in the chain list: label it with the chainId the RPC reports.
+        if (!net.chainId) net.name = `${t("customNetName")} (chainId ${rpcChainId})`;
+
+        async function getCodeStable(address, attempts, delayMs) {
+          let last = "0x";
+          for (let i = 0; i < attempts; i++) {
+            last = (await provider.getCode(address)).toLowerCase();
+            if (last !== "0x") return last;
+            if (i < attempts - 1) await new Promise(r => setTimeout(r, delayMs));
+          }
+          return last;
+        }
+
+        log(t("queryingLog", { net: net.name }), "line-dim");
+        const actualPrimaryCode = await getCodeStable(d.predictedPrimary, 4, 2000);
+        const actualSecondaryCode = await getCodeStable(d.predictedSecondary, 4, 2000);
+
+        const expectedPrimaryCode = minimalProxyRuntimeCode(d.primary.impl).toLowerCase();
+        const expectedSecondaryCode = minimalProxyRuntimeCode(d.secondary.impl).toLowerCase();
+
+        const primaryOk = actualPrimaryCode === expectedPrimaryCode;
+        const secondaryOk = actualSecondaryCode === expectedSecondaryCode;
+
+        const lk = primaryOk && secondaryOk ? await DeployCheck.link(provider, d.predictedPrimary, d.predictedSecondary) : null;
+        if (lk && !lk.ok) {
+          log(t("linkBad", { owner: lk.owner || "?", target: lk.target || "?", km: d.predictedSecondary, up: d.predictedPrimary }), "line-err");
+        } else if (primaryOk && secondaryOk) {
+          log(t("deployVerifiedOk", { net: net.name }), "line-ok");
+          log(t("linkOk"), "line-ok");
+          log(t("upLine", { addr: d.predictedPrimary }), "line-ok");
+          log(t("kmLine", { addr: d.predictedSecondary }), "line-ok");
+        } else {
+          log(t("noMatchingDeployErr", { net: net.name }), "line-err");
+          if (!primaryOk) log(t("upDetail", { detail: actualPrimaryCode === "0x" ? t("noContractAtAddr") : t("diffBytecode") }), "line-err");
+          if (!secondaryOk) log(t("kmDetail", { detail: actualSecondaryCode === "0x" ? t("noContractAtAddr") : t("diffBytecode") }), "line-err");
+        }
+
+        // Controllo aggiuntivo: l'indirizzo del proxy predetto (o già deployato) non dice nulla
+        // sul fatto che l'implementazione a cui punta (LSP0 e Key Manager) abbia davvero bytecode
+        // su questa rete. Se manca, il profilo è — o sarebbe — "muto": ogni delegatecall verso
+        // un indirizzo senza codice ritorna successo senza fare nulla, quindi nessun errore visibile
+        // a deploy avvenuto. Vale la pena segnalarlo sempre, non solo quando il proxy è già presente.
+        // Infrastructure used by a deploy: without the LSP23 factory nothing is created, and without the
+        // post-deployment module the UP would be created with no controller.
+        log(t("checkingInfraLog"), "line-dim");
+        const missingInfra = [];
+        const infra = [["LSP23LinkedContractsFactory", FACTORY_ADDRESS]];
+        if (BigInt(d.postDeploymentModule) !== 0n) infra.push(["Post-deployment module", d.postDeploymentModule]);
+        for (const [label, addr] of infra) {
+          if ((await provider.getCode(addr)) === "0x") {
+            log(t("infraMissingWarn", { label, addr }), "line-warn");
+            missingInfra.push(addr);
+          } else {
+            log(t("infraOkLog", { label, addr }), "line-ok");
+          }
+        }
+
+        log(t("checkingImplLog"), "line-dim");
+        const primaryImplCode = await provider.getCode(d.primary.impl);
+        const secondaryImplCode = await provider.getCode(d.secondary.impl);
+        const primaryImplOk = primaryImplCode !== "0x";
+        const secondaryImplOk = secondaryImplCode !== "0x";
+        if (primaryImplOk && secondaryImplOk) {
+          log(t("bothImplOk", { primary: d.primary.impl, secondary: d.secondary.impl }), "line-ok");
+        } else {
+          log(t("implWarnHeader"), "line-warn");
+          if (!primaryImplOk) log(t("primaryImplMissing", { addr: d.primary.impl }), "line-warn");
+          if (!secondaryImplOk) log(t("secondaryImplMissing", { addr: d.secondary.impl }), "line-warn");
+        }
+        const missing = [...missingInfra, !primaryImplOk && d.primary.impl, !secondaryImplOk && d.secondary.impl].filter(Boolean);
+        if (missing.length) showPublishLink(net, missing);
+      } catch (e) {
+        log(t("genericErrorLog", { err: e.shortMessage || e.message }), "line-err");
+      }
+    });
+  </script>
 
 </body>
+
 </html>

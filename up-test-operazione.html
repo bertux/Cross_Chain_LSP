@@ -1,543 +1,750 @@
 <!DOCTYPE html>
 <html lang="it">
+
 <head>
-<meta charset="UTF-8">
-<script src="theme.js"></script>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="referrer" content="no-referrer">
-<title data-i18n="pageTitle">UP Test Operazione — ChainIntegrate</title>
-<meta name="description" content="Testa la tua Universal Profile rideployata scrivendo e leggendo un timestamp on-chain tramite il Key Manager.">
-<link rel="icon" href="favicon.ico">
-<meta property="og:type" content="website">
-<meta property="og:title" content="UP Test Operazione — ChainIntegrate">
-<meta property="og:description" content="Testa la tua Universal Profile rideployata scrivendo e leggendo un timestamp on-chain tramite il Key Manager.">
-<meta property="og:image" content="https://crosschain-lukso.chainintegrate.it/banner.png">
-<meta property="og:url" content="https://crosschain-lukso.chainintegrate.it/up-test-operazione.html">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="UP Test Operazione — ChainIntegrate">
-<meta name="twitter:description" content="Testa la tua Universal Profile rideployata scrivendo e leggendo un timestamp on-chain tramite il Key Manager.">
-<meta name="twitter:image" content="https://crosschain-lukso.chainintegrate.it/banner.png">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.4/ethers.umd.min.js" integrity="sha384-6Zl0Pc8zjSz8KvmNeXRvUQgY4ryFb+BwDvKCmLYcBME0joAaru491tQgi9B7zsMM" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script src="chains.js"></script>
-<script src="backup-check.js"></script>
-<style>
-  :root {
-    --bg: #0f1115; --panel: #171a21; --border: #2a2f3a; --field: #10131a; --chip: #2a2f3a; --disabled: #3a3f4b; --raised: #1d2330;
-    --text: #e6e8ec; --text-dim: #9aa1ad;
-    --accent: #5b8cff; --ok: #3fbf6f; --warn: #e0a83c; --err: #e05a5a;
-  }
-  * { box-sizing: border-box; }
-  body { background: var(--bg); color: var(--text); font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
-         max-width: 760px; margin: 0 auto; padding: 32px 20px 80px; }
-  h1 { font-size: 20px; margin-bottom: 4px; }
-  .subtitle { color: var(--text-dim); font-size: 13px; margin-bottom: 28px; }
-  .panel { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 20px; margin-bottom: 20px; }
-  .panel h2 { font-size: 14px; margin: 0 0 14px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.03em; }
-  .note { font-size: 12.5px; color: var(--text-dim); line-height: 1.5; margin-bottom: 12px; }
-  label { display: block; font-size: 13px; color: var(--text-dim); margin: 14px 0 6px; }
-  label:first-child { margin-top: 0; }
-  select, input { width: 100%; background: var(--field); border: 1px solid var(--border); color: var(--text);
-                  border-radius: 6px; padding: 10px 12px; font-size: 14px; font-family: inherit; }
-  button { width: 100%; background: var(--accent); color: white; border: none; border-radius: 6px;
-           padding: 12px; font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 12px; }
-  button:disabled { background: var(--disabled); cursor: not-allowed; }
-  button.secondary { background: var(--chip); }
-  .status-box { background: var(--field); border: 1px solid var(--border); border-radius: 6px; padding: 12px;
-                font-family: monospace; font-size: 12.5px; margin-top: 12px; }
-  .status-box .empty { color: var(--text-dim); }
-  #log { font-family: monospace; font-size: 12.5px; white-space: pre-wrap; word-break: break-all; line-height: 1.6; }
-  .line-ok { color: var(--ok); } .line-warn { color: var(--warn); } .line-err { color: var(--err); } .line-dim { color: var(--text-dim); }
-  .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-family: monospace; }
-  .badge.ok { background: rgba(63,191,111,0.15); color: var(--ok); }
-  .badge.err { background: rgba(224,90,90,0.15); color: var(--err); }
-  .brand-row { margin-bottom: 24px; }
-  .brand-logo { display: block; width: 100%; height: auto; border-radius: 10px; }
-  .top-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
-  .lang-btn { width: auto; background: var(--chip); padding: 6px 14px; font-size: 12px; margin-top: 0; flex-shrink: 0; }
-  .site-footer { margin-top: 40px; padding: 18px 20px; background: #f5f6f8; border: 1px solid #e3e5ea; border-radius: 10px; color: #4b4f58; }
-  .footer-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
-  .footer-logo { height: 48px; width: auto; flex-shrink: 0; }
-  .footer-text { font-size: 13px; line-height: 1.6; }
-  .footer-li { display: inline-flex; vertical-align: middle; margin: 0 2px; }
-  .site-footer a { color: #2563eb; text-decoration: none; font-weight: 600; }
-  .site-footer a:hover { text-decoration: underline; }
-</style>
+  <meta charset="UTF-8">
+  <script src="theme.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <title data-i18n="pageTitle">UP Test Operazione — ChainIntegrate</title>
+  <meta name="description"
+    content="Testa la tua Universal Profile rideployata scrivendo e leggendo un timestamp on-chain tramite il Key Manager.">
+  <link rel="icon" href="favicon.ico">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="UP Test Operazione — ChainIntegrate">
+  <meta property="og:description"
+    content="Testa la tua Universal Profile rideployata scrivendo e leggendo un timestamp on-chain tramite il Key Manager.">
+  <meta property="og:image" content="https://crosschain-lukso.chainintegrate.it/banner.png">
+  <meta property="og:url" content="https://crosschain-lukso.chainintegrate.it/up-test-operazione.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="UP Test Operazione — ChainIntegrate">
+  <meta name="twitter:description"
+    content="Testa la tua Universal Profile rideployata scrivendo e leggendo un timestamp on-chain tramite il Key Manager.">
+  <meta name="twitter:image" content="https://crosschain-lukso.chainintegrate.it/banner.png">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.4/ethers.umd.min.js"
+    integrity="sha384-6Zl0Pc8zjSz8KvmNeXRvUQgY4ryFb+BwDvKCmLYcBME0joAaru491tQgi9B7zsMM" crossorigin="anonymous"
+    referrerpolicy="no-referrer"></script>
+  <script src="chains.js"></script>
+  <script src="backup-check.js"></script>
+  <style>
+    :root {
+      --bg: #0f1115;
+      --panel: #171a21;
+      --border: #2a2f3a;
+      --field: #10131a;
+      --chip: #2a2f3a;
+      --disabled: #3a3f4b;
+      --raised: #1d2330;
+      --text: #e6e8ec;
+      --text-dim: #9aa1ad;
+      --accent: #5b8cff;
+      --ok: #3fbf6f;
+      --warn: #e0a83c;
+      --err: #e05a5a;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 32px 20px 80px;
+    }
+
+    h1 {
+      font-size: 20px;
+      margin-bottom: 4px;
+    }
+
+    .subtitle {
+      color: var(--text-dim);
+      font-size: 13px;
+      margin-bottom: 28px;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .panel h2 {
+      font-size: 14px;
+      margin: 0 0 14px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .note {
+      font-size: 12.5px;
+      color: var(--text-dim);
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      color: var(--text-dim);
+      margin: 14px 0 6px;
+    }
+
+    label:first-child {
+      margin-top: 0;
+    }
+
+    select,
+    input {
+      width: 100%;
+      background: var(--field);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 6px;
+      padding: 10px 12px;
+      font-size: 14px;
+      font-family: inherit;
+    }
+
+    button {
+      width: 100%;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 12px;
+    }
+
+    button:disabled {
+      background: var(--disabled);
+      cursor: not-allowed;
+    }
+
+    button.secondary {
+      background: var(--chip);
+    }
+
+    .status-box {
+      background: var(--field);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 12px;
+      font-family: monospace;
+      font-size: 12.5px;
+      margin-top: 12px;
+    }
+
+    .status-box .empty {
+      color: var(--text-dim);
+    }
+
+    #log {
+      font-family: monospace;
+      font-size: 12.5px;
+      white-space: pre-wrap;
+      word-break: break-all;
+      line-height: 1.6;
+    }
+
+    .line-ok {
+      color: var(--ok);
+    }
+
+    .line-warn {
+      color: var(--warn);
+    }
+
+    .line-err {
+      color: var(--err);
+    }
+
+    .line-dim {
+      color: var(--text-dim);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-family: monospace;
+    }
+
+    .badge.ok {
+      background: rgba(63, 191, 111, 0.15);
+      color: var(--ok);
+    }
+
+    .badge.err {
+      background: rgba(224, 90, 90, 0.15);
+      color: var(--err);
+    }
+
+    .brand-row {
+      margin-bottom: 24px;
+    }
+
+    .brand-logo {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 10px;
+    }
+
+    .top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .lang-btn {
+      width: auto;
+      background: var(--chip);
+      padding: 6px 14px;
+      font-size: 12px;
+      margin-top: 0;
+      flex-shrink: 0;
+    }
+
+    .site-footer {
+      margin-top: 40px;
+      padding: 18px 20px;
+      background: #f5f6f8;
+      border: 1px solid #e3e5ea;
+      border-radius: 10px;
+      color: #4b4f58;
+    }
+
+    .footer-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .footer-logo {
+      height: 48px;
+      width: auto;
+      flex-shrink: 0;
+    }
+
+    .footer-text {
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .footer-li {
+      display: inline-flex;
+      vertical-align: middle;
+      margin: 0 2px;
+    }
+
+    .site-footer a {
+      color: #2563eb;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .site-footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
 </head>
+
 <body>
 
-<div class="brand-row">
-  <img src="banner.png" alt="ChainIntegrate" class="brand-logo" onerror="this.style.display='none'">
-</div>
-
-<div class="top-row">
-  <div>
-    <h1 data-i18n="h1">UP Test Operazione</h1>
-    <div class="subtitle" data-i18n="subtitle">Scrive un piccolo dato di prova su una UP già deployata, tramite il Key Manager — per verificare che un controller sappia davvero operare, senza fare un deploy.</div>
+  <div class="brand-row">
+    <img src="banner.png" alt="ChainIntegrate" class="brand-logo" onerror="this.style.display='none'">
   </div>
-  <button class="lang-btn" id="langToggle" data-i18n="langToggleBtn">English</button>
-</div>
 
-<div class="panel">
-  <h2 data-i18n="panel0Title">0 · Come funziona questa pagina</h2>
-  <div class="note" data-i18n-html="panel0Note"></div>
-</div>
-
-<div class="panel">
-  <h2 data-i18n="panel3Title">1 · Rete su cui operare</h2>
-  <div class="note" data-i18n="panel3Note"></div>
-  <input type="text" id="networkFilter" data-i18n-placeholder="networkFilterPlaceholder" placeholder="Filtra per nome... (es. base, polygon, arbitrum)">
-  <select id="network" style="margin-top:8px;"></select>
-  <div id="customRpcWrap" style="display:none;">
-    <label data-i18n="customRpcLabel">RPC URL custom</label>
-    <input type="text" id="customRpc" placeholder="https://...">
-    <label data-i18n="customExplorerLabel">Explorer URL custom (opzionale)</label>
-    <input type="text" id="customExplorer" placeholder="https://.../tx/">
+  <div class="top-row">
+    <div>
+      <h1 data-i18n="h1">UP Test Operazione</h1>
+      <div class="subtitle" data-i18n="subtitle">Scrive un piccolo dato di prova su una UP già deployata, tramite il Key
+        Manager — per verificare che un controller sappia davvero operare, senza fare un deploy.</div>
+    </div>
+    <button class="lang-btn" id="langToggle" data-i18n="langToggleBtn">English</button>
   </div>
-</div>
 
-<div class="panel">
-  <h2 data-i18n="panel1Title">2 · Profilo da testare</h2>
-  <button id="connectUp" data-i18n="connectUpBtn">Connetti la tua Universal Profile</button>
-  <div class="status-box" id="profileStatus"><span class="empty" data-i18n="notConnected">Non connesso.</span></div>
-  <div class="note" style="margin-top:10px;" data-i18n="connectUpNote">
-    Serve solo per leggere l'indirizzo della UP — nessuna firma o transazione viene fatta a questo punto.
-    Se vuoi testare una UP diversa da quella connessa nella tua estensione, puoi inserirne l'indirizzo a mano qui sotto.
+  <div class="panel">
+    <h2 data-i18n="panel0Title">0 · Come funziona questa pagina</h2>
+    <div class="note" data-i18n-html="panel0Note"></div>
   </div>
-  <label data-i18n="profileAddressLabel">Indirizzo UP da testare</label>
-  <input type="text" id="profileAddress" placeholder="0x...">
-  <div id="backupAlert"></div>
-</div>
 
-<div class="panel">
-  <h2 data-i18n="panel2Title">3 · Wallet firmatario (il controller)</h2>
-  <div class="note" data-i18n="panel2Note"></div>
-  <div class="note" style="margin-top:12px; padding:12px 14px; border:1px solid var(--warn); border-radius:8px; background:rgba(224,168,60,0.08); color:var(--text);" data-i18n-html="fundsNote"></div>
-  <button id="connectSigner" data-i18n="connectSignerBtn">Connetti MetaMask / wallet firmatario</button>
-  <div class="status-box" id="signerStatus"><span class="empty" data-i18n="notConnected">Non connesso.</span></div>
-</div>
-
-
-<div class="panel">
-  <h2 data-i18n="panel4Title">4 · Test</h2>
-  <div class="note" data-i18n-html="panel4Note"></div>
-  <button id="testBtn" data-i18n="testBtn">Scrivi dato di prova</button>
-  <div id="log" class="line-dim" style="margin-top:10px;"><span data-i18n="logInitial">In attesa dei collegamenti sopra.</span></div>
-</div>
-
-<div class="site-footer">
-  <div class="footer-row">
-    <img src="logo.png" alt="ChainIntegrate" class="footer-logo" onerror="this.style.display='none'">
-    <div class="footer-text" data-i18n-html="footerHtml"></div>
+  <div class="panel">
+    <h2 data-i18n="panel3Title">1 · Rete su cui operare</h2>
+    <div class="note" data-i18n="panel3Note"></div>
+    <input type="text" id="networkFilter" data-i18n-placeholder="networkFilterPlaceholder"
+      placeholder="Filtra per nome... (es. base, polygon, arbitrum)">
+    <select id="network" style="margin-top:8px;"></select>
+    <div id="customRpcWrap" style="display:none;">
+      <label data-i18n="customRpcLabel">RPC URL custom</label>
+      <input type="text" id="customRpc" placeholder="https://...">
+      <label data-i18n="customExplorerLabel">Explorer URL custom (opzionale)</label>
+      <input type="text" id="customExplorer" placeholder="https://.../tx/">
+    </div>
   </div>
-</div>
 
-<script>
-const $ = (id) => document.getElementById(id);
-// Every value that did not originate in this file (user input, wallet responses, RPC or
-// library error messages) must be escaped before being interpolated into innerHTML.
-const escapeHtml = (v) => String(v).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  <div class="panel">
+    <h2 data-i18n="panel1Title">2 · Profilo da testare</h2>
+    <button id="connectUp" data-i18n="connectUpBtn">Connetti la tua Universal Profile</button>
+    <div class="status-box" id="profileStatus"><span class="empty" data-i18n="notConnected">Non connesso.</span></div>
+    <div class="note" style="margin-top:10px;" data-i18n="connectUpNote">
+      Serve solo per leggere l'indirizzo della UP — nessuna firma o transazione viene fatta a questo punto.
+      Se vuoi testare una UP diversa da quella connessa nella tua estensione, puoi inserirne l'indirizzo a mano qui
+      sotto.
+    </div>
+    <label data-i18n="profileAddressLabel">Indirizzo UP da testare</label>
+    <input type="text" id="profileAddress" placeholder="0x...">
+    <div id="backupAlert"></div>
+  </div>
 
-// ==================== I18N ====================
-let LANG = "it";
-
-const I18N = {
-  it: {
-    pageTitle: "UP Test Operazione — ChainIntegrate",
-    h1: "UP Test Operazione",
-    subtitle: "Scrive un piccolo dato di prova su una UP già deployata, tramite il Key Manager — per verificare che un controller sappia davvero operare, senza fare un deploy.",
-    langToggleBtn: "English",
-    customNetName: "Rete custom",
-
-    panel0Title: "0 · Come funziona questa pagina",
-    panel0Note: "Qui si opera su una UP <b>già deployata</b> su una rete diversa da LUKSO — non è la stessa cosa che collegare l'estensione UP direttamente. La UP infatti non firma le transazioni su un'altra rete: chi firma è il <b>wallet controller</b> (es. MetaMask) connesso a quella rete, con i permessi giusti sulla UP. Per questo la pagina ti chiede due collegamenti separati: (1) connetti la tua UP solo per leggerne comodamente l'indirizzo — nessuna firma qui; (2) connetti MetaMask (o un altro wallet) sulla <b>rete di destinazione</b> dove hai rideployato la UP, ed è quel wallet a mandare la transazione di test.",
-
-    panel1Title: "2 · Profilo da testare",
-    connectUpBtn: "Connetti la tua Universal Profile",
-    notConnected: "Non connesso.",
-    connectUpNote: "Serve solo per leggere l'indirizzo della UP — nessuna firma o transazione viene fatta a questo punto. Se vuoi testare una UP diversa da quella connessa nella tua estensione, puoi inserirne l'indirizzo a mano qui sotto.",
-    profileAddressLabel: "Indirizzo UP da testare",
-
-    panel2Title: "3 · Wallet firmatario (il controller)",
-    panel2Note: "Questo è il wallet che manovra davvero la UP sulla rete scelta al punto 1 — deve essere connesso a quella rete, non a LUKSO. È normale avere sia l'estensione UP che MetaMask attivi insieme nel browser: usa quello giusto per ciascun passaggio.",
-    fundsNote: "<b>💡 I fondi: due indirizzi, tutti e due tuoi</b><br>• <b>L'indirizzo della tua UP</b> (uguale su tutte le reti) è il tuo <i>conto</i>: mandaci fondi <b>solo dopo</b> che deploy e test su questa rete sono andati a buon fine: se qualcosa va storto (chiave del controller sbagliata, deploy fallito) i fondi mandati prima resterebbero bloccati.<br>• <b>L'indirizzo del controller</b> (il wallet in MetaMask) è la <i>chiave</i> che firma. Ogni operazione costa una piccola commissione (gas), e <b>la paga il controller, non la UP</b>.<br>👉 Quindi manda un po' di fondi <b>anche al controller</b>, sulla stessa rete (es. POL su Polygon, ETH su Base o Arbitrum): quanto basta per qualche transazione. Senza, il controller non può firmare nulla, anche se la UP è piena.",
-    connectSignerBtn: "Connetti MetaMask / wallet firmatario",
-
-    panel3Title: "1 · Rete su cui operare",
-    panel3Note: "La rete dove la tua UP è stata rideployata (non LUKSO). Il wallet firmatario del punto 3 deve essere connesso a questa stessa rete: lo stato del punto 3 mostra la rete attuale del wallet, verificalo prima di procedere.",
-    networkFilterPlaceholder: "Filtra per nome... (es. base, polygon, arbitrum)",
-    customRpcLabel: "RPC URL custom",
-    customExplorerLabel: "Explorer URL custom (opzionale)",
-
-    panel4Title: "4 · Test",
-    panel4Note: "Scrive una chiave di prova (<code>up.test.ping</code>) con un valore univoco, poi la rilegge on-chain per confermare. Non tocca dati esistenti, non richiede fondi sulla UP — solo gas per la transazione dal wallet firmatario.",
-    testBtn: "Scrivi dato di prova",
-    logInitial: "In attesa dei collegamenti sopra.",
-
-    extNotFound: "Estensione Universal Profile non trovata in questo browser",
-    connectedBadge: "Connesso",
-    connectionRejected: "Connessione rifiutata o fallita",
-    noSignerFound: "Nessun wallet firmatario trovato",
-    unknownNetworkLabel: (v) => `rete sconosciuta (chainId ${v.chainId})`,
-
-    missingAddrErr: "Indirizzo UP mancante o non valido (pannello 2) — connetti la tua UP o inseriscilo a mano.",
-    connectSignerFirstLog: "Collega prima il wallet firmatario (pannello 3).",
-    missingRpcLog: "Manca l'RPC della rete (pannello 1).",
-    upLog: (v) => `UP: ${v.addr}`,
-    kmLog: (v) => `Key Manager: ${v.addr}`,
-    netLog: (v) => `Rete: ${v.name}`,
-    signerChangedErr: "❌ L'account attivo nel wallet è cambiato: ricollega il wallet firmatario e ripeti il test.",
-    gasFailErr: (v) => `❌ Stima gas fallita — il controller probabilmente non ha i permessi giusti su questa UP/rete: ${v.err}`,
-    permsOkLog: (v) => `✅ Permessi verificati (stima gas riuscita: ${v.gas} unità).`,
-    sendingTestTxLog: "Invio transazione di test (conferma nel wallet)...",
-    txHashLog: (v) => `Tx: ${v.hash}`,
-    waitingConfirmLog: "In attesa di conferma...",
-    writeConfirmedLog: (v) => `✅✅ Scrittura confermata e riletta on-chain: "${v.value}"`,
-    controllerOkLog: "Il controller in MetaMask sa operare questa UP su questa rete.",
-    genericErrorLog: (v) => `Errore: ${v.err}`,
-    signerNoFundsErr: (v) => `❌ Il controller (${v.addr}) non ha abbastanza ${v.currency} su ${v.net} per pagare la commissione: servono circa ${v.need}, ne ha ${v.have}. La commissione la paga il controller, non la UP: manda un po' di ${v.currency} all'indirizzo del controller su ${v.net} e riprova.`,
-    signerFundsOkLog: (v) => `✅ Il controller ha fondi per la commissione (${v.balance} ${v.currency}).`,
-    ownerNotKmErr: (v) => `❌ L'owner della UP (${v.addr}) non ha bytecode su questa rete: non è un Key Manager.`,
-    upNotDeployedErr: "❌ La UP non risulta deployata su questa rete.",
-    rpcChainMismatchErr: (v) => `❌ BLOCCANTE — l'RPC risponde con chainId ${v.rpcChainId}, ma la rete selezionata è ${v.netName} (chainId ${v.chainId}).`,
-    walletWrongNetwork: (v) => `❌ BLOCCANTE — il wallet firmatario è sulla rete con chainId ${v.walletChainId}, ma la rete selezionata è ${v.netName} (chainId ${v.chainId}). Cambia rete nel wallet.`,
-    walletNetworkCheckFailed: "❌ BLOCCANTE — impossibile leggere la rete del wallet firmatario.",
-    walletCorrectNetwork: (v) => `✅ Wallet firmatario e RPC sulla stessa rete (chainId ${v.chainId}).`,
-    readBackMismatchErr: (v) => `❌ Il valore riletto on-chain ("${v.got}") non corrisponde a quello scritto ("${v.expected}"). Se la tx è confermata, riprova tra poco: l'RPC potrebbe non essere ancora aggiornato.`,
-
-    footerHtml: `Servizi di consulenza in integrazione dati &amp; blockchain a cura di ChainIntegrate <a href="https://www.linkedin.com/company/chainintegrate" target="_blank" rel="noopener" aria-label="LinkedIn" class="footer-li"><svg width="20" height="20" viewBox="0 0 20 20"><rect width="20" height="20" rx="4" fill="#0A66C2"/><text x="10" y="15" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#fff">in</text></svg></a> · <a href="https://t.me/Simone_1977_2" target="_blank" rel="noopener">Assistenza via Telegram</a> · <a href="https://github.com/ChainIntegrate/Cross_Chain" target="_blank" rel="noopener">Codice sorgente su GitHub</a>`,
-  },
-  en: {
-    pageTitle: "UP Test Operation — ChainIntegrate",
-    h1: "UP Test Operation",
-    subtitle: "Writes a small test value to an already-deployed UP, via the Key Manager — to verify a controller can actually operate it, without doing a deploy.",
-    langToggleBtn: "Italiano",
-    customNetName: "Custom network",
-
-    panel0Title: "0 · How this page works",
-    panel0Note: "This page operates on a UP that is <b>already deployed</b> on a network other than LUKSO — it's not the same as just connecting the UP extension. The UP itself doesn't sign transactions on another network: the one signing is the <b>controller wallet</b> (e.g. MetaMask) connected to that network, with the right permissions on the UP. That's why the page asks for two separate connections: (1) connect your UP only to read its address conveniently — no signature here; (2) connect MetaMask (or another wallet) on the <b>destination network</b> where you redeployed the UP, and that wallet is the one sending the test transaction.",
-
-    panel1Title: "2 · Profile to test",
-    connectUpBtn: "Connect your Universal Profile",
-    notConnected: "Not connected.",
-    connectUpNote: "Only used to read the UP address — no signature or transaction happens at this point. If you want to test a UP other than the one connected in your extension, you can enter its address manually below.",
-    profileAddressLabel: "UP address to test",
-
-    panel2Title: "3 · Signing wallet (the controller)",
-    panel2Note: "This is the wallet that actually operates the UP on the network chosen in step 1 — it must be connected to that network, not to LUKSO. It's normal to have both the UP extension and MetaMask active in the browser at the same time: use the right one for each step.",
-    fundsNote: "<b>💡 Funds: two addresses, both yours</b><br>• <b>Your UP address</b> (the same on every network) is your <i>account</i>: send funds to it <b>only after</b> the deploy and the test on this network have succeeded: if something goes wrong (wrong controller key, failed deploy) funds sent earlier would stay stuck.<br>• <b>The controller address</b> (the wallet in MetaMask) is the <i>key</i> that signs. Every operation costs a small fee (gas), and <b>the controller pays it, not the UP</b>.<br>👉 So send some funds <b>to the controller too</b>, on the same network (e.g. POL on Polygon, ETH on Base or Arbitrum): enough for a few transactions. Without them the controller cannot sign anything, even if the UP is full.",
-    connectSignerBtn: "Connect MetaMask / signing wallet",
-
-    panel3Title: "1 · Network to operate on",
-    panel3Note: "The network where your UP was redeployed (not LUKSO). The signing wallet from step 3 must be connected to this same network — the status in step 3 shows the wallet's current network, check it before proceeding.",
-    networkFilterPlaceholder: "Filter by name... (e.g. base, polygon, arbitrum)",
-    customRpcLabel: "Custom RPC URL",
-    customExplorerLabel: "Custom explorer URL (optional)",
-
-    panel4Title: "4 · Test",
-    panel4Note: "Writes a test key (<code>up.test.ping</code>) with a unique value, then reads it back on-chain to confirm. Doesn't touch existing data, doesn't require funds on the UP — only gas for the transaction from the signing wallet.",
-    testBtn: "Write test value",
-    logInitial: "Waiting for the connections above.",
-
-    extNotFound: "Universal Profile extension not found in this browser",
-    connectedBadge: "Connected",
-    connectionRejected: "Connection rejected or failed",
-    noSignerFound: "No signing wallet found",
-    unknownNetworkLabel: (v) => `unknown network (chainId ${v.chainId})`,
-
-    missingAddrErr: "Missing or invalid UP address (panel 2) — connect your UP or enter it manually.",
-    connectSignerFirstLog: "Connect the signing wallet first (panel 3).",
-    missingRpcLog: "Missing network RPC (panel 1).",
-    upLog: (v) => `UP: ${v.addr}`,
-    kmLog: (v) => `Key Manager: ${v.addr}`,
-    netLog: (v) => `Network: ${v.name}`,
-    signerChangedErr: "❌ The active wallet account changed: reconnect the signing wallet and run the test again.",
-    gasFailErr: (v) => `❌ Gas estimation failed — the controller likely doesn't have the right permissions on this UP/network: ${v.err}`,
-    permsOkLog: (v) => `✅ Permissions verified (gas estimate succeeded: ${v.gas} units).`,
-    sendingTestTxLog: "Sending test transaction (confirm in your wallet)...",
-    txHashLog: (v) => `Tx: ${v.hash}`,
-    waitingConfirmLog: "Waiting for confirmation...",
-    writeConfirmedLog: (v) => `✅✅ Write confirmed and read back on-chain: "${v.value}"`,
-    controllerOkLog: "The controller in MetaMask can operate this UP on this network.",
-    genericErrorLog: (v) => `Error: ${v.err}`,
-    signerNoFundsErr: (v) => `❌ The controller (${v.addr}) does not have enough ${v.currency} on ${v.net} to pay the fee: about ${v.need} needed, it has ${v.have}. The fee is paid by the controller, not by the UP: send some ${v.currency} to the controller address on ${v.net} and try again.`,
-    signerFundsOkLog: (v) => `✅ The controller has funds for the fee (${v.balance} ${v.currency}).`,
-    ownerNotKmErr: (v) => `❌ The UP owner (${v.addr}) has no bytecode on this network: it is not a Key Manager.`,
-    upNotDeployedErr: "❌ The UP isn't deployed on this network.",
-    rpcChainMismatchErr: (v) => `❌ BLOCKING — the RPC answers with chainId ${v.rpcChainId}, but the selected network is ${v.netName} (chainId ${v.chainId}).`,
-    walletWrongNetwork: (v) => `❌ BLOCKING — the signing wallet is on chainId ${v.walletChainId}, but the selected network is ${v.netName} (chainId ${v.chainId}). Switch network in the wallet.`,
-    walletNetworkCheckFailed: "❌ BLOCKING — could not read the signing wallet's network.",
-    walletCorrectNetwork: (v) => `✅ Signing wallet and RPC are on the same network (chainId ${v.chainId}).`,
-    readBackMismatchErr: (v) => `❌ The value read back on-chain ("${v.got}") does not match the one written ("${v.expected}"). If the tx is confirmed, retry shortly: the RPC may not be up to date yet.`,
-
-    footerHtml: `Data &amp; blockchain integration consulting by ChainIntegrate <a href="https://www.linkedin.com/company/chainintegrate" target="_blank" rel="noopener" aria-label="LinkedIn" class="footer-li"><svg width="20" height="20" viewBox="0 0 20 20"><rect width="20" height="20" rx="4" fill="#0A66C2"/><text x="10" y="15" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#fff">in</text></svg></a> · <a href="https://t.me/Simone_1977_2" target="_blank" rel="noopener">Support via Telegram</a> · <a href="https://github.com/ChainIntegrate/Cross_Chain" target="_blank" rel="noopener">Source code on GitHub</a>`,
-  },
-};
-
-function t(key, vars) {
-  const entry = I18N[LANG][key];
-  return typeof entry === "function" ? entry(vars || {}) : entry;
-}
-
-function applyI18n() {
-  document.documentElement.lang = LANG;
-  document.querySelectorAll("[data-i18n]").forEach(el => { el.textContent = t(el.getAttribute("data-i18n")); });
-  document.querySelectorAll("[data-i18n-html]").forEach(el => { el.innerHTML = t(el.getAttribute("data-i18n-html")); });
-  document.querySelectorAll("[data-i18n-placeholder]").forEach(el => { el.placeholder = t(el.getAttribute("data-i18n-placeholder")); });
-}
-applyI18n();
-$("langToggle").addEventListener("click", () => {
-  LANG = LANG === "it" ? "en" : "it";
-  applyI18n();
-});
-
-// ==================== APP ====================
-const EXPLORER_PATH = "/tx/";
+  <div class="panel">
+    <h2 data-i18n="panel2Title">3 · Wallet firmatario (il controller)</h2>
+    <div class="note" data-i18n="panel2Note"></div>
+    <div class="note"
+      style="margin-top:12px; padding:12px 14px; border:1px solid var(--warn); border-radius:8px; background:rgba(224,168,60,0.08); color:var(--text);"
+      data-i18n-html="fundsNote"></div>
+    <button id="connectSigner" data-i18n="connectSignerBtn">Connetti MetaMask / wallet firmatario</button>
+    <div class="status-box" id="signerStatus"><span class="empty" data-i18n="notConnected">Non connesso.</span></div>
+  </div>
 
 
-// Upper bound of the gas price, read straight from the RPC. ethers' getFeeData() is avoided on
-// purpose: on some chains (e.g. Polygon) it calls a third-party gas-station API and fails when
-// that service is down or blocked. Same formula as ethers: 2 * baseFee + priority fee.
-async function estimateMaxGasPrice(provider) {
-  const gasPrice = BigInt(await provider.send("eth_gasPrice", []));
-  const block = await provider.send("eth_getBlockByNumber", ["latest", false]);
-  if (!block || !block.baseFeePerGas) return gasPrice;
-  const baseFee = BigInt(block.baseFeePerGas);
-  const tip = gasPrice > baseFee ? gasPrice - baseFee : 0n;
-  return 2n * baseFee + tip;
-}
+  <div class="panel">
+    <h2 data-i18n="panel4Title">4 · Test</h2>
+    <div class="note" data-i18n-html="panel4Note"></div>
+    <button id="testBtn" data-i18n="testBtn">Scrivi dato di prova</button>
+    <div id="log" class="line-dim" style="margin-top:10px;"><span data-i18n="logInitial">In attesa dei collegamenti
+        sopra.</span></div>
+  </div>
 
-function log(msg, cls) {
-  const l = document.createElement("div");
-  if (cls) l.className = cls;
-  l.textContent = msg;
-  $("log").appendChild(l);
-}
+  <div class="site-footer">
+    <div class="footer-row">
+      <img src="logo.png" alt="ChainIntegrate" class="footer-logo" onerror="this.style.display='none'">
+      <div class="footer-text" data-i18n-html="footerHtml"></div>
+    </div>
+  </div>
 
-// --- 1. Profilo: connessione alla PROPRIA estensione UP, come nella pagina di deploy.
-// Pagina pubblica: nessuna tabella di profili noti, chiunque la usi vede solo il proprio
-// indirizzo, letto direttamente dalla connessione. Il campo indirizzo resta editabile per
-// chi vuole testare una UP diversa da quella connessa nell'estensione.
-$("connectUp").addEventListener("click", async () => {
-  if (!window.lukso) {
-    $("profileStatus").innerHTML = `<span class="badge err">${t("extNotFound")}</span>`;
-    return;
-  }
-  try {
-    const accounts = await window.lukso.request({ method: "eth_requestAccounts" });
-    const upAddress = accounts[0];
-    $("profileAddress").value = upAddress;
-    $("profileStatus").innerHTML = `<span class="badge ok">${t("connectedBadge")}</span> ${escapeHtml(upAddress)}`;
-  } catch (e) {
-    $("profileStatus").innerHTML = `<span class="badge err">${t("connectionRejected")}</span>`;
-  }
-});
-function currentProfile() {
-  return { address: $("profileAddress").value.trim() };
-}
+  <script>
+    const $ = (id) => document.getElementById(id);
+    // Every value that did not originate in this file (user input, wallet responses, RPC or
+    // library error messages) must be escaped before being interpolated into innerHTML.
+    const escapeHtml = (v) => String(v).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
-// --- 2. Wallet firmatario, via EIP-6963 ---
-let signerProvider = null, signerAddress = null;
-const discoveredProviders = [];
-window.addEventListener("eip6963:announceProvider", (e) => discoveredProviders.push(e.detail));
-window.dispatchEvent(new Event("eip6963:requestProvider"));
+    // ==================== I18N ====================
+    let LANG = "en";
 
-$("connectSigner").addEventListener("click", async () => {
-  let candidate = discoveredProviders.find(p => !/lukso|universal profile/i.test(p.info.name))?.provider;
-  if (!candidate && window.ethereum && window.ethereum !== window.lukso) candidate = window.ethereum;
-  if (!candidate) {
-    $("signerStatus").innerHTML = `<span class="badge err">${t("noSignerFound")}</span>`;
-    return;
-  }
-  try {
-    const accounts = await candidate.request({ method: "eth_requestAccounts" });
-    signerAddress = accounts[0];
-    signerProvider = candidate;
-    let netLabel = "";
-    try {
-      const chainIdHex = await candidate.request({ method: "eth_chainId" });
-      netLabel = ` · ${chainDisplayName(parseInt(chainIdHex, 16))}`;
-    } catch (e) { /* se non si riesce a leggere la rete, si mostra comunque l'indirizzo */ }
-    $("signerStatus").innerHTML = `<span class="badge ok">${t("connectedBadge")}</span> ${escapeHtml(signerAddress + netLabel)}`;
-  } catch (e) {
-    $("signerStatus").innerHTML = `<span class="badge err">${t("connectionRejected")}</span>`;
-  }
-});
+    const I18N = {
+      it: {
+        pageTitle: "UP Test Operazione — ChainIntegrate",
+        h1: "UP Test Operazione",
+        subtitle: "Scrive un piccolo dato di prova su una UP già deployata, tramite il Key Manager — per verificare che un controller sappia davvero operare, senza fare un deploy.",
+        langToggleBtn: "English",
+        customNetName: "Rete custom",
 
-// --- 3. Rete ---
-const networkSelectEl = $("network");
+        panel0Title: "0 · Come funziona questa pagina",
+        panel0Note: "Qui si opera su una UP <b>già deployata</b> su una rete diversa da LUKSO — non è la stessa cosa che collegare l'estensione UP direttamente. La UP infatti non firma le transazioni su un'altra rete: chi firma è il <b>wallet controller</b> (es. MetaMask) connesso a quella rete, con i permessi giusti sulla UP. Per questo la pagina ti chiede due collegamenti separati: (1) connetti la tua UP solo per leggerne comodamente l'indirizzo — nessuna firma qui; (2) connetti MetaMask (o un altro wallet) sulla <b>rete di destinazione</b> dove hai rideployato la UP, ed è quel wallet a mandare la transazione di test.",
 
-// Nome rete leggibile a partire dal chainId, per mostrare a quale rete è connesso il
-// wallet firmatario (utile con tanti test su reti diverse). LUKSO non è nell'elenco CHAINS
-// perché quell'elenco è quello delle reti di destinazione, non della UP originale.
-function chainDisplayName(chainId) {
-  if (chainId === 42) return "LUKSO Mainnet";
-  if (chainId === 4201) return "LUKSO Testnet";
-  const found = CHAINS.find(c => c.chainId === chainId);
-  return found ? found.name : t("unknownNetworkLabel", { chainId });
-}
+        panel1Title: "2 · Profilo da testare",
+        connectUpBtn: "Connetti la tua Universal Profile",
+        notConnected: "Non connesso.",
+        connectUpNote: "Serve solo per leggere l'indirizzo della UP — nessuna firma o transazione viene fatta a questo punto. Se vuoi testare una UP diversa da quella connessa nella tua estensione, puoi inserirne l'indirizzo a mano qui sotto.",
+        profileAddressLabel: "Indirizzo UP da testare",
 
-function renderNetworkOptions(filter) {
-  const f = (filter || "").toLowerCase();
-  networkSelectEl.innerHTML = "";
-  CHAINS.filter(c => c.name.toLowerCase().includes(f)).forEach(c => {
-    const opt = document.createElement("option");
-    opt.value = c.key;
-    opt.textContent = c.chainId ? `${c.name} (chainId ${c.chainId})` : c.name;
-    networkSelectEl.appendChild(opt);
-  });
-}
-renderNetworkOptions("");
+        panel2Title: "3 · Wallet firmatario (il controller)",
+        panel2Note: "Questo è il wallet che manovra davvero la UP sulla rete scelta al punto 1 — deve essere connesso a quella rete, non a LUKSO. È normale avere sia l'estensione UP che MetaMask attivi insieme nel browser: usa quello giusto per ciascun passaggio.",
+        fundsNote: "<b>💡 I fondi: due indirizzi, tutti e due tuoi</b><br>• <b>L'indirizzo della tua UP</b> (uguale su tutte le reti) è il tuo <i>conto</i>: mandaci fondi <b>solo dopo</b> che deploy e test su questa rete sono andati a buon fine: se qualcosa va storto (chiave del controller sbagliata, deploy fallito) i fondi mandati prima resterebbero bloccati.<br>• <b>L'indirizzo del controller</b> (il wallet in MetaMask) è la <i>chiave</i> che firma. Ogni operazione costa una piccola commissione (gas), e <b>la paga il controller, non la UP</b>.<br>👉 Quindi manda un po' di fondi <b>anche al controller</b>, sulla stessa rete (es. POL su Polygon, ETH su Base o Arbitrum): quanto basta per qualche transazione. Senza, il controller non può firmare nulla, anche se la UP è piena.",
+        connectSignerBtn: "Connetti MetaMask / wallet firmatario",
 
-// Se si arriva da un link della pagina di deploy dopo un deploy confermato, preseleziona
-// la stessa rete appena usata.
-const presetNetworkKey = new URLSearchParams(location.search).get("network");
-if (presetNetworkKey && presetNetworkKey !== "custom" && CHAINS.some(c => c.key === presetNetworkKey)) {
-  networkSelectEl.value = presetNetworkKey;
-}
+        panel3Title: "1 · Rete su cui operare",
+        panel3Note: "La rete dove la tua UP è stata rideployata (non LUKSO). Il wallet firmatario del punto 3 deve essere connesso a questa stessa rete: lo stato del punto 3 mostra la rete attuale del wallet, verificalo prima di procedere.",
+        networkFilterPlaceholder: "Filtra per nome... (es. base, polygon, arbitrum)",
+        customRpcLabel: "RPC URL custom",
+        customExplorerLabel: "Explorer URL custom (opzionale)",
 
-$("networkFilter").addEventListener("input", (e) => {
-  renderNetworkOptions(e.target.value);
-  // Filtering can silently change the selected option: propagate it like a user selection.
-  networkSelectEl.dispatchEvent(new Event("change"));
-});
-networkSelectEl.addEventListener("change", () => {
-  $("customRpcWrap").style.display = networkSelectEl.value === "custom" ? "block" : "none";
-});
-function getNetwork() {
-  if (networkSelectEl.value === "custom") {
-    return { name: t("customNetName"), rpc: $("customRpc").value.trim(), explorer: $("customExplorer").value.trim() || null };
-  }
-  return CHAINS.find(c => c.key === networkSelectEl.value);
-}
+        panel4Title: "4 · Test",
+        panel4Note: "Scrive una chiave di prova (<code>up.test.ping</code>) con un valore univoco, poi la rilegge on-chain per confermare. Non tocca dati esistenti, non richiede fondi sulla UP — solo gas per la transazione dal wallet firmatario.",
+        testBtn: "Scrivi dato di prova",
+        logInitial: "In attesa dei collegamenti sopra.",
 
-// Alert shown only when this UP has no backup controller on the selected network (read-only).
-BackupCheck.attach({ el: $("backupAlert"), getNetwork, getUp: () => $("profileAddress").value });
+        extNotFound: "Estensione Universal Profile non trovata in questo browser",
+        connectedBadge: "Connesso",
+        connectionRejected: "Connessione rifiutata o fallita",
+        noSignerFound: "Nessun wallet firmatario trovato",
+        unknownNetworkLabel: (v) => `rete sconosciuta (chainId ${v.chainId})`,
 
-// --- 4. Test ---
-// The Key Manager is read from the UP itself (LSP0 owner()), not recomputed from a fixed
-// implementation address: this works whatever Key Manager version the profile uses.
-async function readKeyManager(provider, upAddress) {
-  const up = new ethers.Contract(upAddress, ["function owner() view returns (address)"], provider);
-  return ethers.getAddress(await up.owner());
-}
+        missingAddrErr: "Indirizzo UP mancante o non valido (pannello 2) — connetti la tua UP o inseriscilo a mano.",
+        connectSignerFirstLog: "Collega prima il wallet firmatario (pannello 3).",
+        missingRpcLog: "Manca l'RPC della rete (pannello 1).",
+        upLog: (v) => `UP: ${v.addr}`,
+        kmLog: (v) => `Key Manager: ${v.addr}`,
+        netLog: (v) => `Rete: ${v.name}`,
+        signerChangedErr: "❌ L'account attivo nel wallet è cambiato: ricollega il wallet firmatario e ripeti il test.",
+        gasFailErr: (v) => `❌ Stima gas fallita — il controller probabilmente non ha i permessi giusti su questa UP/rete: ${v.err}`,
+        permsOkLog: (v) => `✅ Permessi verificati (stima gas riuscita: ${v.gas} unità).`,
+        sendingTestTxLog: "Invio transazione di test (conferma nel wallet)...",
+        txHashLog: (v) => `Tx: ${v.hash}`,
+        waitingConfirmLog: "In attesa di conferma...",
+        writeConfirmedLog: (v) => `✅✅ Scrittura confermata e riletta on-chain: "${v.value}"`,
+        controllerOkLog: "Il controller in MetaMask sa operare questa UP su questa rete.",
+        genericErrorLog: (v) => `Errore: ${v.err}`,
+        signerNoFundsErr: (v) => `❌ Il controller (${v.addr}) non ha abbastanza ${v.currency} su ${v.net} per pagare la commissione: servono circa ${v.need}, ne ha ${v.have}. La commissione la paga il controller, non la UP: manda un po' di ${v.currency} all'indirizzo del controller su ${v.net} e riprova.`,
+        signerFundsOkLog: (v) => `✅ Il controller ha fondi per la commissione (${v.balance} ${v.currency}).`,
+        ownerNotKmErr: (v) => `❌ L'owner della UP (${v.addr}) non ha bytecode su questa rete: non è un Key Manager.`,
+        upNotDeployedErr: "❌ La UP non risulta deployata su questa rete.",
+        rpcChainMismatchErr: (v) => `❌ BLOCCANTE — l'RPC risponde con chainId ${v.rpcChainId}, ma la rete selezionata è ${v.netName} (chainId ${v.chainId}).`,
+        walletWrongNetwork: (v) => `❌ BLOCCANTE — il wallet firmatario è sulla rete con chainId ${v.walletChainId}, ma la rete selezionata è ${v.netName} (chainId ${v.chainId}). Cambia rete nel wallet.`,
+        walletNetworkCheckFailed: "❌ BLOCCANTE — impossibile leggere la rete del wallet firmatario.",
+        walletCorrectNetwork: (v) => `✅ Wallet firmatario e RPC sulla stessa rete (chainId ${v.chainId}).`,
+        readBackMismatchErr: (v) => `❌ Il valore riletto on-chain ("${v.got}") non corrisponde a quello scritto ("${v.expected}"). Se la tx è confermata, riprova tra poco: l'RPC potrebbe non essere ancora aggiornato.`,
 
-// Both the RPC used for checks and the wallet that signs must be on the selected chain.
-async function checkChains(net, provider) {
-  const rpcChainId = Number(await provider.send("eth_chainId", []));
-  // A custom RPC has no name in the chain list: label it with the chainId the RPC reports.
-  if (!net.chainId) net.name = `${t("customNetName")} (chainId ${rpcChainId})`;
-  const expectedChainId = net.chainId || rpcChainId;
-  if (rpcChainId !== expectedChainId) {
-    return { ok: false, msg: t("rpcChainMismatchErr", { rpcChainId, netName: net.name, chainId: expectedChainId }) };
-  }
-  let walletChainId;
-  try {
-    walletChainId = parseInt(await signerProvider.request({ method: "eth_chainId" }), 16);
-  } catch (e) {
-    return { ok: false, msg: t("walletNetworkCheckFailed") };
-  }
-  if (walletChainId !== expectedChainId) {
-    return { ok: false, msg: t("walletWrongNetwork", { walletChainId, netName: net.name, chainId: expectedChainId }) };
-  }
-  return { ok: true, chainId: expectedChainId };
-}
+        footerHtml: `Servizi di consulenza in integrazione dati &amp; blockchain a cura di ChainIntegrate <a href="https://www.linkedin.com/company/chainintegrate" target="_blank" rel="noopener" aria-label="LinkedIn" class="footer-li"><svg width="20" height="20" viewBox="0 0 20 20"><rect width="20" height="20" rx="4" fill="#0A66C2"/><text x="10" y="15" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#fff">in</text></svg></a> · <a href="https://t.me/Simone_1977_2" target="_blank" rel="noopener">Assistenza via Telegram</a> · <a href="https://github.com/ChainIntegrate/Cross_Chain" target="_blank" rel="noopener">Codice sorgente su GitHub</a>`,
+      },
+      en: {
+        pageTitle: "UP Test Operation — ChainIntegrate",
+        h1: "UP Test Operation",
+        subtitle: "Writes a small test value to an already-deployed UP, via the Key Manager — to verify a controller can actually operate it, without doing a deploy.",
+        langToggleBtn: "Italiano",
+        customNetName: "Custom network",
 
-$("testBtn").addEventListener("click", async () => {
-  $("log").innerHTML = "";
-  const profile = currentProfile();
-  if (!profile.address || !ethers.isAddress(profile.address)) { log(t("missingAddrErr"), "line-err"); return; }
-  if (!signerAddress) { log(t("connectSignerFirstLog"), "line-err"); return; }
-  const net = getNetwork();
-  if (!net || !net.rpc) { log(t("missingRpcLog"), "line-err"); return; }
+        panel0Title: "0 · How this page works",
+        panel0Note: "This page operates on a UP that is <b>already deployed</b> on a network other than LUKSO — it's not the same as just connecting the UP extension. The UP itself doesn't sign transactions on another network: the one signing is the <b>controller wallet</b> (e.g. MetaMask) connected to that network, with the right permissions on the UP. That's why the page asks for two separate connections: (1) connect your UP only to read its address conveniently — no signature here; (2) connect MetaMask (or another wallet) on the <b>destination network</b> where you redeployed the UP, and that wallet is the one sending the test transaction.",
 
-  try {
-    log(t("upLog", { addr: profile.address }), "line-dim");
-    log(t("netLog", { name: net.name }), "line-dim");
+        panel1Title: "2 · Profile to test",
+        connectUpBtn: "Connect your Universal Profile",
+        notConnected: "Not connected.",
+        connectUpNote: "Only used to read the UP address — no signature or transaction happens at this point. If you want to test a UP other than the one connected in your extension, you can enter its address manually below.",
+        profileAddressLabel: "UP address to test",
 
-    const readProvider = new ethers.JsonRpcProvider(net.rpc, undefined, { batchMaxCount: 1 });
-    const chains = await checkChains(net, readProvider);
-    if (!chains.ok) { log(chains.msg, "line-err"); return; }
-    log(t("walletCorrectNetwork", { chainId: chains.chainId }), "line-ok");
+        panel2Title: "3 · Signing wallet (the controller)",
+        panel2Note: "This is the wallet that actually operates the UP on the network chosen in step 1 — it must be connected to that network, not to LUKSO. It's normal to have both the UP extension and MetaMask active in the browser at the same time: use the right one for each step.",
+        fundsNote: "<b>💡 Funds: two addresses, both yours</b><br>• <b>Your UP address</b> (the same on every network) is your <i>account</i>: send funds to it <b>only after</b> the deploy and the test on this network have succeeded: if something goes wrong (wrong controller key, failed deploy) funds sent earlier would stay stuck.<br>• <b>The controller address</b> (the wallet in MetaMask) is the <i>key</i> that signs. Every operation costs a small fee (gas), and <b>the controller pays it, not the UP</b>.<br>👉 So send some funds <b>to the controller too</b>, on the same network (e.g. POL on Polygon, ETH on Base or Arbitrum): enough for a few transactions. Without them the controller cannot sign anything, even if the UP is full.",
+        connectSignerBtn: "Connect MetaMask / signing wallet",
 
-    if ((await readProvider.getCode(profile.address)) === "0x") {
-      log(t("upNotDeployedErr"), "line-err");
-      return;
-    }
-    const keyManagerAddress = await readKeyManager(readProvider, profile.address);
-    log(t("kmLog", { addr: keyManagerAddress }), "line-dim");
-    const kmCode = await readProvider.getCode(keyManagerAddress);
-    if (kmCode === "0x") {
-      log(t("ownerNotKmErr", { addr: keyManagerAddress }), "line-err");
-      return;
+        panel3Title: "1 · Network to operate on",
+        panel3Note: "The network where your UP was redeployed (not LUKSO). The signing wallet from step 3 must be connected to this same network — the status in step 3 shows the wallet's current network, check it before proceeding.",
+        networkFilterPlaceholder: "Filter by name... (e.g. base, polygon, arbitrum)",
+        customRpcLabel: "Custom RPC URL",
+        customExplorerLabel: "Custom explorer URL (optional)",
+
+        panel4Title: "4 · Test",
+        panel4Note: "Writes a test key (<code>up.test.ping</code>) with a unique value, then reads it back on-chain to confirm. Doesn't touch existing data, doesn't require funds on the UP — only gas for the transaction from the signing wallet.",
+        testBtn: "Write test value",
+        logInitial: "Waiting for the connections above.",
+
+        extNotFound: "Universal Profile extension not found in this browser",
+        connectedBadge: "Connected",
+        connectionRejected: "Connection rejected or failed",
+        noSignerFound: "No signing wallet found",
+        unknownNetworkLabel: (v) => `unknown network (chainId ${v.chainId})`,
+
+        missingAddrErr: "Missing or invalid UP address (panel 2) — connect your UP or enter it manually.",
+        connectSignerFirstLog: "Connect the signing wallet first (panel 3).",
+        missingRpcLog: "Missing network RPC (panel 1).",
+        upLog: (v) => `UP: ${v.addr}`,
+        kmLog: (v) => `Key Manager: ${v.addr}`,
+        netLog: (v) => `Network: ${v.name}`,
+        signerChangedErr: "❌ The active wallet account changed: reconnect the signing wallet and run the test again.",
+        gasFailErr: (v) => `❌ Gas estimation failed — the controller likely doesn't have the right permissions on this UP/network: ${v.err}`,
+        permsOkLog: (v) => `✅ Permissions verified (gas estimate succeeded: ${v.gas} units).`,
+        sendingTestTxLog: "Sending test transaction (confirm in your wallet)...",
+        txHashLog: (v) => `Tx: ${v.hash}`,
+        waitingConfirmLog: "Waiting for confirmation...",
+        writeConfirmedLog: (v) => `✅✅ Write confirmed and read back on-chain: "${v.value}"`,
+        controllerOkLog: "The controller in MetaMask can operate this UP on this network.",
+        genericErrorLog: (v) => `Error: ${v.err}`,
+        signerNoFundsErr: (v) => `❌ The controller (${v.addr}) does not have enough ${v.currency} on ${v.net} to pay the fee: about ${v.need} needed, it has ${v.have}. The fee is paid by the controller, not by the UP: send some ${v.currency} to the controller address on ${v.net} and try again.`,
+        signerFundsOkLog: (v) => `✅ The controller has funds for the fee (${v.balance} ${v.currency}).`,
+        ownerNotKmErr: (v) => `❌ The UP owner (${v.addr}) has no bytecode on this network: it is not a Key Manager.`,
+        upNotDeployedErr: "❌ The UP isn't deployed on this network.",
+        rpcChainMismatchErr: (v) => `❌ BLOCKING — the RPC answers with chainId ${v.rpcChainId}, but the selected network is ${v.netName} (chainId ${v.chainId}).`,
+        walletWrongNetwork: (v) => `❌ BLOCKING — the signing wallet is on chainId ${v.walletChainId}, but the selected network is ${v.netName} (chainId ${v.chainId}). Switch network in the wallet.`,
+        walletNetworkCheckFailed: "❌ BLOCKING — could not read the signing wallet's network.",
+        walletCorrectNetwork: (v) => `✅ Signing wallet and RPC are on the same network (chainId ${v.chainId}).`,
+        readBackMismatchErr: (v) => `❌ The value read back on-chain ("${v.got}") does not match the one written ("${v.expected}"). If the tx is confirmed, retry shortly: the RPC may not be up to date yet.`,
+
+        footerHtml: `Data &amp; blockchain integration consulting by ChainIntegrate <a href="https://www.linkedin.com/company/chainintegrate" target="_blank" rel="noopener" aria-label="LinkedIn" class="footer-li"><svg width="20" height="20" viewBox="0 0 20 20"><rect width="20" height="20" rx="4" fill="#0A66C2"/><text x="10" y="15" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#fff">in</text></svg></a> · <a href="https://t.me/Simone_1977_2" target="_blank" rel="noopener">Support via Telegram</a> · <a href="https://github.com/ChainIntegrate/Cross_Chain" target="_blank" rel="noopener">Source code on GitHub</a>`,
+      },
+    };
+
+    function t(key, vars) {
+      const entry = I18N[LANG][key];
+      return typeof entry === "function" ? entry(vars || {}) : entry;
     }
 
-    const testKey = ethers.id("up.test.ping");
-    const testValueText = "ok-" + Date.now();
-    const testValue = ethers.toUtf8Bytes(testValueText);
-
-    const upIface = new ethers.Interface(["function setData(bytes32,bytes)"]);
-    const setDataCalldata = upIface.encodeFunctionData("setData", [testKey, testValue]);
-
-    const kmIface = new ethers.Interface(["function execute(bytes) returns (bytes)"]);
-    const executeCalldata = kmIface.encodeFunctionData("execute", [setDataCalldata]);
-
-    const gasEstimate = await readProvider.estimateGas({
-      to: keyManagerAddress, data: executeCalldata, from: signerAddress
-    }).catch(e => {
-      log(t("gasFailErr", { err: e.shortMessage || e.message }), "line-err");
-      throw e;
+    function applyI18n() {
+      document.documentElement.lang = LANG;
+      document.querySelectorAll("[data-i18n]").forEach(el => { el.textContent = t(el.getAttribute("data-i18n")); });
+      document.querySelectorAll("[data-i18n-html]").forEach(el => { el.innerHTML = t(el.getAttribute("data-i18n-html")); });
+      document.querySelectorAll("[data-i18n-placeholder]").forEach(el => { el.placeholder = t(el.getAttribute("data-i18n-placeholder")); });
+    }
+    applyI18n();
+    $("langToggle").addEventListener("click", () => {
+      LANG = LANG === "it" ? "en" : "it";
+      applyI18n();
     });
-    log(t("permsOkLog", { gas: gasEstimate.toString() }), "line-ok");
 
-    // The controller pays the fee, not the UP: check it can afford it before opening the wallet,
-    // so a user with an empty controller gets a clear explanation instead of a wallet error.
-    const gasPrice = await estimateMaxGasPrice(readProvider);
-    const gasCost = gasEstimate * gasPrice + (gasEstimate * gasPrice) / 4n;
-    const signerBalance = await readProvider.getBalance(signerAddress);
-    if (signerBalance < gasCost) {
-      log(t("signerNoFundsErr", { addr: signerAddress, net: net.name, currency: net.currency || "", need: ethers.formatEther(gasCost), have: ethers.formatEther(signerBalance) }), "line-err");
-      return;
-    }
-    log(t("signerFundsOkLog", { balance: ethers.formatEther(signerBalance), currency: net.currency || "" }), "line-ok");
+    // ==================== APP ====================
+    const EXPLORER_PATH = "/tx/";
 
-    const browserProvider = new ethers.BrowserProvider(signerProvider);
-    const signerObj = await browserProvider.getSigner();
-    // Gas was estimated for signerAddress: make sure the wallet still signs with that account.
-    if (signerObj.address.toLowerCase() !== signerAddress.toLowerCase()) {
-      log(t("signerChangedErr"), "line-err");
-      return;
+
+    // Upper bound of the gas price, read straight from the RPC. ethers' getFeeData() is avoided on
+    // purpose: on some chains (e.g. Polygon) it calls a third-party gas-station API and fails when
+    // that service is down or blocked. Same formula as ethers: 2 * baseFee + priority fee.
+    async function estimateMaxGasPrice(provider) {
+      const gasPrice = BigInt(await provider.send("eth_gasPrice", []));
+      const block = await provider.send("eth_getBlockByNumber", ["latest", false]);
+      if (!block || !block.baseFeePerGas) return gasPrice;
+      const baseFee = BigInt(block.baseFeePerGas);
+      const tip = gasPrice > baseFee ? gasPrice - baseFee : 0n;
+      return 2n * baseFee + tip;
     }
 
-    log(t("sendingTestTxLog"), "line-dim");
-    const tx = await signerObj.sendTransaction({ to: keyManagerAddress, data: executeCalldata, chainId: chains.chainId });
-    log(t("txHashLog", { hash: tx.hash }), "line-dim");
-    const explorerUrl = getExplorerUrl(net, EXPLORER_PATH, tx.hash);
-    if (explorerUrl) log(explorerUrl, "line-dim");
-
-    log(t("waitingConfirmLog"), "line-dim");
-    await tx.wait();
-
-    const upReadIface = new ethers.Interface(["function getData(bytes32) view returns (bytes)"]);
-    const upContract = new ethers.Contract(profile.address, upReadIface, readProvider);
-    // Public RPCs are often load-balanced: retry briefly before declaring a mismatch.
-    let readBackText = "";
-    for (let i = 0; i < 5; i++) {
-      readBackText = ethers.toUtf8String(await upContract.getData(testKey));
-      if (readBackText === testValueText) break;
-      await new Promise(r => setTimeout(r, 2000));
-    }
-    if (readBackText !== testValueText) {
-      log(t("readBackMismatchErr", { got: readBackText, expected: testValueText }), "line-err");
-      return;
+    function log(msg, cls) {
+      const l = document.createElement("div");
+      if (cls) l.className = cls;
+      l.textContent = msg;
+      $("log").appendChild(l);
     }
 
-    log(t("writeConfirmedLog", { value: readBackText }), "line-ok");
-    log(t("controllerOkLog"), "line-ok");
-  } catch (e) {
-    log(t("genericErrorLog", { err: e.shortMessage || e.message }), "line-err");
-  }
-});
-</script>
+    // --- 1. Profilo: connessione alla PROPRIA estensione UP, come nella pagina di deploy.
+    // Pagina pubblica: nessuna tabella di profili noti, chiunque la usi vede solo il proprio
+    // indirizzo, letto direttamente dalla connessione. Il campo indirizzo resta editabile per
+    // chi vuole testare una UP diversa da quella connessa nell'estensione.
+    $("connectUp").addEventListener("click", async () => {
+      if (!window.lukso) {
+        $("profileStatus").innerHTML = `<span class="badge err">${t("extNotFound")}</span>`;
+        return;
+      }
+      try {
+        const accounts = await window.lukso.request({ method: "eth_requestAccounts" });
+        const upAddress = accounts[0];
+        $("profileAddress").value = upAddress;
+        $("profileStatus").innerHTML = `<span class="badge ok">${t("connectedBadge")}</span> ${escapeHtml(upAddress)}`;
+      } catch (e) {
+        $("profileStatus").innerHTML = `<span class="badge err">${t("connectionRejected")}</span>`;
+      }
+    });
+    function currentProfile() {
+      return { address: $("profileAddress").value.trim() };
+    }
+
+    // --- 2. Wallet firmatario, via EIP-6963 ---
+    let signerProvider = null, signerAddress = null;
+    const discoveredProviders = [];
+    window.addEventListener("eip6963:announceProvider", (e) => discoveredProviders.push(e.detail));
+    window.dispatchEvent(new Event("eip6963:requestProvider"));
+
+    $("connectSigner").addEventListener("click", async () => {
+      let candidate = discoveredProviders.find(p => !/lukso|universal profile/i.test(p.info.name))?.provider;
+      if (!candidate && window.ethereum && window.ethereum !== window.lukso) candidate = window.ethereum;
+      if (!candidate) {
+        $("signerStatus").innerHTML = `<span class="badge err">${t("noSignerFound")}</span>`;
+        return;
+      }
+      try {
+        const accounts = await candidate.request({ method: "eth_requestAccounts" });
+        signerAddress = accounts[0];
+        signerProvider = candidate;
+        let netLabel = "";
+        try {
+          const chainIdHex = await candidate.request({ method: "eth_chainId" });
+          netLabel = ` · ${chainDisplayName(parseInt(chainIdHex, 16))}`;
+        } catch (e) { /* se non si riesce a leggere la rete, si mostra comunque l'indirizzo */ }
+        $("signerStatus").innerHTML = `<span class="badge ok">${t("connectedBadge")}</span> ${escapeHtml(signerAddress + netLabel)}`;
+      } catch (e) {
+        $("signerStatus").innerHTML = `<span class="badge err">${t("connectionRejected")}</span>`;
+      }
+    });
+
+    // --- 3. Rete ---
+    const networkSelectEl = $("network");
+
+    // Nome rete leggibile a partire dal chainId, per mostrare a quale rete è connesso il
+    // wallet firmatario (utile con tanti test su reti diverse). LUKSO non è nell'elenco CHAINS
+    // perché quell'elenco è quello delle reti di destinazione, non della UP originale.
+    function chainDisplayName(chainId) {
+      if (chainId === 42) return "LUKSO Mainnet";
+      if (chainId === 4201) return "LUKSO Testnet";
+      const found = CHAINS.find(c => c.chainId === chainId);
+      return found ? found.name : t("unknownNetworkLabel", { chainId });
+    }
+
+    function renderNetworkOptions(filter) {
+      const f = (filter || "").toLowerCase();
+      networkSelectEl.innerHTML = "";
+      CHAINS.filter(c => c.name.toLowerCase().includes(f)).forEach(c => {
+        const opt = document.createElement("option");
+        opt.value = c.key;
+        opt.textContent = c.chainId ? `${c.name} (chainId ${c.chainId})` : c.name;
+        networkSelectEl.appendChild(opt);
+      });
+    }
+    renderNetworkOptions("");
+
+    // Se si arriva da un link della pagina di deploy dopo un deploy confermato, preseleziona
+    // la stessa rete appena usata.
+    const presetNetworkKey = new URLSearchParams(location.search).get("network");
+    if (presetNetworkKey && presetNetworkKey !== "custom" && CHAINS.some(c => c.key === presetNetworkKey)) {
+      networkSelectEl.value = presetNetworkKey;
+    }
+
+    $("networkFilter").addEventListener("input", (e) => {
+      renderNetworkOptions(e.target.value);
+      // Filtering can silently change the selected option: propagate it like a user selection.
+      networkSelectEl.dispatchEvent(new Event("change"));
+    });
+    networkSelectEl.addEventListener("change", () => {
+      $("customRpcWrap").style.display = networkSelectEl.value === "custom" ? "block" : "none";
+    });
+    function getNetwork() {
+      if (networkSelectEl.value === "custom") {
+        return { name: t("customNetName"), rpc: $("customRpc").value.trim(), explorer: $("customExplorer").value.trim() || null };
+      }
+      return CHAINS.find(c => c.key === networkSelectEl.value);
+    }
+
+    // Alert shown only when this UP has no backup controller on the selected network (read-only).
+    BackupCheck.attach({ el: $("backupAlert"), getNetwork, getUp: () => $("profileAddress").value });
+
+    // --- 4. Test ---
+    // The Key Manager is read from the UP itself (LSP0 owner()), not recomputed from a fixed
+    // implementation address: this works whatever Key Manager version the profile uses.
+    async function readKeyManager(provider, upAddress) {
+      const up = new ethers.Contract(upAddress, ["function owner() view returns (address)"], provider);
+      return ethers.getAddress(await up.owner());
+    }
+
+    // Both the RPC used for checks and the wallet that signs must be on the selected chain.
+    async function checkChains(net, provider) {
+      const rpcChainId = Number(await provider.send("eth_chainId", []));
+      // A custom RPC has no name in the chain list: label it with the chainId the RPC reports.
+      if (!net.chainId) net.name = `${t("customNetName")} (chainId ${rpcChainId})`;
+      const expectedChainId = net.chainId || rpcChainId;
+      if (rpcChainId !== expectedChainId) {
+        return { ok: false, msg: t("rpcChainMismatchErr", { rpcChainId, netName: net.name, chainId: expectedChainId }) };
+      }
+      let walletChainId;
+      try {
+        walletChainId = parseInt(await signerProvider.request({ method: "eth_chainId" }), 16);
+      } catch (e) {
+        return { ok: false, msg: t("walletNetworkCheckFailed") };
+      }
+      if (walletChainId !== expectedChainId) {
+        return { ok: false, msg: t("walletWrongNetwork", { walletChainId, netName: net.name, chainId: expectedChainId }) };
+      }
+      return { ok: true, chainId: expectedChainId };
+    }
+
+    $("testBtn").addEventListener("click", async () => {
+      $("log").innerHTML = "";
+      const profile = currentProfile();
+      if (!profile.address || !ethers.isAddress(profile.address)) { log(t("missingAddrErr"), "line-err"); return; }
+      if (!signerAddress) { log(t("connectSignerFirstLog"), "line-err"); return; }
+      const net = getNetwork();
+      if (!net || !net.rpc) { log(t("missingRpcLog"), "line-err"); return; }
+
+      try {
+        log(t("upLog", { addr: profile.address }), "line-dim");
+        log(t("netLog", { name: net.name }), "line-dim");
+
+        const readProvider = new ethers.JsonRpcProvider(net.rpc, undefined, { batchMaxCount: 1 });
+        const chains = await checkChains(net, readProvider);
+        if (!chains.ok) { log(chains.msg, "line-err"); return; }
+        log(t("walletCorrectNetwork", { chainId: chains.chainId }), "line-ok");
+
+        if ((await readProvider.getCode(profile.address)) === "0x") {
+          log(t("upNotDeployedErr"), "line-err");
+          return;
+        }
+        const keyManagerAddress = await readKeyManager(readProvider, profile.address);
+        log(t("kmLog", { addr: keyManagerAddress }), "line-dim");
+        const kmCode = await readProvider.getCode(keyManagerAddress);
+        if (kmCode === "0x") {
+          log(t("ownerNotKmErr", { addr: keyManagerAddress }), "line-err");
+          return;
+        }
+
+        const testKey = ethers.id("up.test.ping");
+        const testValueText = "ok-" + Date.now();
+        const testValue = ethers.toUtf8Bytes(testValueText);
+
+        const upIface = new ethers.Interface(["function setData(bytes32,bytes)"]);
+        const setDataCalldata = upIface.encodeFunctionData("setData", [testKey, testValue]);
+
+        const kmIface = new ethers.Interface(["function execute(bytes) returns (bytes)"]);
+        const executeCalldata = kmIface.encodeFunctionData("execute", [setDataCalldata]);
+
+        const gasEstimate = await readProvider.estimateGas({
+          to: keyManagerAddress, data: executeCalldata, from: signerAddress
+        }).catch(e => {
+          log(t("gasFailErr", { err: e.shortMessage || e.message }), "line-err");
+          throw e;
+        });
+        log(t("permsOkLog", { gas: gasEstimate.toString() }), "line-ok");
+
+        // The controller pays the fee, not the UP: check it can afford it before opening the wallet,
+        // so a user with an empty controller gets a clear explanation instead of a wallet error.
+        const gasPrice = await estimateMaxGasPrice(readProvider);
+        const gasCost = gasEstimate * gasPrice + (gasEstimate * gasPrice) / 4n;
+        const signerBalance = await readProvider.getBalance(signerAddress);
+        if (signerBalance < gasCost) {
+          log(t("signerNoFundsErr", { addr: signerAddress, net: net.name, currency: net.currency || "", need: ethers.formatEther(gasCost), have: ethers.formatEther(signerBalance) }), "line-err");
+          return;
+        }
+        log(t("signerFundsOkLog", { balance: ethers.formatEther(signerBalance), currency: net.currency || "" }), "line-ok");
+
+        const browserProvider = new ethers.BrowserProvider(signerProvider);
+        const signerObj = await browserProvider.getSigner();
+        // Gas was estimated for signerAddress: make sure the wallet still signs with that account.
+        if (signerObj.address.toLowerCase() !== signerAddress.toLowerCase()) {
+          log(t("signerChangedErr"), "line-err");
+          return;
+        }
+
+        log(t("sendingTestTxLog"), "line-dim");
+        const tx = await signerObj.sendTransaction({ to: keyManagerAddress, data: executeCalldata, chainId: chains.chainId });
+        log(t("txHashLog", { hash: tx.hash }), "line-dim");
+        const explorerUrl = getExplorerUrl(net, EXPLORER_PATH, tx.hash);
+        if (explorerUrl) log(explorerUrl, "line-dim");
+
+        log(t("waitingConfirmLog"), "line-dim");
+        await tx.wait();
+
+        const upReadIface = new ethers.Interface(["function getData(bytes32) view returns (bytes)"]);
+        const upContract = new ethers.Contract(profile.address, upReadIface, readProvider);
+        // Public RPCs are often load-balanced: retry briefly before declaring a mismatch.
+        let readBackText = "";
+        for (let i = 0; i < 5; i++) {
+          readBackText = ethers.toUtf8String(await upContract.getData(testKey));
+          if (readBackText === testValueText) break;
+          await new Promise(r => setTimeout(r, 2000));
+        }
+        if (readBackText !== testValueText) {
+          log(t("readBackMismatchErr", { got: readBackText, expected: testValueText }), "line-err");
+          return;
+        }
+
+        log(t("writeConfirmedLog", { value: readBackText }), "line-ok");
+        log(t("controllerOkLog"), "line-ok");
+      } catch (e) {
+        log(t("genericErrorLog", { err: e.shortMessage || e.message }), "line-err");
+      }
+    });
+  </script>
 
 </body>
+
 </html>

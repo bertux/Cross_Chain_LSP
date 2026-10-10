@@ -1,799 +1,1069 @@
 <!DOCTYPE html>
 <html lang="it">
+
 <head>
-<meta charset="UTF-8">
-<script src="theme.js"></script>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="referrer" content="no-referrer">
-<meta name="robots" content="noindex, nofollow">
-<title>Ricezione NFT sulla UP — ChainIntegrate</title>
-<link rel="icon" href="favicon.ico">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.4/ethers.umd.min.js" integrity="sha384-6Zl0Pc8zjSz8KvmNeXRvUQgY4ryFb+BwDvKCmLYcBME0joAaru491tQgi9B7zsMM" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script src="chains.js"></script>
-<style>
-  :root {
-    --bg: #0f1115; --panel: #171a21; --border: #2a2f3a; --field: #10131a; --chip: #2a2f3a; --disabled: #3a3f4b; --raised: #1d2330;
-    --text: #e6e8ec; --text-dim: #9aa1ad;
-    --accent: #5b8cff; --ok: #3fbf6f; --warn: #e0a83c; --err: #e05a5a;
-  }
-  * { box-sizing: border-box; }
-  body { background: var(--bg); color: var(--text); font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
-         max-width: 760px; margin: 0 auto; padding: 32px 20px 80px; }
-  h1 { font-size: 20px; margin-bottom: 4px; }
-  .subtitle { color: var(--text-dim); font-size: 13px; margin-bottom: 28px; }
-  .panel { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 20px; margin-bottom: 20px; }
-  .panel h2 { font-size: 14px; margin: 0 0 14px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.03em; }
-  .note { font-size: 12.5px; color: var(--text-dim); line-height: 1.5; margin-bottom: 12px; }
-  label { display: block; font-size: 13px; color: var(--text-dim); margin: 14px 0 6px; }
-  select, input { width: 100%; background: var(--field); border: 1px solid var(--border); color: var(--text);
-                  border-radius: 6px; padding: 10px 12px; font-size: 14px; font-family: inherit; }
-  button { width: 100%; background: var(--accent); color: white; border: none; border-radius: 6px;
-           padding: 12px; font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 12px; }
-  button:disabled { background: var(--disabled); cursor: not-allowed; }
-  button.danger { background: var(--err); }
-  button.secondary { background: var(--chip); }
-  .status-box { background: var(--field); border: 1px solid var(--border); border-radius: 6px; padding: 12px;
-                font-family: monospace; font-size: 12.5px; margin-top: 12px; }
-  .status-box .empty { color: var(--text-dim); }
-  #log { font-family: monospace; font-size: 12.5px; white-space: pre-wrap; word-break: break-all; line-height: 1.6; }
-  .line-ok { color: var(--ok); } .line-warn { color: var(--warn); } .line-err { color: var(--err); } .line-dim { color: var(--text-dim); }
-  .line-compare { color: var(--warn); font-weight: 700; border: 1px solid var(--warn); border-radius: 6px; padding: 8px 10px; margin: 6px 0; }
-  .brand-row { margin-bottom: 24px; }
-  .brand-logo { display: block; width: 100%; height: auto; border-radius: 10px; }
-  .top-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
-  .lang-btn { width: auto; background: var(--chip); padding: 6px 14px; font-size: 12px; margin-top: 0; flex-shrink: 0; }
-  .site-footer { margin-top: 40px; padding: 18px 20px; background: #f5f6f8; border: 1px solid #e3e5ea; border-radius: 10px; color: #4b4f58; }
-  .footer-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
-  .footer-logo { height: 48px; width: auto; flex-shrink: 0; }
-  .footer-text { font-size: 13px; line-height: 1.6; }
-  .footer-li { display: inline-flex; vertical-align: middle; margin: 0 2px; }
-  .site-footer a { color: #2563eb; text-decoration: none; font-weight: 600; }
-  .kv { display: grid; grid-template-columns: 210px 1fr; gap: 6px 12px; font-size: 13px; margin-top: 10px; }
-  .kv .k { color: var(--text-dim); }
-  .kv .v { font-family: monospace; word-break: break-all; }
-  .kv .v.ok { color: var(--ok); } .kv .v.warn { color: var(--warn); } .kv .v.err { color: var(--err); }
-  .verdict { margin-top: 12px; font-weight: 700; }
-  .check-row { display: flex; align-items: center; gap: 8px; margin-top: 14px; font-size: 13.5px; }
-  .check-row input { width: auto; }
-  .warn-box { margin-top: 12px; padding: 12px 14px; border: 1px solid var(--err); border-radius: 8px; background: rgba(224,90,90,0.08); font-size: 13px; line-height: 1.5; }
-  .link-btn { display: block; text-align: center; background: var(--accent); color: white; border-radius: 6px; padding: 12px; font-size: 14px; font-weight: 600; text-decoration: none; margin-top: 12px; }
-  .link-btn[hidden] { display: none; }
-  .plan { font-family: monospace; font-size: 12.5px; line-height: 1.6; white-space: pre-wrap; word-break: break-word; }
-  @media (max-width: 560px) { .kv { grid-template-columns: 1fr; } }
-</style>
+  <meta charset="UTF-8">
+  <script src="theme.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Ricezione NFT sulla UP — ChainIntegrate</title>
+  <link rel="icon" href="favicon.ico">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.4/ethers.umd.min.js"
+    integrity="sha384-6Zl0Pc8zjSz8KvmNeXRvUQgY4ryFb+BwDvKCmLYcBME0joAaru491tQgi9B7zsMM" crossorigin="anonymous"
+    referrerpolicy="no-referrer"></script>
+  <script src="chains.js"></script>
+  <style>
+    :root {
+      --bg: #0f1115;
+      --panel: #171a21;
+      --border: #2a2f3a;
+      --field: #10131a;
+      --chip: #2a2f3a;
+      --disabled: #3a3f4b;
+      --raised: #1d2330;
+      --text: #e6e8ec;
+      --text-dim: #9aa1ad;
+      --accent: #5b8cff;
+      --ok: #3fbf6f;
+      --warn: #e0a83c;
+      --err: #e05a5a;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 32px 20px 80px;
+    }
+
+    h1 {
+      font-size: 20px;
+      margin-bottom: 4px;
+    }
+
+    .subtitle {
+      color: var(--text-dim);
+      font-size: 13px;
+      margin-bottom: 28px;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .panel h2 {
+      font-size: 14px;
+      margin: 0 0 14px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .note {
+      font-size: 12.5px;
+      color: var(--text-dim);
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      color: var(--text-dim);
+      margin: 14px 0 6px;
+    }
+
+    select,
+    input {
+      width: 100%;
+      background: var(--field);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 6px;
+      padding: 10px 12px;
+      font-size: 14px;
+      font-family: inherit;
+    }
+
+    button {
+      width: 100%;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 12px;
+    }
+
+    button:disabled {
+      background: var(--disabled);
+      cursor: not-allowed;
+    }
+
+    button.danger {
+      background: var(--err);
+    }
+
+    button.secondary {
+      background: var(--chip);
+    }
+
+    .status-box {
+      background: var(--field);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 12px;
+      font-family: monospace;
+      font-size: 12.5px;
+      margin-top: 12px;
+    }
+
+    .status-box .empty {
+      color: var(--text-dim);
+    }
+
+    #log {
+      font-family: monospace;
+      font-size: 12.5px;
+      white-space: pre-wrap;
+      word-break: break-all;
+      line-height: 1.6;
+    }
+
+    .line-ok {
+      color: var(--ok);
+    }
+
+    .line-warn {
+      color: var(--warn);
+    }
+
+    .line-err {
+      color: var(--err);
+    }
+
+    .line-dim {
+      color: var(--text-dim);
+    }
+
+    .line-compare {
+      color: var(--warn);
+      font-weight: 700;
+      border: 1px solid var(--warn);
+      border-radius: 6px;
+      padding: 8px 10px;
+      margin: 6px 0;
+    }
+
+    .brand-row {
+      margin-bottom: 24px;
+    }
+
+    .brand-logo {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 10px;
+    }
+
+    .top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .lang-btn {
+      width: auto;
+      background: var(--chip);
+      padding: 6px 14px;
+      font-size: 12px;
+      margin-top: 0;
+      flex-shrink: 0;
+    }
+
+    .site-footer {
+      margin-top: 40px;
+      padding: 18px 20px;
+      background: #f5f6f8;
+      border: 1px solid #e3e5ea;
+      border-radius: 10px;
+      color: #4b4f58;
+    }
+
+    .footer-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .footer-logo {
+      height: 48px;
+      width: auto;
+      flex-shrink: 0;
+    }
+
+    .footer-text {
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .footer-li {
+      display: inline-flex;
+      vertical-align: middle;
+      margin: 0 2px;
+    }
+
+    .site-footer a {
+      color: #2563eb;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .kv {
+      display: grid;
+      grid-template-columns: 210px 1fr;
+      gap: 6px 12px;
+      font-size: 13px;
+      margin-top: 10px;
+    }
+
+    .kv .k {
+      color: var(--text-dim);
+    }
+
+    .kv .v {
+      font-family: monospace;
+      word-break: break-all;
+    }
+
+    .kv .v.ok {
+      color: var(--ok);
+    }
+
+    .kv .v.warn {
+      color: var(--warn);
+    }
+
+    .kv .v.err {
+      color: var(--err);
+    }
+
+    .verdict {
+      margin-top: 12px;
+      font-weight: 700;
+    }
+
+    .check-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 14px;
+      font-size: 13.5px;
+    }
+
+    .check-row input {
+      width: auto;
+    }
+
+    .warn-box {
+      margin-top: 12px;
+      padding: 12px 14px;
+      border: 1px solid var(--err);
+      border-radius: 8px;
+      background: rgba(224, 90, 90, 0.08);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .link-btn {
+      display: block;
+      text-align: center;
+      background: var(--accent);
+      color: white;
+      border-radius: 6px;
+      padding: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      margin-top: 12px;
+    }
+
+    .link-btn[hidden] {
+      display: none;
+    }
+
+    .plan {
+      font-family: monospace;
+      font-size: 12.5px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    @media (max-width: 560px) {
+      .kv {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
+
 <body>
 
-<div class="brand-row">
-  <img src="banner.png" alt="ChainIntegrate" class="brand-logo" onerror="this.style.display='none'">
-</div>
-
-<div class="top-row">
-  <div>
-    <h1 data-i18n="h1">Ricezione NFT sulla UP (sperimentale)</h1>
-    <div class="subtitle" data-i18n="subtitle"></div>
+  <div class="brand-row">
+    <img src="banner.png" alt="ChainIntegrate" class="brand-logo" onerror="this.style.display='none'">
   </div>
-  <button class="lang-btn" id="langToggle" data-i18n="langToggleBtn">English</button>
-</div>
 
-<div class="panel">
-  <h2 data-i18n="panel0Title">0 · Come funziona</h2>
-  <div class="note" data-i18n-html="panel0Note"></div>
-  <div class="warn-box" data-i18n-html="disclaimer"></div>
-  <div class="check-row"><input type="checkbox" id="ackRisk"><label for="ackRisk" style="margin:0; color: var(--text);" data-i18n="ackLabel">Ho letto e accetto</label></div>
-</div>
-
-<div class="panel">
-  <h2 data-i18n="panel1Title">1 · Rete</h2>
-  <input type="text" id="networkFilter" data-i18n-placeholder="networkFilterPlaceholder" placeholder="Filtra per nome...">
-  <select id="network" style="margin-top:8px;"></select>
-  <div id="customRpcWrap" style="display:none;">
-    <label data-i18n="customRpcLabel">RPC URL custom</label>
-    <input type="text" id="customRpc" placeholder="https://...">
-    <label data-i18n="customExplorerLabel">Explorer URL custom (opzionale)</label>
-    <input type="text" id="customExplorer" placeholder="https://.../tx/">
+  <div class="top-row">
+    <div>
+      <h1 data-i18n="h1">Ricezione NFT sulla UP (sperimentale)</h1>
+      <div class="subtitle" data-i18n="subtitle"></div>
+    </div>
+    <button class="lang-btn" id="langToggle" data-i18n="langToggleBtn">English</button>
   </div>
-</div>
 
-<div class="panel">
-  <h2 data-i18n="panel2Title">2 · La tua UP</h2>
-  <button id="connectUp" class="secondary" data-i18n="connectUpBtn">Leggi l'indirizzo dall'estensione UP</button>
-  <label for="upAddress" data-i18n="upAddressLabel">Indirizzo della UP</label>
-  <input type="text" id="upAddress" placeholder="0x...">
-</div>
-
-<div class="panel">
-  <h2 data-i18n="panel3Title">3 · Controller (MetaMask) e verifica</h2>
-  <div class="note" data-i18n="panel3Note"></div>
-  <button id="connectSigner" data-i18n="connectSignerBtn">Connetti MetaMask (controller)</button>
-  <div class="status-box" id="checkBox"><span class="empty" data-i18n="checkIdle">La verifica parte da sola quando rete, UP e MetaMask sono impostati.</span></div>
-  <button id="recheckBtn" class="secondary" data-i18n="recheckBtn">Ricontrolla</button>
-</div>
-
-<div class="panel">
-  <h2 data-i18n="panel4Title">4 · Azioni</h2>
-  <div class="note" data-i18n-html="panel4Note"></div>
-  <a id="publishLink" class="link-btn" hidden target="_blank" rel="noopener" data-i18n="publishLinkText">Pubblica l'estensione su questa rete (pagina di pubblicazione) →</a>
-  <button id="prepareBtn" disabled data-i18n="prepareBtn">Prepara e simula l'abilitazione</button>
-  <div class="status-box plan" id="planBox"><span class="empty" data-i18n="noPlan">Nessuna operazione preparata.</span></div>
-  <div class="check-row" id="replaceRow" style="display:none;"><input type="checkbox" id="ackReplace"><label for="ackReplace" style="margin:0; color: var(--warn);" data-i18n="ackReplaceLabel">Ho capito che sostituisco le estensioni esistenti indicate sopra</label></div>
-  <button id="enableBtn" class="danger" disabled data-i18n="enableBtn">Firma e invia (una sola transazione)</button>
-  <div id="log" class="line-dim" style="margin-top:10px;"></div>
-</div>
-
-<div class="site-footer">
-  <div class="footer-row">
-    <img src="logo.png" alt="ChainIntegrate" class="footer-logo" onerror="this.style.display='none'">
-    <div class="footer-text" data-i18n-html="footerHtml"></div>
+  <div class="panel">
+    <h2 data-i18n="panel0Title">0 · Come funziona</h2>
+    <div class="note" data-i18n-html="panel0Note"></div>
+    <div class="warn-box" data-i18n-html="disclaimer"></div>
+    <div class="check-row"><input type="checkbox" id="ackRisk"><label for="ackRisk"
+        style="margin:0; color: var(--text);" data-i18n="ackLabel">Ho letto e accetto</label></div>
   </div>
-</div>
 
-<script>
-const $ = (id) => document.getElementById(id);
+  <div class="panel">
+    <h2 data-i18n="panel1Title">1 · Rete</h2>
+    <input type="text" id="networkFilter" data-i18n-placeholder="networkFilterPlaceholder"
+      placeholder="Filtra per nome...">
+    <select id="network" style="margin-top:8px;"></select>
+    <div id="customRpcWrap" style="display:none;">
+      <label data-i18n="customRpcLabel">RPC URL custom</label>
+      <input type="text" id="customRpc" placeholder="https://...">
+      <label data-i18n="customExplorerLabel">Explorer URL custom (opzionale)</label>
+      <input type="text" id="customExplorer" placeholder="https://.../tx/">
+    </div>
+  </div>
 
-// Built-in chains: shared chains.js. Explorer links to transactions use the "/tx/" path.
-const EXPLORER_PATH = "/tx/";
+  <div class="panel">
+    <h2 data-i18n="panel2Title">2 · La tua UP</h2>
+    <button id="connectUp" class="secondary" data-i18n="connectUpBtn">Leggi l'indirizzo dall'estensione UP</button>
+    <label for="upAddress" data-i18n="upAddressLabel">Indirizzo della UP</label>
+    <input type="text" id="upAddress" placeholder="0x...">
+  </div>
 
-// ==================== EXTENSION ====================
-// contracts/NFTReceiverExtension.sol, compiled as documented in contracts/README.md (solc 0.8.24,
-// optimizer 200 runs, evmVersion paris, no metadata hash) and published through Nick's deterministic
-// deployment proxy with salt 0: same address on every chain. contracts/NFTReceiverExtension.json holds
-// the same values.
-const NICK_FACTORY = "0x4e59b44847b379578588920cA78FbF26c0B4956C";
-const EXT_RUNTIME_HASH = "0xed365f94b64256c4c81311071c739de4a006d09676dc9e2bd5cd49b346ddb955";
-const EXT_ADDRESS = "0x7F68e74483867058C806218aa05aB5527984C03e";
+  <div class="panel">
+    <h2 data-i18n="panel3Title">3 · Controller (MetaMask) e verifica</h2>
+    <div class="note" data-i18n="panel3Note"></div>
+    <button id="connectSigner" data-i18n="connectSignerBtn">Connetti MetaMask (controller)</button>
+    <div class="status-box" id="checkBox"><span class="empty" data-i18n="checkIdle">La verifica parte da sola quando
+        rete, UP e MetaMask sono impostati.</span></div>
+    <button id="recheckBtn" class="secondary" data-i18n="recheckBtn">Ricontrolla</button>
+  </div>
 
-// Selectors the UP forwards to the extension (LSP17), in this order.
-const HOOKS = [
-  { sel: "0x150b7a02", name: "onERC721Received" },
-  { sel: "0xf23a6e61", name: "onERC1155Received" },
-  { sel: "0xbc197c81", name: "onERC1155BatchReceived" },
-  { sel: "0x01ffc9a7", name: "supportsInterface" },
-];
-// LSP17 extension data key: bytes10 prefix + 0x0000 + function selector + zero padding.
-const LSP17_KEY = (selector) => "0xcee78b4094da860110960000" + selector.slice(2) + "00".repeat(16);
-const PERM_PREFIX = "0x4b80742de2bf82acb3630000"; // LSP6 AddressPermissions:Permissions:<address>
+  <div class="panel">
+    <h2 data-i18n="panel4Title">4 · Azioni</h2>
+    <div class="note" data-i18n-html="panel4Note"></div>
+    <a id="publishLink" class="link-btn" hidden target="_blank" rel="noopener" data-i18n="publishLinkText">Pubblica
+      l'estensione su questa rete (pagina di pubblicazione) →</a>
+    <button id="prepareBtn" disabled data-i18n="prepareBtn">Prepara e simula l'abilitazione</button>
+    <div class="status-box plan" id="planBox"><span class="empty" data-i18n="noPlan">Nessuna operazione
+        preparata.</span></div>
+    <div class="check-row" id="replaceRow" style="display:none;"><input type="checkbox" id="ackReplace"><label
+        for="ackReplace" style="margin:0; color: var(--warn);" data-i18n="ackReplaceLabel">Ho capito che sostituisco le
+        estensioni esistenti indicate sopra</label></div>
+    <button id="enableBtn" class="danger" disabled data-i18n="enableBtn">Firma e invia (una sola transazione)</button>
+    <div id="log" class="line-dim" style="margin-top:10px;"></div>
+  </div>
 
-// LSP6 permission bits, as in @lukso/lsp6-contracts LSP6Constants.sol (bits 0..22).
-const PERMISSION_BITS = [
-  "CHANGEOWNER","ADDCONTROLLER","EDITPERMISSIONS","ADDEXTENSIONS","CHANGEEXTENSIONS",
-  "ADDUNIVERSALRECEIVERDELEGATE","CHANGEUNIVERSALRECEIVERDELEGATE","REENTRANCY",
-  "SUPER_TRANSFERVALUE","TRANSFERVALUE","SUPER_CALL","CALL","SUPER_STATICCALL","STATICCALL",
-  "SUPER_DELEGATECALL","DELEGATECALL","DEPLOY","SUPER_SETDATA","SETDATA","ENCRYPT","DECRYPT",
-  "SIGN","EXECUTE_RELAY_CALL","ERC4337"
-];
-const P = Object.fromEntries(PERMISSION_BITS.map((n, i) => [n, 1n << BigInt(i)]));
-const permNames = (perms) => PERMISSION_BITS.filter((n) => perms & P[n]).join(", ") || "—";
+  <div class="site-footer">
+    <div class="footer-row">
+      <img src="logo.png" alt="ChainIntegrate" class="footer-logo" onerror="this.style.display='none'">
+      <div class="footer-text" data-i18n-html="footerHtml"></div>
+    </div>
+  </div>
 
-const UP_IFACE = new ethers.Interface([
-  "function setData(bytes32 dataKey, bytes dataValue)",
-  "function setDataBatch(bytes32[] dataKeys, bytes[] dataValues)",
-  "function getData(bytes32 dataKey) view returns (bytes)",
-  "function getDataBatch(bytes32[] dataKeys) view returns (bytes[])",
-  "function owner() view returns (address)",
-  "function supportsInterface(bytes4 interfaceId) view returns (bool)",
-]);
-const KM_IFACE = new ethers.Interface([
-  "function execute(bytes payload) payable returns (bytes)",
-  "function executeBatch(uint256[] values, bytes[] payloads) payable returns (bytes[])",
-  "error NotAuthorised(address from, string permission)",
-  "error NoPermissionsSet(address from)",
-  "error InvalidDataValuesForDataKeys(bytes32 dataKey, bytes dataValue)",
-]);
+  <script>
+    const $ = (id) => document.getElementById(id);
 
-// ==================== I18N ====================
-let LANG = "it";
-const I18N = {
-  it: {
-    pageTitle: "Ricezione NFT sulla UP — ChainIntegrate",
-    h1: "Ricezione NFT sulla UP (sperimentale)",
-    subtitle: "Permetti alla tua Universal Profile di ricevere NFT ERC-721 ed ERC-1155 su una rete dove l'hai rideployata (per esempio acquisti su OpenSea).",
-    langToggleBtn: "English",
-    panel0Title: "0 · Come funziona",
-    panel0Note: "Quando un NFT standard viene consegnato con un \"trasferimento sicuro\", il contratto del token chiede al destinatario se sa riceverlo. Una UP risponde solo tramite un'<b>estensione</b> (LSP17) registrata nei suoi dati; le UP rideployate di solito non ne hanno, e gli acquisti falliscono (\"il wallet non può ricevere\").<br><br>Questa pagina: <b>(1)</b> se serve, ti porta alla pagina di pubblicazione per pubblicare sulla rete l'estensione <code>NFTReceiverExtension</code>, un contratto minimo senza proprietario, dati o fondi, sempre allo stesso indirizzo su ogni rete; <b>(2)</b> la registra sulla UP con <b>una sola transazione atomica</b> del Key Manager: concede al controller il permesso di aggiungere estensioni, registra l'estensione, e riporta i permessi del controller <b>esattamente</b> a quelli di prima. Se una parte fallisce, non cambia niente. Prima di firmare vedi l'elenco delle operazioni e il risultato della simulazione.",
-    disclaimer: "<b>⚠️ Leggi prima di usare questa pagina</b><ul style=\"margin:8px 0 0; padding-left:20px;\"><li><b>Strumento sperimentale, non sottoposto ad audit esterno.</b> Transazioni reali e irreversibili.</li><li><b>Modifica la configurazione della UP su questa rete:</b> aggiunge le chiavi di estensione per ricevere NFT (su altre reti va ripetuta). I permessi del controller restano uguali a prima.</li><li><b>L'estensione</b> risponde solo alle chiamate di ricezione NFT e a <code>supportsInterface</code>: viene chiamata dalla UP con una chiamata normale, quindi non può leggere né modificare dati o fondi della UP. Sorgente, bytecode e istruzioni per verificarlo sono nella cartella <code>contracts/</code> del repository.</li><li><b>Ricevere NFT</b> significa anche poter ricevere NFT indesiderati (spam): non dare mai approvazioni o firme per NFT che non conosci.</li><li><b>Nessuna garanzia.</b> Software \"così com'è\" (licenza MIT): lo usi a tuo rischio. ChainIntegrate non risponde di perdite o danni. Nessuna affiliazione con LUKSO o altri.</li><li><b>Questa pagina non chiede mai chiavi private</b>: firmi tutto in MetaMask.</li></ul>",
-    ackLabel: "Ho letto e accetto: uso questo strumento a mio rischio.",
-    ackRequired: "Prima accetta le condizioni nel pannello 0.",
-    panel1Title: "1 · Rete",
-    networkFilterPlaceholder: "Filtra per nome... (es. base, polygon, arbitrum)",
-    customRpcLabel: "RPC URL custom",
-    customExplorerLabel: "Explorer URL custom (opzionale)",
-    customNetName: "Rete custom",
-    panel2Title: "2 · La tua UP",
-    connectUpBtn: "Leggi l'indirizzo dall'estensione UP",
-    upAddressLabel: "Indirizzo della UP",
-    panel3Title: "3 · Controller (MetaMask) e verifica",
-    panel3Note: "MetaMask con la chiave del controller della UP, sulla rete scelta. Paga il gas. La verifica parte da sola e si ripete se cambi rete, UP, account o rete in MetaMask.",
-    connectSignerBtn: "Connetti MetaMask (controller)",
-    checkIdle: "La verifica parte da sola quando rete, UP e MetaMask sono impostati.",
-    recheckBtn: "Ricontrolla",
-    panel4Title: "4 · Azioni",
-    panel4Note: "Se l'estensione non esiste ancora su questa rete, la pagina ti dà il link alla <b>pagina di pubblicazione</b>: lì chiunque può pubblicarla, con qualsiasi wallet e senza UP; costa solo gas e non dà controllo su nessuna UP. Poi, qui, con il controller della UP prepari l'abilitazione: la pagina mostra ogni operazione e la simula; solo dopo puoi firmare.",
-    publishLinkText: "Pubblica l'estensione su questa rete (pagina di pubblicazione) →",
-    prepareBtn: "Prepara e simula l'abilitazione",
-    noPlan: "Nessuna operazione preparata.",
-    ackReplaceLabel: "Ho capito che sostituisco le estensioni esistenti indicate sopra",
-    enableBtn: "Firma e invia (una sola transazione)",
+    // Built-in chains: shared chains.js. Explorer links to transactions use the "/tx/" path.
+    const EXPLORER_PATH = "/tx/";
 
-    cNetwork: "Rete", cRpc: "RPC", cWallet: "MetaMask", cUp: "UP", cKm: "Key Manager", cPerms: "Permessi del controller",
-    cExt: "Estensione su questa rete", cFactory: "Factory deterministica", cHooks: "Stato sulla UP",
-    rpcOk: (v) => `✅ chainId ${v.id}`,
-    rpcWrong: (v) => `❌ l'RPC risponde con chainId ${v.id}, atteso ${v.exp}`,
-    rpcFail: (v) => `❌ RPC non raggiungibile: ${v.err}`,
-    walletMissing: "❌ non connesso",
-    walletOk: (v) => `✅ ${v.addr} · chainId ${v.id}`,
-    walletWrong: (v) => `❌ ${v.addr} è sulla rete con chainId ${v.id}: passa a chainId ${v.exp} in MetaMask`,
-    walletUnknown: "❌ impossibile leggere la rete di MetaMask",
-    upMissing: "❌ indirizzo mancante o non valido",
-    upNotDeployed: "❌ non deployata su questa rete",
-    upOk: (v) => `✅ ${v.addr}`,
-    kmBad: (v) => `❌ l'owner della UP (${v.addr}) non è un contratto su questa rete`,
-    kmOk: (v) => `✅ ${v.addr}`,
-    permsNone: "❌ nessuno: questo account non è un controller della UP. Importa in MetaMask la chiave del controller di QUESTA UP.",
-    permsList: (v) => `${v.hex} · ${v.names}`,
-    extOk: (v) => `✅ pubblicata (${v.addr}), codice verificato`,
-    extMissing: (v) => `⚠️ non ancora pubblicata su questa rete (${v.addr}): usa "Pubblica l'estensione"`,
-    extWrongCode: (v) => `❌ all'indirizzo ${v.addr} c'è un codice diverso da quello atteso: non usarla`,
-    factoryOk: "✅ presente",
-    factoryMissing: "❌ assente su questa rete: l'estensione non si può pubblicare allo stesso indirizzo",
-    hookOk: (v) => `${v.name}: ✅ già registrata`,
-    hookEmpty: (v) => `${v.name}: da aggiungere`,
-    hookOther: (v) => `${v.name}: ⚠️ c'è un'altra estensione (${v.ext}), verrebbe sostituita`,
-    verdictDone: "✅ La UP può già ricevere NFT ERC-721 ed ERC-1155 su questa rete. Non serve fare altro.",
-    verdictNeedPublish: "L'estensione non è ancora pubblicata su questa rete: pubblicala prima con la pagina di pubblicazione (link nel pannello 4), con qualsiasi wallet. Poi torna qui e premi \"Ricontrolla\".",
-    verdictReady: "✅ Pronto: prepara e simula l'abilitazione (pannello 4).",
-    verdictNoEdit: (v) => `❌ Al controller mancano i permessi ${v.missing} e non ha EDITPERMISSIONS per concederseli: serve un controller con più permessi.`,
-    verdictFail: "❌ Verifica non superata: correggi il punto in rosso qui sopra.",
-    verdictMissing: "Completa i campi mancanti: la verifica ripartirà da sola.",
-    verdictUpForEnable: "Per abilitare la ricezione NFT su una UP, inserisci l'indirizzo della UP e connetti il suo controller.",
-    checkRunning: "Verifica in corso...",
+    // ==================== EXTENSION ====================
+    // contracts/NFTReceiverExtension.sol, compiled as documented in contracts/README.md (solc 0.8.24,
+    // optimizer 200 runs, evmVersion paris, no metadata hash) and published through Nick's deterministic
+    // deployment proxy with salt 0: same address on every chain. contracts/NFTReceiverExtension.json holds
+    // the same values.
+    const NICK_FACTORY = "0x4e59b44847b379578588920cA78FbF26c0B4956C";
+    const EXT_RUNTIME_HASH = "0xed365f94b64256c4c81311071c739de4a006d09676dc9e2bd5cd49b346ddb955";
+    const EXT_ADDRESS = "0x7F68e74483867058C806218aa05aB5527984C03e";
 
-    extNotFound: "Estensione Universal Profile non trovata.",
-    connectionRejected: "Connessione rifiutata o fallita.",
-    noSignerFound: "Nessun wallet firmatario trovato (es. MetaMask).",
-    genericError: (v) => `Errore: ${v.err}`,
-    checkFirst: "La verifica del pannello 3 non è verde: aggiornala prima di continuare.",
-    txSent: (v) => `Tx inviata: ${v.hash}`,
-    waiting: "In attesa di conferma...",
-    txUnknown: "⚠️ Dopo un minuto l'RPC non mostra ancora la transazione: controlla l'esito sull'explorer (link sopra) prima di riprovare.",
-    txFailed: "❌ Transazione fallita on-chain.",
-    planTitle: (v) => `Operazioni in UNA transazione, firmata dal controller ${v.signer} e inviata al Key Manager ${v.km}:`,
-    planGrant: (v) => `1. Concede temporaneamente al controller: ${v.bits} (permessi ${v.from} → ${v.to})`,
-    planSet: (v) => `${v.n}. Registra l'estensione ${v.ext} sulla UP per: ${v.names}`,
-    planRestore: (v) => `${v.n}. Riporta i permessi del controller esattamente a ${v.from}`,
-    planNoGrant: "Il controller ha già i permessi necessari: nessuna modifica ai permessi.",
-    planAtomic: "Se una qualsiasi operazione fallisce, l'intera transazione viene annullata e non cambia nulla.",
-    planReplaceWarn: "⚠️ Alcune chiavi hanno già un'altra estensione: verrà sostituita. Spunta la conferma qui sotto per procedere.",
-    simulating: "Simulazione della transazione...",
-    simOk: (v) => `✅ Simulazione riuscita. Gas stimato: ${v.gas}.`,
-    simFail: (v) => `❌ La simulazione fallisce: ${v.err}. Niente viene inviato.`,
-    signerNoGas: (v) => `❌ Il controller non ha abbastanza fondi per il gas: servono circa ${v.need}, ne ha ${v.have}.`,
-    readyToSign: "Pronto. Rileggi le operazioni qui sopra, poi premi \"Firma e invia\" e conferma in MetaMask (destinatario: il Key Manager della UP).",
-    replaceAckRequired: "Spunta la conferma sulla sostituzione delle estensioni esistenti.",
-    stale: "❌ Qualcosa è cambiato dopo la preparazione (rete, account o dati della UP): prepara di nuovo.",
-    sending: "Invio della transazione (conferma in MetaMask)...",
-    verifying: "Verifica finale sulla UP...",
-    finalOk: "✅✅ Fatto: la UP ora può ricevere NFT ERC-721 ed ERC-1155 su questa rete, e i permessi del controller sono uguali a prima.",
-    finalBad: (v) => `⚠️ Transazione confermata, ma la verifica finale non torna: ${v.what}. Controlla sull'explorer.`,
+    // Selectors the UP forwards to the extension (LSP17), in this order.
+    const HOOKS = [
+      { sel: "0x150b7a02", name: "onERC721Received" },
+      { sel: "0xf23a6e61", name: "onERC1155Received" },
+      { sel: "0xbc197c81", name: "onERC1155BatchReceived" },
+      { sel: "0x01ffc9a7", name: "supportsInterface" },
+    ];
+    // LSP17 extension data key: bytes10 prefix + 0x0000 + function selector + zero padding.
+    const LSP17_KEY = (selector) => "0xcee78b4094da860110960000" + selector.slice(2) + "00".repeat(16);
+    const PERM_PREFIX = "0x4b80742de2bf82acb3630000"; // LSP6 AddressPermissions:Permissions:<address>
 
-    footerHtml: `Servizi di consulenza in integrazione dati &amp; blockchain a cura di ChainIntegrate <a href="https://www.linkedin.com/company/chainintegrate" target="_blank" rel="noopener" aria-label="LinkedIn" class="footer-li"><svg width="20" height="20" viewBox="0 0 20 20"><rect width="20" height="20" rx="4" fill="#0A66C2"/><text x="10" y="15" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#fff">in</text></svg></a> · <a href="https://t.me/Simone_1977_2" target="_blank" rel="noopener">Assistenza via Telegram</a> · <a href="https://github.com/ChainIntegrate/Cross_Chain" target="_blank" rel="noopener">Codice sorgente su GitHub</a>`,
-  },
-  en: {
-    pageTitle: "NFT reception on the UP — ChainIntegrate",
-    h1: "NFT reception on the UP (experimental)",
-    subtitle: "Let your Universal Profile receive ERC-721 and ERC-1155 NFTs on a network where you redeployed it (for example purchases on OpenSea).",
-    langToggleBtn: "Italiano",
-    panel0Title: "0 · How it works",
-    panel0Note: "When a standard NFT is delivered with a \"safe transfer\", the token contract asks the recipient whether it can receive it. A UP answers only through an <b>extension</b> (LSP17) registered in its data; redeployed UPs usually have none, so purchases fail (\"wallet cannot receive\").<br><br>This page: <b>(1)</b> if needed, takes you to the publishing page to publish on the network the <code>NFTReceiverExtension</code>, a minimal contract with no owner, data or funds, always at the same address on every network; <b>(2)</b> registers it on the UP with <b>a single atomic Key Manager transaction</b>: it grants the controller the permission to add extensions, registers the extension, and sets the controller's permissions back to <b>exactly</b> what they were. If any part fails, nothing changes. Before signing you see the list of operations and the simulation result.",
-    disclaimer: "<b>⚠️ Read before using this page</b><ul style=\"margin:8px 0 0; padding-left:20px;\"><li><b>Experimental tool, not externally audited.</b> Real, irreversible transactions.</li><li><b>It changes the UP's configuration on this network:</b> it adds the extension keys to receive NFTs (repeat it on other networks). The controller's permissions stay the same as before.</li><li><b>The extension</b> answers only NFT-reception calls and <code>supportsInterface</code>: the UP calls it with a normal call, so it cannot read or change the UP's data or funds. Source, bytecode and verification steps are in the repository's <code>contracts/</code> folder.</li><li><b>Receiving NFTs</b> also means being able to receive unwanted NFTs (spam): never give approvals or signatures for NFTs you do not know.</li><li><b>No warranty.</b> Software \"as is\" (MIT license): you use it at your own risk. ChainIntegrate is not liable for any loss or damage. No affiliation with LUKSO or others.</li><li><b>This page never asks for private keys</b>: you sign everything in MetaMask.</li></ul>",
-    ackLabel: "I have read and accept: I use this tool at my own risk.",
-    ackRequired: "Accept the conditions in panel 0 first.",
-    panel1Title: "1 · Network",
-    networkFilterPlaceholder: "Filter by name... (e.g. base, polygon, arbitrum)",
-    customRpcLabel: "Custom RPC URL",
-    customExplorerLabel: "Custom explorer URL (optional)",
-    customNetName: "Custom network",
-    panel2Title: "2 · Your UP",
-    connectUpBtn: "Read the address from the UP extension",
-    upAddressLabel: "UP address",
-    panel3Title: "3 · Controller (MetaMask) and check",
-    panel3Note: "MetaMask with the UP controller's key, on the chosen network. It pays the gas. The check starts by itself and runs again if you change network, UP, account or MetaMask's network.",
-    connectSignerBtn: "Connect MetaMask (controller)",
-    checkIdle: "The check starts by itself once network, UP and MetaMask are set.",
-    recheckBtn: "Check again",
-    panel4Title: "4 · Actions",
-    panel4Note: "If the extension does not exist on this network yet, the page gives you the link to the <b>publishing page</b>: there anyone can publish it, with any wallet and without a UP; it only costs gas and gives no control over any UP. Then, here, with the UP's controller you prepare the enabling: the page shows every operation and simulates it; only then can you sign.",
-    publishLinkText: "Publish the extension on this network (publishing page) →",
-    prepareBtn: "Prepare and simulate the enabling",
-    noPlan: "No operation prepared.",
-    ackReplaceLabel: "I understand that I am replacing the existing extensions listed above",
-    enableBtn: "Sign and send (a single transaction)",
+    // LSP6 permission bits, as in @lukso/lsp6-contracts LSP6Constants.sol (bits 0..22).
+    const PERMISSION_BITS = [
+      "CHANGEOWNER", "ADDCONTROLLER", "EDITPERMISSIONS", "ADDEXTENSIONS", "CHANGEEXTENSIONS",
+      "ADDUNIVERSALRECEIVERDELEGATE", "CHANGEUNIVERSALRECEIVERDELEGATE", "REENTRANCY",
+      "SUPER_TRANSFERVALUE", "TRANSFERVALUE", "SUPER_CALL", "CALL", "SUPER_STATICCALL", "STATICCALL",
+      "SUPER_DELEGATECALL", "DELEGATECALL", "DEPLOY", "SUPER_SETDATA", "SETDATA", "ENCRYPT", "DECRYPT",
+      "SIGN", "EXECUTE_RELAY_CALL", "ERC4337"
+    ];
+    const P = Object.fromEntries(PERMISSION_BITS.map((n, i) => [n, 1n << BigInt(i)]));
+    const permNames = (perms) => PERMISSION_BITS.filter((n) => perms & P[n]).join(", ") || "—";
 
-    cNetwork: "Network", cRpc: "RPC", cWallet: "MetaMask", cUp: "UP", cKm: "Key Manager", cPerms: "Controller permissions",
-    cExt: "Extension on this network", cFactory: "Deterministic factory", cHooks: "State on the UP",
-    rpcOk: (v) => `✅ chainId ${v.id}`,
-    rpcWrong: (v) => `❌ the RPC answers with chainId ${v.id}, expected ${v.exp}`,
-    rpcFail: (v) => `❌ RPC unreachable: ${v.err}`,
-    walletMissing: "❌ not connected",
-    walletOk: (v) => `✅ ${v.addr} · chainId ${v.id}`,
-    walletWrong: (v) => `❌ ${v.addr} is on chainId ${v.id}: switch MetaMask to chainId ${v.exp}`,
-    walletUnknown: "❌ could not read MetaMask's network",
-    upMissing: "❌ missing or invalid address",
-    upNotDeployed: "❌ not deployed on this network",
-    upOk: (v) => `✅ ${v.addr}`,
-    kmBad: (v) => `❌ the UP owner (${v.addr}) is not a contract on this network`,
-    kmOk: (v) => `✅ ${v.addr}`,
-    permsNone: "❌ none: this account is not a controller of the UP. Import into MetaMask the controller key of THIS UP.",
-    permsList: (v) => `${v.hex} · ${v.names}`,
-    extOk: (v) => `✅ published (${v.addr}), code verified`,
-    extMissing: (v) => `⚠️ not published on this network yet (${v.addr}): use "Publish the extension"`,
-    extWrongCode: (v) => `❌ the code at ${v.addr} is not the expected one: do not use it`,
-    factoryOk: "✅ present",
-    factoryMissing: "❌ missing on this network: the extension cannot be published at the same address",
-    hookOk: (v) => `${v.name}: ✅ already registered`,
-    hookEmpty: (v) => `${v.name}: to add`,
-    hookOther: (v) => `${v.name}: ⚠️ another extension is set (${v.ext}), it would be replaced`,
-    verdictDone: "✅ The UP can already receive ERC-721 and ERC-1155 NFTs on this network. Nothing else to do.",
-    verdictNeedPublish: "The extension is not published on this network yet: publish it first with the publishing page (link in panel 4), with any wallet. Then come back and press \"Check again\".",
-    verdictReady: "✅ Ready: prepare and simulate the enabling (panel 4).",
-    verdictNoEdit: (v) => `❌ The controller lacks ${v.missing} and does not have EDITPERMISSIONS to grant them: a controller with more permissions is needed.`,
-    verdictFail: "❌ Check failed: fix the item in red above.",
-    verdictMissing: "Fill in the missing fields: the check will start again by itself.",
-    verdictUpForEnable: "To enable NFT reception on a UP, enter the UP address and connect its controller.",
-    checkRunning: "Checking...",
+    const UP_IFACE = new ethers.Interface([
+      "function setData(bytes32 dataKey, bytes dataValue)",
+      "function setDataBatch(bytes32[] dataKeys, bytes[] dataValues)",
+      "function getData(bytes32 dataKey) view returns (bytes)",
+      "function getDataBatch(bytes32[] dataKeys) view returns (bytes[])",
+      "function owner() view returns (address)",
+      "function supportsInterface(bytes4 interfaceId) view returns (bool)",
+    ]);
+    const KM_IFACE = new ethers.Interface([
+      "function execute(bytes payload) payable returns (bytes)",
+      "function executeBatch(uint256[] values, bytes[] payloads) payable returns (bytes[])",
+      "error NotAuthorised(address from, string permission)",
+      "error NoPermissionsSet(address from)",
+      "error InvalidDataValuesForDataKeys(bytes32 dataKey, bytes dataValue)",
+    ]);
 
-    extNotFound: "Universal Profile extension not found.",
-    connectionRejected: "Connection rejected or failed.",
-    noSignerFound: "No signing wallet found (e.g. MetaMask).",
-    genericError: (v) => `Error: ${v.err}`,
-    checkFirst: "The check in panel 3 is not green: update it before continuing.",
-    txSent: (v) => `Tx sent: ${v.hash}`,
-    waiting: "Waiting for confirmation...",
-    txUnknown: "⚠️ After a minute the RPC still does not show the transaction: check the outcome on the explorer (link above) before trying again.",
-    txFailed: "❌ Transaction failed on-chain.",
-    planTitle: (v) => `Operations in ONE transaction, signed by the controller ${v.signer} and sent to the Key Manager ${v.km}:`,
-    planGrant: (v) => `1. Temporarily grants the controller: ${v.bits} (permissions ${v.from} → ${v.to})`,
-    planSet: (v) => `${v.n}. Registers the extension ${v.ext} on the UP for: ${v.names}`,
-    planRestore: (v) => `${v.n}. Sets the controller's permissions back to exactly ${v.from}`,
-    planNoGrant: "The controller already holds the needed permissions: no permission change.",
-    planAtomic: "If any operation fails, the whole transaction is reverted and nothing changes.",
-    planReplaceWarn: "⚠️ Some keys already hold another extension: it will be replaced. Tick the confirmation below to proceed.",
-    simulating: "Simulating the transaction...",
-    simOk: (v) => `✅ Simulation succeeded. Estimated gas: ${v.gas}.`,
-    simFail: (v) => `❌ The simulation fails: ${v.err}. Nothing is sent.`,
-    signerNoGas: (v) => `❌ The controller does not have enough funds for gas: about ${v.need} needed, it has ${v.have}.`,
-    readyToSign: "Ready. Read the operations above again, then press \"Sign and send\" and confirm in MetaMask (recipient: the UP's Key Manager).",
-    replaceAckRequired: "Tick the confirmation about replacing the existing extensions.",
-    stale: "❌ Something changed after preparing (network, account or UP data): prepare again.",
-    sending: "Sending the transaction (confirm in MetaMask)...",
-    verifying: "Final check on the UP...",
-    finalOk: "✅✅ Done: the UP can now receive ERC-721 and ERC-1155 NFTs on this network, and the controller's permissions are the same as before.",
-    finalBad: (v) => `⚠️ Transaction confirmed, but the final check does not match: ${v.what}. Check on the explorer.`,
+    // ==================== I18N ====================
+    let LANG = "en";
+    const I18N = {
+      it: {
+        pageTitle: "Ricezione NFT sulla UP — ChainIntegrate",
+        h1: "Ricezione NFT sulla UP (sperimentale)",
+        subtitle: "Permetti alla tua Universal Profile di ricevere NFT ERC-721 ed ERC-1155 su una rete dove l'hai rideployata (per esempio acquisti su OpenSea).",
+        langToggleBtn: "English",
+        panel0Title: "0 · Come funziona",
+        panel0Note: "Quando un NFT standard viene consegnato con un \"trasferimento sicuro\", il contratto del token chiede al destinatario se sa riceverlo. Una UP risponde solo tramite un'<b>estensione</b> (LSP17) registrata nei suoi dati; le UP rideployate di solito non ne hanno, e gli acquisti falliscono (\"il wallet non può ricevere\").<br><br>Questa pagina: <b>(1)</b> se serve, ti porta alla pagina di pubblicazione per pubblicare sulla rete l'estensione <code>NFTReceiverExtension</code>, un contratto minimo senza proprietario, dati o fondi, sempre allo stesso indirizzo su ogni rete; <b>(2)</b> la registra sulla UP con <b>una sola transazione atomica</b> del Key Manager: concede al controller il permesso di aggiungere estensioni, registra l'estensione, e riporta i permessi del controller <b>esattamente</b> a quelli di prima. Se una parte fallisce, non cambia niente. Prima di firmare vedi l'elenco delle operazioni e il risultato della simulazione.",
+        disclaimer: "<b>⚠️ Leggi prima di usare questa pagina</b><ul style=\"margin:8px 0 0; padding-left:20px;\"><li><b>Strumento sperimentale, non sottoposto ad audit esterno.</b> Transazioni reali e irreversibili.</li><li><b>Modifica la configurazione della UP su questa rete:</b> aggiunge le chiavi di estensione per ricevere NFT (su altre reti va ripetuta). I permessi del controller restano uguali a prima.</li><li><b>L'estensione</b> risponde solo alle chiamate di ricezione NFT e a <code>supportsInterface</code>: viene chiamata dalla UP con una chiamata normale, quindi non può leggere né modificare dati o fondi della UP. Sorgente, bytecode e istruzioni per verificarlo sono nella cartella <code>contracts/</code> del repository.</li><li><b>Ricevere NFT</b> significa anche poter ricevere NFT indesiderati (spam): non dare mai approvazioni o firme per NFT che non conosci.</li><li><b>Nessuna garanzia.</b> Software \"così com'è\" (licenza MIT): lo usi a tuo rischio. ChainIntegrate non risponde di perdite o danni. Nessuna affiliazione con LUKSO o altri.</li><li><b>Questa pagina non chiede mai chiavi private</b>: firmi tutto in MetaMask.</li></ul>",
+        ackLabel: "Ho letto e accetto: uso questo strumento a mio rischio.",
+        ackRequired: "Prima accetta le condizioni nel pannello 0.",
+        panel1Title: "1 · Rete",
+        networkFilterPlaceholder: "Filtra per nome... (es. base, polygon, arbitrum)",
+        customRpcLabel: "RPC URL custom",
+        customExplorerLabel: "Explorer URL custom (opzionale)",
+        customNetName: "Rete custom",
+        panel2Title: "2 · La tua UP",
+        connectUpBtn: "Leggi l'indirizzo dall'estensione UP",
+        upAddressLabel: "Indirizzo della UP",
+        panel3Title: "3 · Controller (MetaMask) e verifica",
+        panel3Note: "MetaMask con la chiave del controller della UP, sulla rete scelta. Paga il gas. La verifica parte da sola e si ripete se cambi rete, UP, account o rete in MetaMask.",
+        connectSignerBtn: "Connetti MetaMask (controller)",
+        checkIdle: "La verifica parte da sola quando rete, UP e MetaMask sono impostati.",
+        recheckBtn: "Ricontrolla",
+        panel4Title: "4 · Azioni",
+        panel4Note: "Se l'estensione non esiste ancora su questa rete, la pagina ti dà il link alla <b>pagina di pubblicazione</b>: lì chiunque può pubblicarla, con qualsiasi wallet e senza UP; costa solo gas e non dà controllo su nessuna UP. Poi, qui, con il controller della UP prepari l'abilitazione: la pagina mostra ogni operazione e la simula; solo dopo puoi firmare.",
+        publishLinkText: "Pubblica l'estensione su questa rete (pagina di pubblicazione) →",
+        prepareBtn: "Prepara e simula l'abilitazione",
+        noPlan: "Nessuna operazione preparata.",
+        ackReplaceLabel: "Ho capito che sostituisco le estensioni esistenti indicate sopra",
+        enableBtn: "Firma e invia (una sola transazione)",
 
-    footerHtml: `Data &amp; blockchain integration consulting by ChainIntegrate <a href="https://www.linkedin.com/company/chainintegrate" target="_blank" rel="noopener" aria-label="LinkedIn" class="footer-li"><svg width="20" height="20" viewBox="0 0 20 20"><rect width="20" height="20" rx="4" fill="#0A66C2"/><text x="10" y="15" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#fff">in</text></svg></a> · <a href="https://t.me/Simone_1977_2" target="_blank" rel="noopener">Support via Telegram</a> · <a href="https://github.com/ChainIntegrate/Cross_Chain" target="_blank" rel="noopener">Source code on GitHub</a>`,
-  },
-};
+        cNetwork: "Rete", cRpc: "RPC", cWallet: "MetaMask", cUp: "UP", cKm: "Key Manager", cPerms: "Permessi del controller",
+        cExt: "Estensione su questa rete", cFactory: "Factory deterministica", cHooks: "Stato sulla UP",
+        rpcOk: (v) => `✅ chainId ${v.id}`,
+        rpcWrong: (v) => `❌ l'RPC risponde con chainId ${v.id}, atteso ${v.exp}`,
+        rpcFail: (v) => `❌ RPC non raggiungibile: ${v.err}`,
+        walletMissing: "❌ non connesso",
+        walletOk: (v) => `✅ ${v.addr} · chainId ${v.id}`,
+        walletWrong: (v) => `❌ ${v.addr} è sulla rete con chainId ${v.id}: passa a chainId ${v.exp} in MetaMask`,
+        walletUnknown: "❌ impossibile leggere la rete di MetaMask",
+        upMissing: "❌ indirizzo mancante o non valido",
+        upNotDeployed: "❌ non deployata su questa rete",
+        upOk: (v) => `✅ ${v.addr}`,
+        kmBad: (v) => `❌ l'owner della UP (${v.addr}) non è un contratto su questa rete`,
+        kmOk: (v) => `✅ ${v.addr}`,
+        permsNone: "❌ nessuno: questo account non è un controller della UP. Importa in MetaMask la chiave del controller di QUESTA UP.",
+        permsList: (v) => `${v.hex} · ${v.names}`,
+        extOk: (v) => `✅ pubblicata (${v.addr}), codice verificato`,
+        extMissing: (v) => `⚠️ non ancora pubblicata su questa rete (${v.addr}): usa "Pubblica l'estensione"`,
+        extWrongCode: (v) => `❌ all'indirizzo ${v.addr} c'è un codice diverso da quello atteso: non usarla`,
+        factoryOk: "✅ presente",
+        factoryMissing: "❌ assente su questa rete: l'estensione non si può pubblicare allo stesso indirizzo",
+        hookOk: (v) => `${v.name}: ✅ già registrata`,
+        hookEmpty: (v) => `${v.name}: da aggiungere`,
+        hookOther: (v) => `${v.name}: ⚠️ c'è un'altra estensione (${v.ext}), verrebbe sostituita`,
+        verdictDone: "✅ La UP può già ricevere NFT ERC-721 ed ERC-1155 su questa rete. Non serve fare altro.",
+        verdictNeedPublish: "L'estensione non è ancora pubblicata su questa rete: pubblicala prima con la pagina di pubblicazione (link nel pannello 4), con qualsiasi wallet. Poi torna qui e premi \"Ricontrolla\".",
+        verdictReady: "✅ Pronto: prepara e simula l'abilitazione (pannello 4).",
+        verdictNoEdit: (v) => `❌ Al controller mancano i permessi ${v.missing} e non ha EDITPERMISSIONS per concederseli: serve un controller con più permessi.`,
+        verdictFail: "❌ Verifica non superata: correggi il punto in rosso qui sopra.",
+        verdictMissing: "Completa i campi mancanti: la verifica ripartirà da sola.",
+        verdictUpForEnable: "Per abilitare la ricezione NFT su una UP, inserisci l'indirizzo della UP e connetti il suo controller.",
+        checkRunning: "Verifica in corso...",
 
-function t(key, vars) {
-  const entry = I18N[LANG][key];
-  return typeof entry === "function" ? entry(vars || {}) : entry;
-}
-function applyI18n() {
-  document.documentElement.lang = LANG;
-  document.title = t("pageTitle");
-  document.querySelectorAll("[data-i18n]").forEach(el => { el.textContent = t(el.getAttribute("data-i18n")); });
-  document.querySelectorAll("[data-i18n-html]").forEach(el => { el.innerHTML = t(el.getAttribute("data-i18n-html")); });
-  document.querySelectorAll("[data-i18n-placeholder]").forEach(el => { el.placeholder = t(el.getAttribute("data-i18n-placeholder")); });
-  if (lastCheck) renderCheck(lastCheck);
-}
-$("langToggle").addEventListener("click", () => { LANG = LANG === "it" ? "en" : "it"; applyI18n(); });
+        extNotFound: "Estensione Universal Profile non trovata.",
+        connectionRejected: "Connessione rifiutata o fallita.",
+        noSignerFound: "Nessun wallet firmatario trovato (es. MetaMask).",
+        genericError: (v) => `Errore: ${v.err}`,
+        checkFirst: "La verifica del pannello 3 non è verde: aggiornala prima di continuare.",
+        txSent: (v) => `Tx inviata: ${v.hash}`,
+        waiting: "In attesa di conferma...",
+        txUnknown: "⚠️ Dopo un minuto l'RPC non mostra ancora la transazione: controlla l'esito sull'explorer (link sopra) prima di riprovare.",
+        txFailed: "❌ Transazione fallita on-chain.",
+        planTitle: (v) => `Operazioni in UNA transazione, firmata dal controller ${v.signer} e inviata al Key Manager ${v.km}:`,
+        planGrant: (v) => `1. Concede temporaneamente al controller: ${v.bits} (permessi ${v.from} → ${v.to})`,
+        planSet: (v) => `${v.n}. Registra l'estensione ${v.ext} sulla UP per: ${v.names}`,
+        planRestore: (v) => `${v.n}. Riporta i permessi del controller esattamente a ${v.from}`,
+        planNoGrant: "Il controller ha già i permessi necessari: nessuna modifica ai permessi.",
+        planAtomic: "Se una qualsiasi operazione fallisce, l'intera transazione viene annullata e non cambia nulla.",
+        planReplaceWarn: "⚠️ Alcune chiavi hanno già un'altra estensione: verrà sostituita. Spunta la conferma qui sotto per procedere.",
+        simulating: "Simulazione della transazione...",
+        simOk: (v) => `✅ Simulazione riuscita. Gas stimato: ${v.gas}.`,
+        simFail: (v) => `❌ La simulazione fallisce: ${v.err}. Niente viene inviato.`,
+        signerNoGas: (v) => `❌ Il controller non ha abbastanza fondi per il gas: servono circa ${v.need}, ne ha ${v.have}.`,
+        readyToSign: "Pronto. Rileggi le operazioni qui sopra, poi premi \"Firma e invia\" e conferma in MetaMask (destinatario: il Key Manager della UP).",
+        replaceAckRequired: "Spunta la conferma sulla sostituzione delle estensioni esistenti.",
+        stale: "❌ Qualcosa è cambiato dopo la preparazione (rete, account o dati della UP): prepara di nuovo.",
+        sending: "Invio della transazione (conferma in MetaMask)...",
+        verifying: "Verifica finale sulla UP...",
+        finalOk: "✅✅ Fatto: la UP ora può ricevere NFT ERC-721 ed ERC-1155 su questa rete, e i permessi del controller sono uguali a prima.",
+        finalBad: (v) => `⚠️ Transazione confermata, ma la verifica finale non torna: ${v.what}. Controlla sull'explorer.`,
 
-// ==================== HELPERS ====================
-// Data from wallets and RPCs is written with textContent, never innerHTML.
-function setStatus(id, text, cls) {
-  const el = $(id);
-  el.textContent = "";
-  const span = document.createElement("span");
-  if (cls) span.className = cls;
-  span.textContent = text;
-  el.appendChild(span);
-}
-function log(msg, cls) {
-  const l = document.createElement("div");
-  if (cls) l.className = cls;
-  l.textContent = msg;
-  $("log").appendChild(l);
-}
-function logSeparator() {
-  const l = document.createElement("div");
-  l.className = "line-dim";
-  l.textContent = `—— ${new Date().toLocaleTimeString()} ——`;
-  $("log").appendChild(l);
-}
-const riskAccepted = () => $("ackRisk").checked;
-const tr = (v) => Array.isArray(v) ? t(v[0], v[1]) : v;
+        footerHtml: `Servizi di consulenza in integrazione dati &amp; blockchain a cura di ChainIntegrate <a href="https://www.linkedin.com/company/chainintegrate" target="_blank" rel="noopener" aria-label="LinkedIn" class="footer-li"><svg width="20" height="20" viewBox="0 0 20 20"><rect width="20" height="20" rx="4" fill="#0A66C2"/><text x="10" y="15" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#fff">in</text></svg></a> · <a href="https://t.me/Simone_1977_2" target="_blank" rel="noopener">Assistenza via Telegram</a> · <a href="https://github.com/ChainIntegrate/Cross_Chain" target="_blank" rel="noopener">Codice sorgente su GitHub</a>`,
+      },
+      en: {
+        pageTitle: "NFT reception on the UP — ChainIntegrate",
+        h1: "NFT reception on the UP (experimental)",
+        subtitle: "Let your Universal Profile receive ERC-721 and ERC-1155 NFTs on a network where you redeployed it (for example purchases on OpenSea).",
+        langToggleBtn: "Italiano",
+        panel0Title: "0 · How it works",
+        panel0Note: "When a standard NFT is delivered with a \"safe transfer\", the token contract asks the recipient whether it can receive it. A UP answers only through an <b>extension</b> (LSP17) registered in its data; redeployed UPs usually have none, so purchases fail (\"wallet cannot receive\").<br><br>This page: <b>(1)</b> if needed, takes you to the publishing page to publish on the network the <code>NFTReceiverExtension</code>, a minimal contract with no owner, data or funds, always at the same address on every network; <b>(2)</b> registers it on the UP with <b>a single atomic Key Manager transaction</b>: it grants the controller the permission to add extensions, registers the extension, and sets the controller's permissions back to <b>exactly</b> what they were. If any part fails, nothing changes. Before signing you see the list of operations and the simulation result.",
+        disclaimer: "<b>⚠️ Read before using this page</b><ul style=\"margin:8px 0 0; padding-left:20px;\"><li><b>Experimental tool, not externally audited.</b> Real, irreversible transactions.</li><li><b>It changes the UP's configuration on this network:</b> it adds the extension keys to receive NFTs (repeat it on other networks). The controller's permissions stay the same as before.</li><li><b>The extension</b> answers only NFT-reception calls and <code>supportsInterface</code>: the UP calls it with a normal call, so it cannot read or change the UP's data or funds. Source, bytecode and verification steps are in the repository's <code>contracts/</code> folder.</li><li><b>Receiving NFTs</b> also means being able to receive unwanted NFTs (spam): never give approvals or signatures for NFTs you do not know.</li><li><b>No warranty.</b> Software \"as is\" (MIT license): you use it at your own risk. ChainIntegrate is not liable for any loss or damage. No affiliation with LUKSO or others.</li><li><b>This page never asks for private keys</b>: you sign everything in MetaMask.</li></ul>",
+        ackLabel: "I have read and accept: I use this tool at my own risk.",
+        ackRequired: "Accept the conditions in panel 0 first.",
+        panel1Title: "1 · Network",
+        networkFilterPlaceholder: "Filter by name... (e.g. base, polygon, arbitrum)",
+        customRpcLabel: "Custom RPC URL",
+        customExplorerLabel: "Custom explorer URL (optional)",
+        customNetName: "Custom network",
+        panel2Title: "2 · Your UP",
+        connectUpBtn: "Read the address from the UP extension",
+        upAddressLabel: "UP address",
+        panel3Title: "3 · Controller (MetaMask) and check",
+        panel3Note: "MetaMask with the UP controller's key, on the chosen network. It pays the gas. The check starts by itself and runs again if you change network, UP, account or MetaMask's network.",
+        connectSignerBtn: "Connect MetaMask (controller)",
+        checkIdle: "The check starts by itself once network, UP and MetaMask are set.",
+        recheckBtn: "Check again",
+        panel4Title: "4 · Actions",
+        panel4Note: "If the extension does not exist on this network yet, the page gives you the link to the <b>publishing page</b>: there anyone can publish it, with any wallet and without a UP; it only costs gas and gives no control over any UP. Then, here, with the UP's controller you prepare the enabling: the page shows every operation and simulates it; only then can you sign.",
+        publishLinkText: "Publish the extension on this network (publishing page) →",
+        prepareBtn: "Prepare and simulate the enabling",
+        noPlan: "No operation prepared.",
+        ackReplaceLabel: "I understand that I am replacing the existing extensions listed above",
+        enableBtn: "Sign and send (a single transaction)",
 
-// Upper bound of the gas price, read straight from the RPC (2 * baseFee + priority fee).
-async function estimateMaxGasPrice(provider) {
-  const gasPrice = BigInt(await provider.send("eth_gasPrice", []));
-  const block = await provider.send("eth_getBlockByNumber", ["latest", false]);
-  if (!block || !block.baseFeePerGas) return gasPrice;
-  const baseFee = BigInt(block.baseFeePerGas);
-  const tip = gasPrice > baseFee ? gasPrice - baseFee : 0n;
-  return 2n * baseFee + tip;
-}
-function revertReason(e) {
-  const data = e?.data || e?.info?.error?.data || e?.error?.data;
-  if (typeof data === "string" && data.length >= 10) {
-    try { const d = KM_IFACE.parseError(data); return `${d.name}(${d.args.map(String).join(", ")})`; } catch (x) { /* not an LSP6 error */ }
-  }
-  return e?.shortMessage || e?.reason || e?.message || String(e);
-}
+        cNetwork: "Network", cRpc: "RPC", cWallet: "MetaMask", cUp: "UP", cKm: "Key Manager", cPerms: "Controller permissions",
+        cExt: "Extension on this network", cFactory: "Deterministic factory", cHooks: "State on the UP",
+        rpcOk: (v) => `✅ chainId ${v.id}`,
+        rpcWrong: (v) => `❌ the RPC answers with chainId ${v.id}, expected ${v.exp}`,
+        rpcFail: (v) => `❌ RPC unreachable: ${v.err}`,
+        walletMissing: "❌ not connected",
+        walletOk: (v) => `✅ ${v.addr} · chainId ${v.id}`,
+        walletWrong: (v) => `❌ ${v.addr} is on chainId ${v.id}: switch MetaMask to chainId ${v.exp}`,
+        walletUnknown: "❌ could not read MetaMask's network",
+        upMissing: "❌ missing or invalid address",
+        upNotDeployed: "❌ not deployed on this network",
+        upOk: (v) => `✅ ${v.addr}`,
+        kmBad: (v) => `❌ the UP owner (${v.addr}) is not a contract on this network`,
+        kmOk: (v) => `✅ ${v.addr}`,
+        permsNone: "❌ none: this account is not a controller of the UP. Import into MetaMask the controller key of THIS UP.",
+        permsList: (v) => `${v.hex} · ${v.names}`,
+        extOk: (v) => `✅ published (${v.addr}), code verified`,
+        extMissing: (v) => `⚠️ not published on this network yet (${v.addr}): use "Publish the extension"`,
+        extWrongCode: (v) => `❌ the code at ${v.addr} is not the expected one: do not use it`,
+        factoryOk: "✅ present",
+        factoryMissing: "❌ missing on this network: the extension cannot be published at the same address",
+        hookOk: (v) => `${v.name}: ✅ already registered`,
+        hookEmpty: (v) => `${v.name}: to add`,
+        hookOther: (v) => `${v.name}: ⚠️ another extension is set (${v.ext}), it would be replaced`,
+        verdictDone: "✅ The UP can already receive ERC-721 and ERC-1155 NFTs on this network. Nothing else to do.",
+        verdictNeedPublish: "The extension is not published on this network yet: publish it first with the publishing page (link in panel 4), with any wallet. Then come back and press \"Check again\".",
+        verdictReady: "✅ Ready: prepare and simulate the enabling (panel 4).",
+        verdictNoEdit: (v) => `❌ The controller lacks ${v.missing} and does not have EDITPERMISSIONS to grant them: a controller with more permissions is needed.`,
+        verdictFail: "❌ Check failed: fix the item in red above.",
+        verdictMissing: "Fill in the missing fields: the check will start again by itself.",
+        verdictUpForEnable: "To enable NFT reception on a UP, enter the UP address and connect its controller.",
+        checkRunning: "Checking...",
 
-// ==================== 1. Network ====================
-const networkSelectEl = $("network");
-function renderNetworkOptions(filter) {
-  const f = (filter || "").toLowerCase();
-  networkSelectEl.innerHTML = "";
-  CHAINS.filter(c => c.name.toLowerCase().includes(f)).forEach(c => {
-    const opt = document.createElement("option");
-    opt.value = c.key;
-    opt.textContent = c.chainId ? `${c.name} (chainId ${c.chainId})` : c.name;
-    networkSelectEl.appendChild(opt);
-  });
-}
-renderNetworkOptions("");
-const presetNetworkKey = new URLSearchParams(location.search).get("network");
-if (presetNetworkKey && CHAINS.some(c => c.key === presetNetworkKey)) networkSelectEl.value = presetNetworkKey;
-{ const u = new URLSearchParams(location.search).get("up"); if (u && ethers.isAddress(u)) $("upAddress").value = ethers.getAddress(u); }
+        extNotFound: "Universal Profile extension not found.",
+        connectionRejected: "Connection rejected or failed.",
+        noSignerFound: "No signing wallet found (e.g. MetaMask).",
+        genericError: (v) => `Error: ${v.err}`,
+        checkFirst: "The check in panel 3 is not green: update it before continuing.",
+        txSent: (v) => `Tx sent: ${v.hash}`,
+        waiting: "Waiting for confirmation...",
+        txUnknown: "⚠️ After a minute the RPC still does not show the transaction: check the outcome on the explorer (link above) before trying again.",
+        txFailed: "❌ Transaction failed on-chain.",
+        planTitle: (v) => `Operations in ONE transaction, signed by the controller ${v.signer} and sent to the Key Manager ${v.km}:`,
+        planGrant: (v) => `1. Temporarily grants the controller: ${v.bits} (permissions ${v.from} → ${v.to})`,
+        planSet: (v) => `${v.n}. Registers the extension ${v.ext} on the UP for: ${v.names}`,
+        planRestore: (v) => `${v.n}. Sets the controller's permissions back to exactly ${v.from}`,
+        planNoGrant: "The controller already holds the needed permissions: no permission change.",
+        planAtomic: "If any operation fails, the whole transaction is reverted and nothing changes.",
+        planReplaceWarn: "⚠️ Some keys already hold another extension: it will be replaced. Tick the confirmation below to proceed.",
+        simulating: "Simulating the transaction...",
+        simOk: (v) => `✅ Simulation succeeded. Estimated gas: ${v.gas}.`,
+        simFail: (v) => `❌ The simulation fails: ${v.err}. Nothing is sent.`,
+        signerNoGas: (v) => `❌ The controller does not have enough funds for gas: about ${v.need} needed, it has ${v.have}.`,
+        readyToSign: "Ready. Read the operations above again, then press \"Sign and send\" and confirm in MetaMask (recipient: the UP's Key Manager).",
+        replaceAckRequired: "Tick the confirmation about replacing the existing extensions.",
+        stale: "❌ Something changed after preparing (network, account or UP data): prepare again.",
+        sending: "Sending the transaction (confirm in MetaMask)...",
+        verifying: "Final check on the UP...",
+        finalOk: "✅✅ Done: the UP can now receive ERC-721 and ERC-1155 NFTs on this network, and the controller's permissions are the same as before.",
+        finalBad: (v) => `⚠️ Transaction confirmed, but the final check does not match: ${v.what}. Check on the explorer.`,
 
-function getNetwork() {
-  const c = CHAINS.find(x => x.key === networkSelectEl.value);
-  if (!c) return null;
-  if (c.key === "custom") {
-    return { key: "custom", name: t("customNetName"), chainId: null, rpc: $("customRpc").value.trim(), explorer: $("customExplorer").value.trim() || null, currency: "" };
-  }
-  return { ...c };
-}
-function onInputsChanged() {
-  $("customRpcWrap").style.display = networkSelectEl.value === "custom" ? "block" : "none";
-  scheduleCheck();
-}
-$("networkFilter").addEventListener("input", (e) => { renderNetworkOptions(e.target.value); onInputsChanged(); });
-networkSelectEl.addEventListener("change", onInputsChanged);
-$("customRpc").addEventListener("input", onInputsChanged);
+        footerHtml: `Data &amp; blockchain integration consulting by ChainIntegrate <a href="https://www.linkedin.com/company/chainintegrate" target="_blank" rel="noopener" aria-label="LinkedIn" class="footer-li"><svg width="20" height="20" viewBox="0 0 20 20"><rect width="20" height="20" rx="4" fill="#0A66C2"/><text x="10" y="15" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#fff">in</text></svg></a> · <a href="https://t.me/Simone_1977_2" target="_blank" rel="noopener">Support via Telegram</a> · <a href="https://github.com/ChainIntegrate/Cross_Chain" target="_blank" rel="noopener">Source code on GitHub</a>`,
+      },
+    };
 
-// ==================== 2. UP ====================
-$("connectUp").addEventListener("click", async () => {
-  if (!window.lukso) { setStatus("checkBox", t("extNotFound"), "line-err"); return; }
-  try {
-    const accounts = await window.lukso.request({ method: "eth_requestAccounts" });
-    $("upAddress").value = accounts[0];
-    scheduleCheck();
-  } catch (e) {
-    setStatus("checkBox", t("connectionRejected"), "line-err");
-  }
-});
-$("upAddress").addEventListener("input", () => scheduleCheck());
-
-// ==================== 3. Controller + check ====================
-let signerProvider = null, signerAddress = null;
-const discoveredProviders = [];
-window.addEventListener("eip6963:announceProvider", (e) => discoveredProviders.push(e.detail));
-window.dispatchEvent(new Event("eip6963:requestProvider"));
-
-$("connectSigner").addEventListener("click", async () => {
-  let candidate = discoveredProviders.find(p => !/lukso|universal profile/i.test(p.info.name))?.provider;
-  if (!candidate && window.ethereum && window.ethereum !== window.lukso) candidate = window.ethereum;
-  if (!candidate) { setStatus("checkBox", t("noSignerFound"), "line-err"); return; }
-  try {
-    const accounts = await candidate.request({ method: "eth_requestAccounts" });
-    signerAddress = accounts[0];
-    if (signerProvider !== candidate && candidate.on) {
-      candidate.on("accountsChanged", (acc) => { signerAddress = acc?.[0] || null; scheduleCheck(0); });
-      candidate.on("chainChanged", () => scheduleCheck(0));
+    function t(key, vars) {
+      const entry = I18N[LANG][key];
+      return typeof entry === "function" ? entry(vars || {}) : entry;
     }
-    signerProvider = candidate;
-    scheduleCheck(0);
-  } catch (e) {
-    setStatus("checkBox", t("connectionRejected"), "line-err");
-  }
-});
-$("recheckBtn").addEventListener("click", () => scheduleCheck(0));
-$("ackRisk").addEventListener("change", updateButtons);
+    function applyI18n() {
+      document.documentElement.lang = LANG;
+      document.title = t("pageTitle");
+      document.querySelectorAll("[data-i18n]").forEach(el => { el.textContent = t(el.getAttribute("data-i18n")); });
+      document.querySelectorAll("[data-i18n-html]").forEach(el => { el.innerHTML = t(el.getAttribute("data-i18n-html")); });
+      document.querySelectorAll("[data-i18n-placeholder]").forEach(el => { el.placeholder = t(el.getAttribute("data-i18n-placeholder")); });
+      if (lastCheck) renderCheck(lastCheck);
+    }
+    $("langToggle").addEventListener("click", () => { LANG = LANG === "it" ? "en" : "it"; applyI18n(); });
 
-let check = null, lastCheck = null, checkRun = 0, checkTimer = null, plan = null;
+    // ==================== HELPERS ====================
+    // Data from wallets and RPCs is written with textContent, never innerHTML.
+    function setStatus(id, text, cls) {
+      const el = $(id);
+      el.textContent = "";
+      const span = document.createElement("span");
+      if (cls) span.className = cls;
+      span.textContent = text;
+      el.appendChild(span);
+    }
+    function log(msg, cls) {
+      const l = document.createElement("div");
+      if (cls) l.className = cls;
+      l.textContent = msg;
+      $("log").appendChild(l);
+    }
+    function logSeparator() {
+      const l = document.createElement("div");
+      l.className = "line-dim";
+      l.textContent = `—— ${new Date().toLocaleTimeString()} ——`;
+      $("log").appendChild(l);
+    }
+    const riskAccepted = () => $("ackRisk").checked;
+    const tr = (v) => Array.isArray(v) ? t(v[0], v[1]) : v;
 
-function scheduleCheck(delay = 500) {
-  check = null;
-  clearPlan();
-  updateButtons();
-  clearTimeout(checkTimer);
-  checkTimer = setTimeout(runCheck, delay);
-}
-async function runCheck() {
-  const run = ++checkRun;
-  check = null;
-  updateButtons();
-  setStatus("checkBox", t("checkRunning"), "empty");
-  const res = await computeCheck();
-  if (run !== checkRun) return null;
-  lastCheck = res;
-  check = res.ok ? res : null;
-  renderCheck(res);
-  updateButtons();
-  return res;
-}
+    // Upper bound of the gas price, read straight from the RPC (2 * baseFee + priority fee).
+    async function estimateMaxGasPrice(provider) {
+      const gasPrice = BigInt(await provider.send("eth_gasPrice", []));
+      const block = await provider.send("eth_getBlockByNumber", ["latest", false]);
+      if (!block || !block.baseFeePerGas) return gasPrice;
+      const baseFee = BigInt(block.baseFeePerGas);
+      const tip = gasPrice > baseFee ? gasPrice - baseFee : 0n;
+      return 2n * baseFee + tip;
+    }
+    function revertReason(e) {
+      const data = e?.data || e?.info?.error?.data || e?.error?.data;
+      if (typeof data === "string" && data.length >= 10) {
+        try { const d = KM_IFACE.parseError(data); return `${d.name}(${d.args.map(String).join(", ")})`; } catch (x) { /* not an LSP6 error */ }
+      }
+      return e?.shortMessage || e?.reason || e?.message || String(e);
+    }
 
-// Step-by-step report; stops at the first blocking problem.
-async function computeCheck() {
-  const res = { ok: false, missing: false, steps: [], verdict: [] };
-  const step = (key, text, cls) => res.steps.push([key, text, cls]);
-  const net = getNetwork();
-  const rawUp = $("upAddress").value.trim();
-  // Network and wallet are enough to publish the extension; the UP is needed only to enable it.
-  if (!net || !net.rpc || !signerProvider || !signerAddress) {
-    res.missing = true;
-    step("cWallet", signerAddress || ["walletMissing"], signerAddress ? "" : "err");
-    return res;
-  }
-  let provider, rpcId;
-  try {
-    rpcId = Number(await new ethers.JsonRpcProvider(net.rpc, undefined, { batchMaxCount: 1 }).send("eth_chainId", []));
-    provider = new ethers.JsonRpcProvider(net.rpc, rpcId, { staticNetwork: true, batchMaxCount: 1 });
-  } catch (e) {
-    step("cNetwork", net.name, "");
-    step("cRpc", ["rpcFail", { err: e.shortMessage || e.message }], "err");
-    return res;
-  }
-  const chainId = net.chainId || rpcId;
-  if (!net.chainId) net.name = `${t("customNetName")} (chainId ${rpcId})`;
-  step("cNetwork", net.chainId ? `${net.name} (chainId ${net.chainId})` : net.name, "");
-  if (rpcId !== chainId) { step("cRpc", ["rpcWrong", { id: rpcId, exp: chainId }], "err"); return res; }
-  step("cRpc", ["rpcOk", { id: rpcId }], "ok");
+    // ==================== 1. Network ====================
+    const networkSelectEl = $("network");
+    function renderNetworkOptions(filter) {
+      const f = (filter || "").toLowerCase();
+      networkSelectEl.innerHTML = "";
+      CHAINS.filter(c => c.name.toLowerCase().includes(f)).forEach(c => {
+        const opt = document.createElement("option");
+        opt.value = c.key;
+        opt.textContent = c.chainId ? `${c.name} (chainId ${c.chainId})` : c.name;
+        networkSelectEl.appendChild(opt);
+      });
+    }
+    renderNetworkOptions("");
+    const presetNetworkKey = new URLSearchParams(location.search).get("network");
+    if (presetNetworkKey && CHAINS.some(c => c.key === presetNetworkKey)) networkSelectEl.value = presetNetworkKey;
+    { const u = new URLSearchParams(location.search).get("up"); if (u && ethers.isAddress(u)) $("upAddress").value = ethers.getAddress(u); }
 
-  let walletId;
-  try { walletId = parseInt(await signerProvider.request({ method: "eth_chainId" }), 16); }
-  catch (e) { step("cWallet", ["walletUnknown"], "err"); return res; }
-  if (walletId !== chainId) { step("cWallet", ["walletWrong", { addr: signerAddress, id: walletId, exp: chainId }], "err"); return res; }
-  step("cWallet", ["walletOk", { addr: signerAddress, id: walletId }], "ok");
+    function getNetwork() {
+      const c = CHAINS.find(x => x.key === networkSelectEl.value);
+      if (!c) return null;
+      if (c.key === "custom") {
+        return { key: "custom", name: t("customNetName"), chainId: null, rpc: $("customRpc").value.trim(), explorer: $("customExplorer").value.trim() || null, currency: "" };
+      }
+      return { ...c };
+    }
+    function onInputsChanged() {
+      $("customRpcWrap").style.display = networkSelectEl.value === "custom" ? "block" : "none";
+      scheduleCheck();
+    }
+    $("networkFilter").addEventListener("input", (e) => { renderNetworkOptions(e.target.value); onInputsChanged(); });
+    networkSelectEl.addEventListener("change", onInputsChanged);
+    $("customRpc").addEventListener("input", onInputsChanged);
 
-  // The extension: code at the deterministic address must be exactly the expected runtime.
-  const extCode = await provider.getCode(EXT_ADDRESS);
-  let extState;
-  if (extCode === "0x") extState = "missing";
-  else if (ethers.keccak256(extCode) === EXT_RUNTIME_HASH) extState = "ok";
-  else extState = "wrong";
-  step("cExt", extState === "ok" ? ["extOk", { addr: EXT_ADDRESS }] : extState === "missing" ? ["extMissing", { addr: EXT_ADDRESS }] : ["extWrongCode", { addr: EXT_ADDRESS }],
-    extState === "ok" ? "ok" : extState === "missing" ? "warn" : "err");
-  let factoryOk = true;
-  if (extState === "missing") {
-    factoryOk = (await provider.getCode(NICK_FACTORY)) !== "0x";
-    step("cFactory", factoryOk ? ["factoryOk"] : ["factoryMissing"], factoryOk ? "ok" : "err");
-  }
-  // Publishing is permissionless: any wallet on this network can do it, no UP or controller needed.
-  res.pub = { net, chainId, provider, signer: signerAddress, extState, factoryOk };
-  if (extState === "wrong") return res;
-  if (!ethers.isAddress(rawUp)) {
-    res.upMissing = true;
-    step("cUp", ["upMissing"], "warn");
-    return res;
-  }
-
-  try {
-    const up = ethers.getAddress(rawUp);
-    if ((await provider.getCode(up)) === "0x") { step("cUp", ["upNotDeployed"], "err"); return res; }
-    step("cUp", ["upOk", { addr: up }], "ok");
-    const upC = new ethers.Contract(up, UP_IFACE, provider);
-    const km = ethers.getAddress(await upC.owner());
-    if ((await provider.getCode(km)) === "0x") { step("cKm", ["kmBad", { addr: km }], "err"); return res; }
-    step("cKm", ["kmOk", { addr: km }], "ok");
-
-    const permKey = PERM_PREFIX + signerAddress.slice(2).toLowerCase();
-    const permRaw = await upC.getData(permKey);
-    const perms = permRaw && permRaw !== "0x" ? BigInt(permRaw) : 0n;
-    if (perms === 0n) { step("cPerms", ["permsNone"], "err"); return res; }
-    step("cPerms", ["permsList", { hex: "0x" + perms.toString(16).padStart(6, "0"), names: permNames(perms) }], "");
-
-    // Current value of the four LSP17 keys.
-    const values = await upC.getDataBatch(HOOKS.map(h => LSP17_KEY(h.sel)));
-    const hooks = HOOKS.map((h, i) => {
-      const v = values[i];
-      if (!v || v === "0x") return { ...h, state: "empty" };
-      const ext = ethers.dataLength(v) >= 20 ? ethers.getAddress(ethers.dataSlice(v, 0, 20)) : v;
-      return { ...h, state: String(ext).toLowerCase() === EXT_ADDRESS.toLowerCase() && ethers.dataLength(v) === 20 ? "ok" : "other", ext };
-    });
-    step("cHooks", hooks.map(h => h.state === "ok" ? t("hookOk", h) : h.state === "empty" ? t("hookEmpty", h) : t("hookOther", h)).join("\n"), hooks.every(h => h.state === "ok") ? "ok" : "warn");
-
-    const base = { net, chainId, provider, up, km, signer: signerAddress, permKey, permRaw, perms, extState, hooks };
-    if (hooks.every(h => h.state === "ok")) { Object.assign(res, base, { ok: true, done: true }); res.verdict.push([["verdictDone"], "line-ok"]); return res; }
-
-    // Permissions needed: ADDEXTENSIONS for empty keys, CHANGEEXTENSIONS for keys holding another value.
-    let needed = 0n;
-    if (hooks.some(h => h.state === "empty")) needed |= P.ADDEXTENSIONS;
-    if (hooks.some(h => h.state === "other")) needed |= P.CHANGEEXTENSIONS;
-    const missing = needed & ~perms;
-    if (missing && !(perms & P.EDITPERMISSIONS)) { res.verdict.push([["verdictNoEdit", { missing: permNames(missing) }], "line-err"]); return res; }
-    if (missing && ethers.dataLength(permRaw) !== 32) { step("cPerms", ["genericError", { err: "permission value is not 32 bytes" }], "err"); return res; }
-    Object.assign(res, base, { ok: true, done: false, missing });
-    if (extState === "missing") { if (!factoryOk) { res.ok = false; return res; } res.verdict.push([["verdictNeedPublish"], "line-warn"]); }
-    else res.verdict.push([["verdictReady"], "line-ok"]);
-  } catch (e) {
-    step("cUp", ["genericError", { err: e.shortMessage || e.message }], "err");
-    res.ok = false;
-  }
-  return res;
-}
-
-function renderCheck(res) {
-  const box = $("checkBox");
-  box.textContent = "";
-  const grid = document.createElement("div");
-  grid.className = "kv";
-  for (const [k, v, cls] of res.steps) {
-    const kd = document.createElement("div"); kd.className = "k"; kd.textContent = t(k);
-    const vd = document.createElement("div"); vd.className = "v" + (cls ? " " + cls : ""); vd.style.whiteSpace = "pre-wrap"; vd.textContent = tr(v);
-    grid.appendChild(kd); grid.appendChild(vd);
-  }
-  box.appendChild(grid);
-  const verdict = res.verdict.map(([v, cls]) => [tr(v), cls]);
-  const needPublish = res.pub && res.pub.extState === "missing" && res.pub.factoryOk;
-  if (res.missing) verdict.push([t("verdictMissing"), "line-dim"]);
-  else if (res.upMissing) verdict.push([t(needPublish ? "verdictNeedPublish" : "verdictUpForEnable"), needPublish ? "line-warn" : "line-dim"]);
-  else if (!res.ok && !res.verdict.length) {
-    verdict.push([t("verdictFail"), "line-err"]);
-    if (needPublish) verdict.push([t("verdictNeedPublish"), "line-warn"]);
-  }
-  for (const [text, cls] of verdict) {
-    const d = document.createElement("div"); d.className = "verdict " + cls; d.textContent = text; box.appendChild(d);
-  }
-}
-
-function updateButtons() {
-  const ready = !!check && riskAccepted();
-  // Publishing is done on the publishing page (any wallet, no UP): link to it, preset on this network.
-  const pub = lastCheck && lastCheck.pub;
-  const showLink = !!(pub && pub.extState === "missing" && pub.factoryOk);
-  $("publishLink").hidden = !showLink;
-  if (showLink) {
-    const q = new URLSearchParams({ impl: EXT_ADDRESS });
-    if (pub.net.key && pub.net.key !== "custom") q.set("network", pub.net.key);
-    $("publishLink").href = "up-publish-implementation.html?" + q.toString();
-  }
-  $("prepareBtn").disabled = !(ready && !check.done && check.extState === "ok");
-  $("enableBtn").disabled = !(ready && plan);
-}
-function clearPlan() {
-  plan = null;
-  setStatus("planBox", t("noPlan"), "empty");
-  $("replaceRow").style.display = "none";
-  $("ackReplace").checked = false;
-}
-
-// Re-run right before acting: accounts, networks and UP data may have changed.
-async function freshCheck() {
-  clearTimeout(checkTimer);
-  const res = await runCheck();
-  return res && res.ok ? res : null;
-}
-
-// ==================== 4. Enable: one atomic executeBatch ====================
-function buildPayloads(c) {
-  const todo = c.hooks.filter(h => h.state !== "ok");
-  const setExt = UP_IFACE.encodeFunctionData("setDataBatch", [todo.map(h => LSP17_KEY(h.sel)), todo.map(() => EXT_ADDRESS)]);
-  if (!c.missing) return { todo, payloads: [setExt] };
-  const granted = ethers.zeroPadValue(ethers.toBeHex(c.perms | c.missing), 32);
-  return {
-    todo,
-    payloads: [
-      UP_IFACE.encodeFunctionData("setData", [c.permKey, granted]),
-      setExt,
-      // Restore the exact bytes read from the UP, not a recomputed value.
-      UP_IFACE.encodeFunctionData("setData", [c.permKey, c.permRaw]),
-    ],
-  };
-}
-
-$("prepareBtn").addEventListener("click", async () => {
-  if (!riskAccepted()) { log(t("ackRequired"), "line-err"); return; }
-  logSeparator();
-  clearPlan();
-  updateButtons();
-  const c = await freshCheck();
-  if (!c || c.done || c.extState !== "ok") { log(t("checkFirst"), "line-err"); return; }
-  const { todo, payloads } = buildPayloads(c);
-  const hex = (n) => "0x" + n.toString(16).padStart(6, "0");
-  const lines = [t("planTitle", { signer: c.signer, km: c.km })];
-  let n = 1;
-  if (c.missing) { lines.push(t("planGrant", { bits: permNames(c.missing), from: hex(c.perms), to: hex(c.perms | c.missing) })); n++; }
-  else lines.push(t("planNoGrant"));
-  lines.push(t("planSet", { n, ext: EXT_ADDRESS, names: todo.map(h => h.name).join(", ") })); n++;
-  if (c.missing) lines.push(t("planRestore", { n, from: hex(c.perms) }));
-  lines.push(t("planAtomic"));
-  const replacing = todo.some(h => h.state === "other");
-  if (replacing) lines.push(t("planReplaceWarn"));
-  setStatus("planBox", lines.join("\n"), "");
-  $("replaceRow").style.display = replacing ? "flex" : "none";
-  log(lines.join("\n"), "line-compare");
-
-  const data = payloads.length === 1
-    ? KM_IFACE.encodeFunctionData("execute", [payloads[0]])
-    : KM_IFACE.encodeFunctionData("executeBatch", [payloads.map(() => 0), payloads]);
-  log(t("simulating"), "line-dim");
-  let gas;
-  try {
-    await c.provider.call({ from: c.signer, to: c.km, data });
-    gas = await c.provider.estimateGas({ from: c.signer, to: c.km, data });
-  } catch (e) { log(t("simFail", { err: revertReason(e) }), "line-err"); return; }
-  log(t("simOk", { gas: gas.toString() }), "line-ok");
-  const gasLimit = gas + gas / 4n;
-  const need = gasLimit * (await estimateMaxGasPrice(c.provider));
-  const bal = await c.provider.getBalance(c.signer);
-  const cur = c.net.currency || "";
-  if (bal < need) { log(t("signerNoGas", { need: `${ethers.formatEther(need)} ${cur}`, have: `${ethers.formatEther(bal)} ${cur}` }), "line-err"); return; }
-  plan = { data, gasLimit, c, replacing };
-  log(t("readyToSign"), "line-warn");
-  updateButtons();
-});
-$("ackReplace").addEventListener("change", updateButtons);
-
-$("enableBtn").addEventListener("click", async () => {
-  if (!plan || !riskAccepted()) return;
-  if (plan.replacing && !$("ackReplace").checked) { log(t("replaceAckRequired"), "line-err"); return; }
-  const p = plan;
-  $("enableBtn").disabled = true;
-  try {
-    // The data was built from the UP's state at preparation time: it must not have changed.
-    const c = await freshCheck();
-    const same = c && !c.done && c.chainId === p.c.chainId && c.up === p.c.up && c.km === p.c.km &&
-      c.signer.toLowerCase() === p.c.signer.toLowerCase() && c.permRaw === p.c.permRaw &&
-      JSON.stringify(c.hooks.map(h => h.state + (h.ext || ""))) === JSON.stringify(p.c.hooks.map(h => h.state + (h.ext || "")));
-    if (!same) { log(t("stale"), "line-err"); return; }
-    const signer = await new ethers.BrowserProvider(signerProvider).getSigner();
-    if (signer.address.toLowerCase() !== p.c.signer.toLowerCase()) { log(t("stale"), "line-err"); return; }
-    log(t("sending"), "line-dim");
-    const sent = await signer.sendTransaction({ to: p.c.km, data: p.data, gasLimit: p.gasLimit, chainId: p.c.chainId });
-    clearPlan();
-    log(t("txSent", { hash: sent.hash }), "line-dim");
-    const explorerUrl = getExplorerUrl(p.c.net, EXPLORER_PATH, sent.hash);
-    if (explorerUrl) log(explorerUrl, "line-dim");
-    log(t("waiting"), "line-dim");
-    const receipt = await waitReceipt(p.c.provider, sent.hash, signer.provider);
-    if (!receipt) { log(t("txUnknown"), "line-warn"); return; }
-    if (receipt.status !== 1) { log(t("txFailed"), "line-err"); return; }
-
-    log(t("verifying"), "line-dim");
-    // Read at the transaction's block, with a few retries for RPC nodes that lag behind.
-    const upC = new ethers.Contract(p.c.up, UP_IFACE, p.c.provider);
-    const at = { blockTag: receipt.blockNumber };
-    let problems = ["not read"];
-    for (let i = 0; i < 6 && problems.length; i++) {
-      if (i) await new Promise(r => setTimeout(r, 1500));
+    // ==================== 2. UP ====================
+    $("connectUp").addEventListener("click", async () => {
+      if (!window.lukso) { setStatus("checkBox", t("extNotFound"), "line-err"); return; }
       try {
-        const [vals, permNow, s721, s1155] = await Promise.all([
-          upC.getDataBatch(HOOKS.map(h => LSP17_KEY(h.sel)), at),
-          upC.getData(p.c.permKey, at),
-          upC.supportsInterface("0x150b7a02", at),
-          upC.supportsInterface("0x4e2312e0", at),
-        ]);
-        problems = [];
-        if (!vals.every(v => String(v).toLowerCase() === EXT_ADDRESS.toLowerCase())) problems.push("extension keys");
-        if (permNow !== p.c.permRaw) problems.push(`controller permissions ${permNow}`);
-        if (!s721 || !s1155) problems.push("supportsInterface");
-      } catch (e) { problems = [e.shortMessage || e.message]; }
-    }
-    if (problems.length) log(t("finalBad", { what: problems.join(", ") }), "line-warn");
-    else log(t("finalOk"), "line-ok");
-  } catch (e) {
-    log(t("genericError", { err: e.shortMessage || e.message }), "line-err");
-  } finally {
-    scheduleCheck(0);
-  }
-});
+        const accounts = await window.lukso.request({ method: "eth_requestAccounts" });
+        $("upAddress").value = accounts[0];
+        scheduleCheck();
+      } catch (e) {
+        setStatus("checkBox", t("connectionRejected"), "line-err");
+      }
+    });
+    $("upAddress").addEventListener("input", () => scheduleCheck());
 
-applyI18n();
-onInputsChanged();
-</script>
+    // ==================== 3. Controller + check ====================
+    let signerProvider = null, signerAddress = null;
+    const discoveredProviders = [];
+    window.addEventListener("eip6963:announceProvider", (e) => discoveredProviders.push(e.detail));
+    window.dispatchEvent(new Event("eip6963:requestProvider"));
+
+    $("connectSigner").addEventListener("click", async () => {
+      let candidate = discoveredProviders.find(p => !/lukso|universal profile/i.test(p.info.name))?.provider;
+      if (!candidate && window.ethereum && window.ethereum !== window.lukso) candidate = window.ethereum;
+      if (!candidate) { setStatus("checkBox", t("noSignerFound"), "line-err"); return; }
+      try {
+        const accounts = await candidate.request({ method: "eth_requestAccounts" });
+        signerAddress = accounts[0];
+        if (signerProvider !== candidate && candidate.on) {
+          candidate.on("accountsChanged", (acc) => { signerAddress = acc?.[0] || null; scheduleCheck(0); });
+          candidate.on("chainChanged", () => scheduleCheck(0));
+        }
+        signerProvider = candidate;
+        scheduleCheck(0);
+      } catch (e) {
+        setStatus("checkBox", t("connectionRejected"), "line-err");
+      }
+    });
+    $("recheckBtn").addEventListener("click", () => scheduleCheck(0));
+    $("ackRisk").addEventListener("change", updateButtons);
+
+    let check = null, lastCheck = null, checkRun = 0, checkTimer = null, plan = null;
+
+    function scheduleCheck(delay = 500) {
+      check = null;
+      clearPlan();
+      updateButtons();
+      clearTimeout(checkTimer);
+      checkTimer = setTimeout(runCheck, delay);
+    }
+    async function runCheck() {
+      const run = ++checkRun;
+      check = null;
+      updateButtons();
+      setStatus("checkBox", t("checkRunning"), "empty");
+      const res = await computeCheck();
+      if (run !== checkRun) return null;
+      lastCheck = res;
+      check = res.ok ? res : null;
+      renderCheck(res);
+      updateButtons();
+      return res;
+    }
+
+    // Step-by-step report; stops at the first blocking problem.
+    async function computeCheck() {
+      const res = { ok: false, missing: false, steps: [], verdict: [] };
+      const step = (key, text, cls) => res.steps.push([key, text, cls]);
+      const net = getNetwork();
+      const rawUp = $("upAddress").value.trim();
+      // Network and wallet are enough to publish the extension; the UP is needed only to enable it.
+      if (!net || !net.rpc || !signerProvider || !signerAddress) {
+        res.missing = true;
+        step("cWallet", signerAddress || ["walletMissing"], signerAddress ? "" : "err");
+        return res;
+      }
+      let provider, rpcId;
+      try {
+        rpcId = Number(await new ethers.JsonRpcProvider(net.rpc, undefined, { batchMaxCount: 1 }).send("eth_chainId", []));
+        provider = new ethers.JsonRpcProvider(net.rpc, rpcId, { staticNetwork: true, batchMaxCount: 1 });
+      } catch (e) {
+        step("cNetwork", net.name, "");
+        step("cRpc", ["rpcFail", { err: e.shortMessage || e.message }], "err");
+        return res;
+      }
+      const chainId = net.chainId || rpcId;
+      if (!net.chainId) net.name = `${t("customNetName")} (chainId ${rpcId})`;
+      step("cNetwork", net.chainId ? `${net.name} (chainId ${net.chainId})` : net.name, "");
+      if (rpcId !== chainId) { step("cRpc", ["rpcWrong", { id: rpcId, exp: chainId }], "err"); return res; }
+      step("cRpc", ["rpcOk", { id: rpcId }], "ok");
+
+      let walletId;
+      try { walletId = parseInt(await signerProvider.request({ method: "eth_chainId" }), 16); }
+      catch (e) { step("cWallet", ["walletUnknown"], "err"); return res; }
+      if (walletId !== chainId) { step("cWallet", ["walletWrong", { addr: signerAddress, id: walletId, exp: chainId }], "err"); return res; }
+      step("cWallet", ["walletOk", { addr: signerAddress, id: walletId }], "ok");
+
+      // The extension: code at the deterministic address must be exactly the expected runtime.
+      const extCode = await provider.getCode(EXT_ADDRESS);
+      let extState;
+      if (extCode === "0x") extState = "missing";
+      else if (ethers.keccak256(extCode) === EXT_RUNTIME_HASH) extState = "ok";
+      else extState = "wrong";
+      step("cExt", extState === "ok" ? ["extOk", { addr: EXT_ADDRESS }] : extState === "missing" ? ["extMissing", { addr: EXT_ADDRESS }] : ["extWrongCode", { addr: EXT_ADDRESS }],
+        extState === "ok" ? "ok" : extState === "missing" ? "warn" : "err");
+      let factoryOk = true;
+      if (extState === "missing") {
+        factoryOk = (await provider.getCode(NICK_FACTORY)) !== "0x";
+        step("cFactory", factoryOk ? ["factoryOk"] : ["factoryMissing"], factoryOk ? "ok" : "err");
+      }
+      // Publishing is permissionless: any wallet on this network can do it, no UP or controller needed.
+      res.pub = { net, chainId, provider, signer: signerAddress, extState, factoryOk };
+      if (extState === "wrong") return res;
+      if (!ethers.isAddress(rawUp)) {
+        res.upMissing = true;
+        step("cUp", ["upMissing"], "warn");
+        return res;
+      }
+
+      try {
+        const up = ethers.getAddress(rawUp);
+        if ((await provider.getCode(up)) === "0x") { step("cUp", ["upNotDeployed"], "err"); return res; }
+        step("cUp", ["upOk", { addr: up }], "ok");
+        const upC = new ethers.Contract(up, UP_IFACE, provider);
+        const km = ethers.getAddress(await upC.owner());
+        if ((await provider.getCode(km)) === "0x") { step("cKm", ["kmBad", { addr: km }], "err"); return res; }
+        step("cKm", ["kmOk", { addr: km }], "ok");
+
+        const permKey = PERM_PREFIX + signerAddress.slice(2).toLowerCase();
+        const permRaw = await upC.getData(permKey);
+        const perms = permRaw && permRaw !== "0x" ? BigInt(permRaw) : 0n;
+        if (perms === 0n) { step("cPerms", ["permsNone"], "err"); return res; }
+        step("cPerms", ["permsList", { hex: "0x" + perms.toString(16).padStart(6, "0"), names: permNames(perms) }], "");
+
+        // Current value of the four LSP17 keys.
+        const values = await upC.getDataBatch(HOOKS.map(h => LSP17_KEY(h.sel)));
+        const hooks = HOOKS.map((h, i) => {
+          const v = values[i];
+          if (!v || v === "0x") return { ...h, state: "empty" };
+          const ext = ethers.dataLength(v) >= 20 ? ethers.getAddress(ethers.dataSlice(v, 0, 20)) : v;
+          return { ...h, state: String(ext).toLowerCase() === EXT_ADDRESS.toLowerCase() && ethers.dataLength(v) === 20 ? "ok" : "other", ext };
+        });
+        step("cHooks", hooks.map(h => h.state === "ok" ? t("hookOk", h) : h.state === "empty" ? t("hookEmpty", h) : t("hookOther", h)).join("\n"), hooks.every(h => h.state === "ok") ? "ok" : "warn");
+
+        const base = { net, chainId, provider, up, km, signer: signerAddress, permKey, permRaw, perms, extState, hooks };
+        if (hooks.every(h => h.state === "ok")) { Object.assign(res, base, { ok: true, done: true }); res.verdict.push([["verdictDone"], "line-ok"]); return res; }
+
+        // Permissions needed: ADDEXTENSIONS for empty keys, CHANGEEXTENSIONS for keys holding another value.
+        let needed = 0n;
+        if (hooks.some(h => h.state === "empty")) needed |= P.ADDEXTENSIONS;
+        if (hooks.some(h => h.state === "other")) needed |= P.CHANGEEXTENSIONS;
+        const missing = needed & ~perms;
+        if (missing && !(perms & P.EDITPERMISSIONS)) { res.verdict.push([["verdictNoEdit", { missing: permNames(missing) }], "line-err"]); return res; }
+        if (missing && ethers.dataLength(permRaw) !== 32) { step("cPerms", ["genericError", { err: "permission value is not 32 bytes" }], "err"); return res; }
+        Object.assign(res, base, { ok: true, done: false, missing });
+        if (extState === "missing") { if (!factoryOk) { res.ok = false; return res; } res.verdict.push([["verdictNeedPublish"], "line-warn"]); }
+        else res.verdict.push([["verdictReady"], "line-ok"]);
+      } catch (e) {
+        step("cUp", ["genericError", { err: e.shortMessage || e.message }], "err");
+        res.ok = false;
+      }
+      return res;
+    }
+
+    function renderCheck(res) {
+      const box = $("checkBox");
+      box.textContent = "";
+      const grid = document.createElement("div");
+      grid.className = "kv";
+      for (const [k, v, cls] of res.steps) {
+        const kd = document.createElement("div"); kd.className = "k"; kd.textContent = t(k);
+        const vd = document.createElement("div"); vd.className = "v" + (cls ? " " + cls : ""); vd.style.whiteSpace = "pre-wrap"; vd.textContent = tr(v);
+        grid.appendChild(kd); grid.appendChild(vd);
+      }
+      box.appendChild(grid);
+      const verdict = res.verdict.map(([v, cls]) => [tr(v), cls]);
+      const needPublish = res.pub && res.pub.extState === "missing" && res.pub.factoryOk;
+      if (res.missing) verdict.push([t("verdictMissing"), "line-dim"]);
+      else if (res.upMissing) verdict.push([t(needPublish ? "verdictNeedPublish" : "verdictUpForEnable"), needPublish ? "line-warn" : "line-dim"]);
+      else if (!res.ok && !res.verdict.length) {
+        verdict.push([t("verdictFail"), "line-err"]);
+        if (needPublish) verdict.push([t("verdictNeedPublish"), "line-warn"]);
+      }
+      for (const [text, cls] of verdict) {
+        const d = document.createElement("div"); d.className = "verdict " + cls; d.textContent = text; box.appendChild(d);
+      }
+    }
+
+    function updateButtons() {
+      const ready = !!check && riskAccepted();
+      // Publishing is done on the publishing page (any wallet, no UP): link to it, preset on this network.
+      const pub = lastCheck && lastCheck.pub;
+      const showLink = !!(pub && pub.extState === "missing" && pub.factoryOk);
+      $("publishLink").hidden = !showLink;
+      if (showLink) {
+        const q = new URLSearchParams({ impl: EXT_ADDRESS });
+        if (pub.net.key && pub.net.key !== "custom") q.set("network", pub.net.key);
+        $("publishLink").href = "up-publish-implementation.html?" + q.toString();
+      }
+      $("prepareBtn").disabled = !(ready && !check.done && check.extState === "ok");
+      $("enableBtn").disabled = !(ready && plan);
+    }
+    function clearPlan() {
+      plan = null;
+      setStatus("planBox", t("noPlan"), "empty");
+      $("replaceRow").style.display = "none";
+      $("ackReplace").checked = false;
+    }
+
+    // Re-run right before acting: accounts, networks and UP data may have changed.
+    async function freshCheck() {
+      clearTimeout(checkTimer);
+      const res = await runCheck();
+      return res && res.ok ? res : null;
+    }
+
+    // ==================== 4. Enable: one atomic executeBatch ====================
+    function buildPayloads(c) {
+      const todo = c.hooks.filter(h => h.state !== "ok");
+      const setExt = UP_IFACE.encodeFunctionData("setDataBatch", [todo.map(h => LSP17_KEY(h.sel)), todo.map(() => EXT_ADDRESS)]);
+      if (!c.missing) return { todo, payloads: [setExt] };
+      const granted = ethers.zeroPadValue(ethers.toBeHex(c.perms | c.missing), 32);
+      return {
+        todo,
+        payloads: [
+          UP_IFACE.encodeFunctionData("setData", [c.permKey, granted]),
+          setExt,
+          // Restore the exact bytes read from the UP, not a recomputed value.
+          UP_IFACE.encodeFunctionData("setData", [c.permKey, c.permRaw]),
+        ],
+      };
+    }
+
+    $("prepareBtn").addEventListener("click", async () => {
+      if (!riskAccepted()) { log(t("ackRequired"), "line-err"); return; }
+      logSeparator();
+      clearPlan();
+      updateButtons();
+      const c = await freshCheck();
+      if (!c || c.done || c.extState !== "ok") { log(t("checkFirst"), "line-err"); return; }
+      const { todo, payloads } = buildPayloads(c);
+      const hex = (n) => "0x" + n.toString(16).padStart(6, "0");
+      const lines = [t("planTitle", { signer: c.signer, km: c.km })];
+      let n = 1;
+      if (c.missing) { lines.push(t("planGrant", { bits: permNames(c.missing), from: hex(c.perms), to: hex(c.perms | c.missing) })); n++; }
+      else lines.push(t("planNoGrant"));
+      lines.push(t("planSet", { n, ext: EXT_ADDRESS, names: todo.map(h => h.name).join(", ") })); n++;
+      if (c.missing) lines.push(t("planRestore", { n, from: hex(c.perms) }));
+      lines.push(t("planAtomic"));
+      const replacing = todo.some(h => h.state === "other");
+      if (replacing) lines.push(t("planReplaceWarn"));
+      setStatus("planBox", lines.join("\n"), "");
+      $("replaceRow").style.display = replacing ? "flex" : "none";
+      log(lines.join("\n"), "line-compare");
+
+      const data = payloads.length === 1
+        ? KM_IFACE.encodeFunctionData("execute", [payloads[0]])
+        : KM_IFACE.encodeFunctionData("executeBatch", [payloads.map(() => 0), payloads]);
+      log(t("simulating"), "line-dim");
+      let gas;
+      try {
+        await c.provider.call({ from: c.signer, to: c.km, data });
+        gas = await c.provider.estimateGas({ from: c.signer, to: c.km, data });
+      } catch (e) { log(t("simFail", { err: revertReason(e) }), "line-err"); return; }
+      log(t("simOk", { gas: gas.toString() }), "line-ok");
+      const gasLimit = gas + gas / 4n;
+      const need = gasLimit * (await estimateMaxGasPrice(c.provider));
+      const bal = await c.provider.getBalance(c.signer);
+      const cur = c.net.currency || "";
+      if (bal < need) { log(t("signerNoGas", { need: `${ethers.formatEther(need)} ${cur}`, have: `${ethers.formatEther(bal)} ${cur}` }), "line-err"); return; }
+      plan = { data, gasLimit, c, replacing };
+      log(t("readyToSign"), "line-warn");
+      updateButtons();
+    });
+    $("ackReplace").addEventListener("change", updateButtons);
+
+    $("enableBtn").addEventListener("click", async () => {
+      if (!plan || !riskAccepted()) return;
+      if (plan.replacing && !$("ackReplace").checked) { log(t("replaceAckRequired"), "line-err"); return; }
+      const p = plan;
+      $("enableBtn").disabled = true;
+      try {
+        // The data was built from the UP's state at preparation time: it must not have changed.
+        const c = await freshCheck();
+        const same = c && !c.done && c.chainId === p.c.chainId && c.up === p.c.up && c.km === p.c.km &&
+          c.signer.toLowerCase() === p.c.signer.toLowerCase() && c.permRaw === p.c.permRaw &&
+          JSON.stringify(c.hooks.map(h => h.state + (h.ext || ""))) === JSON.stringify(p.c.hooks.map(h => h.state + (h.ext || "")));
+        if (!same) { log(t("stale"), "line-err"); return; }
+        const signer = await new ethers.BrowserProvider(signerProvider).getSigner();
+        if (signer.address.toLowerCase() !== p.c.signer.toLowerCase()) { log(t("stale"), "line-err"); return; }
+        log(t("sending"), "line-dim");
+        const sent = await signer.sendTransaction({ to: p.c.km, data: p.data, gasLimit: p.gasLimit, chainId: p.c.chainId });
+        clearPlan();
+        log(t("txSent", { hash: sent.hash }), "line-dim");
+        const explorerUrl = getExplorerUrl(p.c.net, EXPLORER_PATH, sent.hash);
+        if (explorerUrl) log(explorerUrl, "line-dim");
+        log(t("waiting"), "line-dim");
+        const receipt = await waitReceipt(p.c.provider, sent.hash, signer.provider);
+        if (!receipt) { log(t("txUnknown"), "line-warn"); return; }
+        if (receipt.status !== 1) { log(t("txFailed"), "line-err"); return; }
+
+        log(t("verifying"), "line-dim");
+        // Read at the transaction's block, with a few retries for RPC nodes that lag behind.
+        const upC = new ethers.Contract(p.c.up, UP_IFACE, p.c.provider);
+        const at = { blockTag: receipt.blockNumber };
+        let problems = ["not read"];
+        for (let i = 0; i < 6 && problems.length; i++) {
+          if (i) await new Promise(r => setTimeout(r, 1500));
+          try {
+            const [vals, permNow, s721, s1155] = await Promise.all([
+              upC.getDataBatch(HOOKS.map(h => LSP17_KEY(h.sel)), at),
+              upC.getData(p.c.permKey, at),
+              upC.supportsInterface("0x150b7a02", at),
+              upC.supportsInterface("0x4e2312e0", at),
+            ]);
+            problems = [];
+            if (!vals.every(v => String(v).toLowerCase() === EXT_ADDRESS.toLowerCase())) problems.push("extension keys");
+            if (permNow !== p.c.permRaw) problems.push(`controller permissions ${permNow}`);
+            if (!s721 || !s1155) problems.push("supportsInterface");
+          } catch (e) { problems = [e.shortMessage || e.message]; }
+        }
+        if (problems.length) log(t("finalBad", { what: problems.join(", ") }), "line-warn");
+        else log(t("finalOk"), "line-ok");
+      } catch (e) {
+        log(t("genericError", { err: e.shortMessage || e.message }), "line-err");
+      } finally {
+        scheduleCheck(0);
+      }
+    });
+
+    applyI18n();
+    onInputsChanged();
+  </script>
 
 </body>
+
 </html>
