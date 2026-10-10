@@ -1,6 +1,6 @@
 # Cross_Chain — LUKSO Universal Profile cross-chain toolkit
 
-Browser tools by [ChainIntegrate](https://chainintegrate.it) for redeploying an existing **LUKSO Universal Profile (UP)** at the **same address** on other EVM chains, then checking and using it there.
+Browser tools by [Bertrand Juglas (Bertux)](https://paragraph.com/@bertrand.juglas) for redeploying an existing **LUKSO Universal Profile (UP)** at the **same address** on other EVM chains, then checking and using it there.
 
 ## How it works
 
@@ -71,7 +71,7 @@ The tools never ask for a private key. The calldata is public on-chain data, and
 
 ### Online
 
-The pages are published at `https://crosschain-lukso.chainintegrate.it/`. Start with the guide: [up-crosschain-guide.html](https://crosschain-lukso.chainintegrate.it/up-crosschain-guide.html).
+The pages are published at `https://crosschain-lukso.juglas.name/`. Start with the deployment page: [up-deploy-public.html](https://crosschain-lukso.juglas.name/up-deploy-public.html) and then the guide about the details you want to understand: [up-crosschain-guide.html](https://crosschain-lukso.juglas.name/up-crosschain-guide.html).
 
 ### Advanced: `tools/decrypt.js` (offline only)
 
@@ -81,33 +81,11 @@ It runs locally and offline (`node tools/decrypt.js`); instructions are in [tool
 
 ## Publishing the website
 
-The site is deployed by running `git pull` in the web root (`https://crosschain-lukso.chainintegrate.it/`), so the whole repository lands on the server. The HTML pages, the shared scripts (`chains.js`, `theme.js`, `backup-check.js`, `deploy-check.js`, `asset-list.js`, `gas-relay-client.js`, `gas-relay-page.js`), `vendor/`, the images and `guide-assets/` are website content. The `.git/` folder and `tools/` must not be reachable from the web.
+The site is deployed by Vercel at (`https://crosschain-lukso.juglas.name/`) automatically by pushing on `main` branch. The HTML pages, the shared scripts (`chains.js`, `theme.js`, `backup-check.js`, `deploy-check.js`, `asset-list.js`, `gas-relay-client.js`, `gas-relay-page.js`), `vendor/`, the images and `guide-assets/` are website content. The `.git/` folder and `tools/` must not be reachable from the web.
 
-The web server on this host **does not apply `.htaccess`**, so the protection is done in the server's git clone. It works with any web server. Run this **once**, inside the site folder on the server:
+The web server on this host **does not apply `.htaccess`**, so the protection is done in `.vercelignore`.
 
-```bash
-# 1. Keep tools/ out of the web root: files outside the pattern are removed now and on every future pull.
-git sparse-checkout set --no-cone '/*' '!/tools/'
-
-# 2. Move the git metadata out of the web root, into a folder shared by all sites' git dirs.
-#    Create it once (the only step that needs sudo), owned by the deploy user:
-sudo mkdir -p /var/www/repos && sudo chown ubuntu:ubuntu /var/www/repos && sudo chmod 750 /var/www/repos
-#    `.git` becomes a one-line file containing only a path.
-mv .git /var/www/repos/crosschain-lukso.git && echo "gitdir: /var/www/repos/crosschain-lukso.git" > .git
-```
-
-`/var/www/repos` is not the root of any site, so it is not reachable from the web. Always run `git pull` as the deploy user (`ubuntu`), never with `sudo`: root-owned files would break the next pull.
-
-After that, `git pull` works exactly as before. The root `.htaccess` stays in the repository as an extra safety net for hosts that do apply it (Apache).
-
-**Site configuration.** Some pages read their settings from `config.js`, which is not in the repository. Create it once on the server, in the site folder, by copying `config.example.js` and filling in the values; `git pull` leaves it untouched. Its values are not secret (the browser receives them): protect the WalletConnect Project ID with the allowed-domains list in the Reown dashboard, and the Alchemy API key (used by the Send page to list a UP's tokens and NFTs) with the app's domain allowlist in the Alchemy dashboard.
-
-**Check after every deploy.** Each of these URLs must return *404 Not Found*; `/.git` may return the one-line `gitdir:` file, which contains only a path and no repository data:
-
-- `https://crosschain-lukso.chainintegrate.it/.git/HEAD`
-- `https://crosschain-lukso.chainintegrate.it/.git/config`
-- `https://crosschain-lukso.chainintegrate.it/tools/decrypt.js`
-- `https://crosschain-lukso.chainintegrate.it/decrypt.js` (old location, removed by the pull)
+**Site configuration.** Some pages read their settings from environment variables in Vercel. Its values are not secret (the browser receives them): protect the WalletConnect Project ID with the allowed-domains list in the Reown dashboard, and the Alchemy API key (used by the Send page to list a UP's tokens and NFTs) with the app's domain allowlist in the Alchemy dashboard.
 
 ## Requirements
 
@@ -160,7 +138,7 @@ Open items that need the maintainer to act (site redeploy, CSP, RPC refresh) are
 
 ## Contributing
 
-Bug reports and improvements to the tools are welcome. This repository does not add new chains: the tools already work on any EVM chain through "Custom RPC", and official support for a chain is LUKSO's responsibility. Read [CONTRIBUTING.md](CONTRIBUTING.md) before opening an issue or a pull request.
+Bug reports and improvements to the tools are welcome. This repository does add new chains: the tools already work on any EVM chain through "Custom RPC", and official support for a chain is LUKSO's responsibility. Read [CONTRIBUTING.md](CONTRIBUTING.md) before opening an issue or a pull request.
 
 ## License
 
@@ -169,7 +147,5 @@ Released under the [MIT License](LICENSE), with these exceptions:
 - Third-party code included in the repository keeps its own license: the WalletConnect bundle in `vendor/` (WalletConnect Community License Agreement of Reown, Inc., plus MIT/ISC/Apache-2.0/0BSD dependencies) and the sources embedded in `contracts/*.input.json` (LUKSO, ERC725, OpenZeppelin, `@account-abstraction`). See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
 The software is provided "as is", without warranty of any kind: these tools prepare irreversible on-chain transactions, and you use them at your own risk.
-
-The ChainIntegrate name, logo and banner are not covered by the license.
 
 The site relayer in `tools/relayer/` is run by ChainIntegrate. It relays the operations of the UPs on the allowlist paymaster's list and of the UPs with an active subscription (sponsor paymaster, `up-subscribe.html`). Both are experimental and offered as they are.
