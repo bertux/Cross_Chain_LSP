@@ -64,14 +64,14 @@ Severity scale: **High** means funds can be lost or sent to the wrong place, or 
 
 ### H-01 — Send/Test pages never check the signing wallet's chain (funds can move on the wrong chain)
 
-- **Files:** `up-invia-fondi.html`, `up-test-operazione.html` (also `up-multichain-deploy-v2.html`)
+- **Files:** `up-send-funds.html`, `up-test-operation.html` (also `up-multichain-deploy-v2.html`)
 - **Impact:** All checks (balance, Key Manager existence, gas estimate) ran against the RPC of the selected network. The transaction itself was then sent through the wallet on **whatever chain the wallet happened to be on**. A UP and its Key Manager have the **same addresses on LUKSO and on every chain where they were redeployed**. So a wallet left on LUKSO would pass the wallet-side step and transfer real LYX from the original profile, when the user meant to send, for example, ETH on Base. The confirmation popup would show the right recipient, which makes the mistake easy to miss.
 - **Fix:** Added a new `checkChains()` helper. It reads `eth_chainId` from **both** the RPC and the wallet and blocks unless both equal the selected chain. For a custom RPC, the RPC's own chainId is the reference. The check runs at *Check* time and again right before signing. If the wallet's network cannot be read, the page now **blocks** instead of silently continuing.
 - **Status:** ✅ Fixed
 
 ### H-02 — Deploy page: a successful Verify stayed valid after changing network, inputs or account
 
-- **Files:** `up-deploy-public.html` (same pattern in `up-invia-fondi.html` and `up-multichain-deploy-v2.html`)
+- **Files:** `up-deploy-public.html` (same pattern in `up-send-funds.html` and `up-multichain-deploy-v2.html`)
 - **Impact:** After *Verify*, the *Deploy* button stayed enabled even if the user then:
   - selected another network (typing in the filter box also silently changes the selected option), or
   - edited the calldata or the expected address, or
@@ -101,7 +101,7 @@ Severity scale: **High** means funds can be lost or sent to the wrong place, or 
 
 ### M-02 — Key Manager address and bytecode computed from a hard-coded implementation
 
-- **Files:** `up-deploy-public.html`, `up-verify-only.html`, `up-invia-fondi.html`, `up-test-operazione.html`
+- **Files:** `up-deploy-public.html`, `up-verify-only.html`, `up-send-funds.html`, `up-test-operation.html`
 - **Impact:** LSP23 clones the secondary contract from `secondaryContractDeploymentInit.implementationContract`, the address **named in the calldata**. The salt is `keccak256(abi.encodePacked(primaryAddress))` (verified in `LSP23LinkedContractsFactory.sol`). The pages always used the constant `0x2fe3…f8a4` instead. For any profile created with a different Key Manager version, the pages would:
   - predict the wrong Key Manager address, so the "already exists" check ran on the wrong address;
   - report a failed deploy after a successful one (bytecode mismatch);
@@ -188,20 +188,20 @@ Severity scale: **High** means funds can be lost or sent to the wrong place, or 
 
 ### L-02 — Balance display race condition on the Send page
 
-- **File:** `up-invia-fondi.html`
+- **File:** `up-send-funds.html`
 - **Impact:** A slow RPC answering late could overwrite the balance shown for the network that is currently selected.
 - **Fix:** Each request gets a sequence number, and stale responses are discarded.
 - **Status:** ✅ Fixed
 
 ### L-03 — Send page accepted the zero address or the UP itself as recipient
 
-- **File:** `up-invia-fondi.html`
+- **File:** `up-send-funds.html`
 - **Fix:** Both cases are now blocked, with an explicit message.
 - **Status:** ✅ Fixed
 
 ### L-04 — Test page reported success without comparing the value read back
 
-- **File:** `up-test-operazione.html`
+- **File:** `up-test-operation.html`
 - **Impact:** The page logged "write confirmed" with whatever `getData` returned. That could be an old value or empty, for example from a lagging RPC node.
 - **Fix:** The page compares the value read back with the value written and retries up to 5 times.
 - **Status:** ✅ Fixed
@@ -234,7 +234,7 @@ Severity scale: **High** means funds can be lost or sent to the wrong place, or 
 
 ### L-09 — Gas price lookup depended on a third-party service on Polygon
 
-- **Files:** `up-deploy-public.html`, `up-invia-fondi.html` (and the new `up-publish-implementation.html`)
+- **Files:** `up-deploy-public.html`, `up-send-funds.html` (and the new `up-publish-implementation.html`)
 - **Impact:** The pages used ethers' `getFeeData()`. On chainId 137, ethers 6.13.4 does not ask the RPC for the gas price: it calls the Polygon gas-station API (`gasstation.polygon.technology`). If that service is down, rate-limited or blocked by the browser or network, Verify fails with `error encountered with polygon gas station`, even though the RPC works.
 - **Fix:** A new `estimateMaxGasPrice()` helper reads `eth_gasPrice` and the latest block's base fee directly from the selected RPC. It uses the same upper bound as ethers: `2 × baseFee + priority fee`. Signing is unaffected: the wallet computes its own fees, and ethers' JSON-RPC signer does not call `getFeeData()`.
 - **Status:** ✅ Fixed (reproduced in the browser test with Polygon selected, then verified)

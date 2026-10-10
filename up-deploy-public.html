@@ -493,7 +493,7 @@
     <button id="deployBtn" class="danger" disabled data-i18n="deployBtn">Deploy (irreversible)</button>
     <div id="log" class="line-dim" style="margin-top:10px;"><span data-i18n="logInitial">Waiting for the connections above.</span></div>
     <div id="testLinkBox" class="test-link-box" style="display:none;">
-      <a id="testLinkAnchor" href="up-test-operazione.html" target="_blank" data-i18n="testLinkText">→ Test the UP you just deployed on this network</a>
+      <a id="testLinkAnchor" href="up-test-operation.html" target="_blank" data-i18n="testLinkText">→ Test the UP you just deployed on this network</a>
     </div>
     <div id="backupNextBox" class="next-box" style="display:none;">
       <span data-i18n="backupNextText">Next step: add a backup controller on this network. If you lose the genesis key with no backup, you are locked out of this UP for good.</span>
@@ -1667,7 +1667,7 @@
           if (primaryExplorerUrl) log(primaryExplorerUrl, "line-dim");
           if (secondaryExplorerUrl) log(secondaryExplorerUrl, "line-dim");
           if (net.key) {
-            $("testLinkAnchor").href = `up-test-operazione.html?network=${encodeURIComponent(net.key)}`;
+            $("testLinkAnchor").href = `up-test-operation.html?network=${encodeURIComponent(net.key)}`;
           }
           $("testLinkBox").style.display = "block";
           $("backupNextBox").style.display = "block";

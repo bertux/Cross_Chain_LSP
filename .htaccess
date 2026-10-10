@@ -5,3 +5,7 @@ RedirectMatch 404 "/\.git(/|$)"
 RedirectMatch 404 "/\.(gitignore|htaccess)$"
 RedirectMatch 404 "/tools(/|$)"
 RedirectMatch 404 "\.md$"
+
+# Backwards compatibility redirects for renamed pages
+RedirectPermanent /up-invia-fondi.html /up-send-funds.html
+RedirectPermanent /up-test-operazione.html /up-test-operation.html

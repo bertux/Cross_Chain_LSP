@@ -1,4 +1,4 @@
-Send page (up-invia-fondi.html) with "Pay the gas with the site relayer", Polygon mainnet, 2026-10-02: ERC-20 (USDC)
+Send page (up-send-funds.html) with "Pay the gas with the site relayer", Polygon mainnet, 2026-10-02: ERC-20 (USDC)
 through the relayer. The maintainer's personal UP sends all its USDC (0.363768) to the cassa; the signer is the cassa
 itself, which is the UP's backup controller (same permissions as the genesis key, ERC4337 included): the account that
 signs is also the recipient, and it spends no POL. The paymaster paid 0.074570301273973512 POL. The recipient warning

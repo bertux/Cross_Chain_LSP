@@ -25,7 +25,7 @@ Server:
 For the test, the ChainIntegrate UP 0x4a2605796e0d91A9667d6E30365aEEC384C48c27 was removed from the allowlist of
 UPPaymaster 0xb353565d1f801E7402DBC267b8C0E30E3540D4eD (an allowlist paymaster is always preferred).
 
-First sponsored operation, from up-invia-fondi.html with "Pay the gas with the site relayer": the UP sends 0.01 AVAX
+First sponsored operation, from up-send-funds.html with "Pay the gas with the site relayer": the UP sends 0.01 AVAX
 to the cassa; the signer is the backup controller (4337 permission). The approval is asked for at send time and checked
 by the page before the controller signs.
 

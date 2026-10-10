@@ -1,4 +1,4 @@
-Send page (up-invia-fondi.html) with "Pay the gas with the site relayer", Base mainnet, 2026-10-02: first live
+Send page (up-send-funds.html) with "Pay the gas with the site relayer", Base mainnet, 2026-10-02: first live
 transfer through the option. ChainIntegrate UP sends 0.001 ETH to the maintainer's personal UP; the controller only
 signs a message; the site relayer sends; the site paymaster pays 0.000001170324 ETH. (The "message signed" line was
 added to the log afterwards.)
