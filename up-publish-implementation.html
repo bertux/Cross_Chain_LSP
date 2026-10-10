@@ -6,14 +6,14 @@
   <script src="theme.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="referrer" content="no-referrer">
-  <title>UP Pubblica Implementazione — ChainIntegrate</title>
+  <title data-i18n="pageTitle">UP Publish Implementation — ChainIntegrate</title>
   <meta name="description"
-    content="Pubblica su un'altra rete EVM un'implementazione LUKSO (LSP0, Key Manager) mancante, ripetendo il deploy deterministico originale tramite la Nick's factory.">
+    content="Publish a missing LUKSO implementation (LSP0, Key Manager) on another EVM network, replaying the original deterministic deploy via Nick's factory.">
   <link rel="icon" href="favicon.ico">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="UP Pubblica Implementazione — ChainIntegrate">
+  <meta property="og:title" content="UP Publish Implementation — ChainIntegrate">
   <meta property="og:description"
-    content="Pubblica su un'altra rete EVM un'implementazione LUKSO mancante, allo stesso indirizzo che ha su LUKSO.">
+    content="Publish a missing LUKSO implementation on another EVM network at the same address it has on LUKSO.">
   <meta property="og:image" content="https://crosschain-lukso.juglas.name/banner.png">
   <meta property="og:url" content="https://crosschain-lukso.juglas.name/up-publish-implementation.html">
   <meta name="twitter:card" content="summary_large_image">
@@ -302,61 +302,61 @@
 
   <div class="top-row">
     <div>
-      <h1 data-i18n="h1">UP Pubblica Implementazione</h1>
-      <div class="subtitle" data-i18n="subtitle"></div>
+      <h1 data-i18n="h1">UP Publish Implementation</h1>
+      <div class="subtitle" data-i18n="subtitle">Publish on another network a LUKSO implementation (LSP0 or Key Manager) that is missing there, at the exact same address it has on LUKSO — so your redeployed profile is not "mute".</div>
     </div>
-    <button class="lang-btn" id="langToggle" data-i18n="langToggleBtn">English</button>
+    <button class="lang-btn" id="langToggle" data-i18n="langToggleBtn">Italiano</button>
   </div>
 
   <div class="panel">
-    <h2 data-i18n="panel0Title">0 · Come funziona questa pagina</h2>
-    <div class="note" data-i18n-html="panel0Note"></div>
+    <h2 data-i18n="panel0Title">0 · How this page works</h2>
+    <div class="note" data-i18n-html="panel0Note">A Universal Profile is a proxy that delegates everything to an <b>implementation</b> (LSP0 for the profile, LSP6 for the Key Manager). Profiles created with different contract versions point to different implementations: if your profile's one does not exist on the target network, the profile would be "mute" there. LUKSO published its implementations through <b>Nick's factory</b> (<code>0x4e59b448…4956C</code>), a deterministic deployer that lives at the same address on almost every EVM network: replaying the <i>exact same</i> transaction on the target network creates the implementation at the <i>exact same</i> address. This page reads the original transaction from LUKSO, mathematically checks that it produces the expected address, and has your wallet sign it. The same applies to the infrastructure contracts used by the deploy, such as the LSP23 factory (<code>0x2300000A…</code>) or the post-deployment module: if LUKSO published them through Nick's factory, this page publishes them the same way (otherwise it says so). The same goes for ChainIntegrate's <b>NFT reception extension</b> (<code>0x7F68e744…C03e</code>), used by the "NFT reception on the UP" page: it is published on LUKSO through Nick's factory and is published the same way, by choosing it below. It is permissionless and harmless: anyone can do it, it gives nobody any control over any profile, and it only costs gas.</div>
   </div>
 
   <div class="panel">
-    <h2 data-i18n="panel1Title">1 · Contratto da pubblicare</h2>
-    <label for="implAddress" data-i18n="implLabel">Indirizzo del contratto (come su LUKSO)</label>
+    <h2 data-i18n="panel1Title">1 · Contract to publish</h2>
+    <label for="implAddress" data-i18n="implLabel">Contract address: implementation or infrastructure contract (as on LUKSO)</label>
     <input type="text" id="implAddress" placeholder="0x...">
     <div class="chips" id="implChips"></div>
-    <label for="txHash" data-i18n="txHashLabel">Hash della transazione di creazione su LUKSO (facoltativo)</label>
+    <label for="txHash" data-i18n="txHashLabel">Creation transaction hash on LUKSO (optional)</label>
     <input type="text" id="txHash" placeholder="0x...">
-    <div class="note" style="margin-top:6px;" data-i18n="txHashNote"></div>
-    <label for="rawInput" data-i18n="rawInputLabel">Input data della transazione (avanzato, facoltativo)</label>
+    <div class="note" style="margin-top:6px;" data-i18n="txHashNote">Usually found automatically. If not: open the contract address on the LUKSO explorer, Details tab, and copy the hash of the "at txn" link in the Creator row.</div>
+    <label for="rawInput" data-i18n="rawInputLabel">Transaction input data (advanced, optional)</label>
     <textarea id="rawInput" placeholder="0x..."></textarea>
-    <div class="note" style="margin-top:6px;" data-i18n="rawInputNote"></div>
-    <button id="loadBtn" class="secondary" data-i18n="loadBtn">Leggi il deploy originale da LUKSO</button>
-    <div class="status-box" id="sourceStatus"><span class="empty" data-i18n="notLoaded">Non ancora letto.</span></div>
+    <div class="note" style="margin-top:6px;" data-i18n="rawInputNote">Only needed if the page cannot read the transaction from either the RPC or the explorer: on the LUKSO explorer open the creation transaction and copy the "Raw input" field (it starts with 0x). It is safe: the page mathematically checks that this data produces exactly the implementation address, and any other data is rejected.</div>
+    <button id="loadBtn" class="secondary" data-i18n="loadBtn">Read the original deploy from LUKSO</button>
+    <div class="status-box" id="sourceStatus"><span class="empty" data-i18n="notLoaded">Not read yet.</span></div>
   </div>
 
   <div class="panel">
-    <h2 data-i18n="panel2Title">2 · Wallet che paga la pubblicazione</h2>
-    <div class="note" data-i18n="panel2Note"></div>
-    <button id="connectSigner" data-i18n="connectSignerBtn">Connetti wallet firmatario (es. MetaMask)</button>
-    <div class="status-box" id="signerStatus"><span class="empty" data-i18n="notConnected">Non connesso.</span></div>
+    <h2 data-i18n="panel2Title">2 · Wallet paying for the publication</h2>
+    <div class="note" data-i18n="panel2Note">Any account with a little gas on the target network: it only pays for the transaction and gets no permission on anything.</div>
+    <button id="connectSigner" data-i18n="connectSignerBtn">Connect signing wallet (e.g. MetaMask)</button>
+    <div class="status-box" id="signerStatus"><span class="empty" data-i18n="notConnected">Not connected.</span></div>
   </div>
 
   <div class="panel">
-    <h2 data-i18n="panel3Title">3 · Rete di destinazione</h2>
+    <h2 data-i18n="panel3Title">3 · Target network</h2>
     <input type="text" id="networkFilter" data-i18n-placeholder="networkFilterPlaceholder"
-      placeholder="Filtra per nome...">
+      placeholder="Filter by name...">
     <select id="network" style="margin-top:8px;"></select>
     <div id="customRpcWrap" style="display:none;">
-      <label data-i18n="customRpcLabel">RPC URL custom</label>
+      <label data-i18n="customRpcLabel">Custom RPC URL</label>
       <input type="text" id="customRpc" placeholder="https://...">
     </div>
   </div>
 
   <div class="panel">
-    <h2 data-i18n="panel4Title">4 · Verifica e pubblica</h2>
-    <button id="checkBtn" data-i18n="checkBtn">Verifica</button>
-    <button id="publishBtn" class="danger" disabled data-i18n="publishBtn">Pubblica il contratto</button>
-    <div id="log" class="line-dim"><span data-i18n="logInitial">In attesa dei dati sopra.</span></div>
+    <h2 data-i18n="panel4Title">4 · Verify and publish</h2>
+    <button id="checkBtn" data-i18n="checkBtn">Verify</button>
+    <button id="publishBtn" class="danger" disabled data-i18n="publishBtn">Publish the contract</button>
+    <div id="log" class="line-dim"><span data-i18n="logInitial">Waiting for the data above.</span></div>
   </div>
 
   <div class="site-footer">
     <div class="footer-row">
       <img src="logo.png" alt="ChainIntegrate" class="footer-logo" onerror="this.style.display='none'">
-      <div class="footer-text" data-i18n-html="footerHtml"></div>
+      <div class="footer-text" data-i18n-html="footerHtml">Data &amp; blockchain integration consulting by ChainIntegrate <a href="https://www.linkedin.com/company/chainintegrate" target="_blank" rel="noopener" aria-label="LinkedIn" class="footer-li"><svg width="20" height="20" viewBox="0 0 20 20"><rect width="20" height="20" rx="4" fill="#0A66C2"/><text x="10" y="15" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#fff">in</text></svg></a> · <a href="https://t.me/Simone_1977_2" target="_blank" rel="noopener">Support via Telegram</a> · <a href="https://github.com/ChainIntegrate/Cross_Chain" target="_blank" rel="noopener">Source code on GitHub</a></div>
     </div>
   </div>
 
@@ -371,7 +371,7 @@
 
     const I18N = {
       it: {
-        pageTitle: "UP Pubblica Implementazione — ChainIntegrate",
+        pageTitle: "UP Publish Implementation — ChainIntegrate",
         h1: "UP Pubblica Implementazione",
         subtitle: "Pubblica su un'altra rete un'implementazione LUKSO (LSP0 o Key Manager) che lì manca, allo stesso identico indirizzo che ha su LUKSO — così il tuo profilo rideployato non resta \"muto\".",
         langToggleBtn: "English",

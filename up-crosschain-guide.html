@@ -8,18 +8,18 @@
   <meta name="referrer" content="no-referrer">
   <title>Replicating a Universal Profile Across Chains</title>
   <meta name="description"
-    content="Guida passo-passo per rideployare la tua LUKSO Universal Profile allo stesso indirizzo su un'altra rete EVM.">
+    content="Step-by-step guide to redeploying your LUKSO Universal Profile at the identical address on another EVM chain.">
   <link rel="icon" href="favicon.ico">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Replicating a Universal Profile Across Chains">
   <meta property="og:description"
-    content="Guida passo-passo per rideployare la tua LUKSO Universal Profile allo stesso indirizzo su un'altra rete EVM.">
+    content="Step-by-step guide to redeploying your LUKSO Universal Profile at the identical address on another EVM chain.">
   <meta property="og:image" content="https://crosschain-lukso.juglas.name/banner.png">
   <meta property="og:url" content="https://crosschain-lukso.juglas.name/up-crosschain-guide.html">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Replicating a Universal Profile Across Chains">
   <meta name="twitter:description"
-    content="Guida passo-passo per rideployare la tua LUKSO Universal Profile allo stesso indirizzo su un'altra rete EVM.">
+    content="Step-by-step guide to redeploying your LUKSO Universal Profile at the identical address on another EVM chain.">
   <meta name="twitter:image" content="https://crosschain-lukso.juglas.name/banner.png">
   <style>
     :root {
@@ -1145,6 +1145,7 @@
     document.querySelectorAll(".langbtn").forEach(btn => {
       btn.addEventListener("click", () => {
         const lang = btn.dataset.setlang;
+        document.documentElement.lang = lang;
         document.querySelectorAll(".langbtn").forEach(b => b.classList.toggle("active", b === btn));
         document.querySelectorAll("[data-lang]").forEach(el => el.classList.toggle("active", el.dataset.lang === lang));
       });

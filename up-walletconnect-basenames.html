@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="referrer" content="no-referrer">
   <meta name="robots" content="noindex, nofollow">
-  <title>DEPRECATED — UP WalletConnect — Basenames demo — ChainIntegrate</title>
+  <title data-i18n="pageTitle">DEPRECATED — UP WalletConnect — Basenames demo — ChainIntegrate</title>
   <link rel="icon" href="favicon.ico">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.4/ethers.umd.min.js"
     integrity="sha384-6Zl0Pc8zjSz8KvmNeXRvUQgY4ryFb+BwDvKCmLYcBME0joAaru491tQgi9B7zsMM" crossorigin="anonymous"
@@ -343,66 +343,64 @@
 
   <div class="top-row">
     <div>
-      <h1 data-i18n="h1">UP WalletConnect — demo Basenames</h1>
-      <div class="subtitle" data-i18n="subtitle"></div>
+      <h1 data-i18n="h1">UP WalletConnect — Basenames demo</h1>
+      <div class="subtitle" data-i18n="subtitle">Use your Universal Profile redeployed on Base as the account on Basenames (base.org/names): the dApp sees the UP address, your controller signs.</div>
     </div>
-    <button class="lang-btn" id="langToggle" data-i18n="langToggleBtn">English</button>
+    <button class="lang-btn" id="langToggle" data-i18n="langToggleBtn">Italiano</button>
   </div>
 
   <div class="panel">
-    <h2 data-i18n="panel0Title">0 · Come funziona</h2>
-    <div class="note" data-i18n-html="panel0Note"></div>
+    <h2 data-i18n="panel0Title">0 · How it works</h2>
+    <div class="note" data-i18n-html="panel0Note">This page acts as a <b>WalletConnect bridge</b>: it presents your UP address to Basenames as the connected account. When the site asks to send the registration transaction, the page <b>wraps</b> it into <code>KeyManager.execute(UP.execute(...))</code> and has your controller sign it in MetaMask. The call therefore reaches Basenames with <code>msg.sender</code> = your UP, and the registered name belongs to the UP. The name's price is paid from the <b>UP's balance</b> on Base; the controller pays the gas. If the site asks to <b>sign a message</b> on behalf of the UP, the page shows you its content: if you confirm, the controller signs it in MetaMask and the UP recognises it as its own (ERC-1271 standard, the SIGN permission is needed). Before returning the signature to the site, the page asks the UP on Base whether it considers it valid.</div>
     <div class="warn-box" style="border-color: var(--err); background: rgba(224,90,90,0.08);"
-      data-i18n-html="demoWarning"></div>
+      data-i18n-html="demoWarning"><b>⚠️ Read before using this page</b><ul style="margin:8px 0 0; padding-left:20px;"><li><b>Experimental demo, not audited.</b> It is meant to test a technical concept, not a product. It may contain bugs.</li><li><b>Real, irreversible transactions</b> on the Base network: you can lose the funds you use. Nobody can undo a confirmed transaction.</li><li><b>Only use it with a test account</b> and minimal amounts. Always start in simulation mode.</li><li><b>No warranty.</b> The software is provided "as is" (MIT license): you use it at your own risk. ChainIntegrate is not liable for any loss or damage.</li><li><b>No affiliation</b> with Coinbase, Base, Basenames, WalletConnect/Reown or LUKSO. The names are mentioned only to describe compatibility.</li><li><b>This page never asks for private keys</b> or seed phrases: you sign everything in your own wallet. Always check network, recipient and amount in the MetaMask popup.</li><li><b>Privacy:</b> the WalletConnect connection goes through Reown's servers, which see the session metadata (addresses, network). Checks use Base's public RPC.</li><li><b>Message signatures.</b> A signature can authorise actions even without a transaction: logins, orders, permissions to spend tokens. The page shows you everything the site asks you to sign and the result of every check, but it <b>cannot know what the signature will be used for</b>. If the content is not readable (for example a hash) or you do not understand what you are authorising, <b>reject it</b>. ChainIntegrate takes no responsibility for signatures of unclear content, nor for what the site does with them.</li><li><b>What security relies on:</b> the architecture (signing always happens in your own wallet, permissions are enforced by the UP's Key Manager) and the services used (WalletConnect/Reown domain verification). The page shows the result of these checks but cannot guarantee them.</li><li><b>One controller per UP.</b> If the same controller governs several UPs, a signature valid for this UP is valid for the others too.</li><li>This is not financial advice, nor an invitation to register names or buy tokens.</li></ul><div style="margin-top:8px;">Transactions: Base only and Basenames name registration only, every other request is rejected. Signatures: <code>personal_sign</code> and <code>eth_signTypedData_v4</code> are shown and need your explicit confirmation; <code>eth_sign</code> and legacy signature formats are always rejected.</div></div>
     <div class="check-row"><input type="checkbox" id="ackRisk"><label for="ackRisk"
-        style="margin:0; color: var(--text);" data-i18n="ackLabel">Ho letto e accetto</label></div>
+        style="margin:0; color: var(--text);" data-i18n="ackLabel">I have read and accept: I use this demo at my own risk, with a test account.</label></div>
   </div>
 
   <div class="panel">
-    <h2 data-i18n="panel1Title">1 · La tua UP su Base</h2>
-    <button id="connectUp" class="secondary" data-i18n="connectUpBtn">Leggi l'indirizzo dall'estensione UP</button>
-    <label for="upAddress" data-i18n="upAddressLabel">Indirizzo della UP</label>
+    <h2 data-i18n="panel1Title">1 · Your UP on Base</h2>
+    <button id="connectUp" class="secondary" data-i18n="connectUpBtn">Read the address from the UP extension</button>
+    <label for="upAddress" data-i18n="upAddressLabel">UP address</label>
     <input type="text" id="upAddress" placeholder="0x...">
-    <button id="checkUpBtn" data-i18n="checkUpBtn">Controlla la UP su Base</button>
-    <div class="status-box" id="upStatus"><span class="empty" data-i18n="notChecked">Non ancora controllata.</span>
+    <button id="checkUpBtn" data-i18n="checkUpBtn">Check the UP on Base</button>
+    <div class="status-box" id="upStatus"><span class="empty" data-i18n="notChecked">Not checked yet.</span>
     </div>
   </div>
 
   <div class="panel">
-    <h2 data-i18n="panel2Title">2 · Wallet del controller (firma)</h2>
-    <div class="note" data-i18n="panel2Note"></div>
-    <button id="connectSigner" data-i18n="connectSignerBtn">Connetti MetaMask (controller)</button>
-    <div class="status-box" id="signerStatus"><span class="empty" data-i18n="notConnected">Non connesso.</span></div>
+    <h2 data-i18n="panel2Title">2 · Controller wallet (signing)</h2>
+    <div class="note" data-i18n="panel2Note">MetaMask with the UP controller's key, connected to Base. It pays the transaction gas: it needs a little ETH on Base.</div>
+    <button id="connectSigner" data-i18n="connectSignerBtn">Connect MetaMask (controller)</button>
+    <div class="status-box" id="signerStatus"><span class="empty" data-i18n="notConnected">Not connected.</span></div>
   </div>
 
   <div class="panel">
-    <h2 data-i18n="panel3Title">3 · Collega Basenames con WalletConnect</h2>
-    <div class="note" data-i18n-html="panel3Note"></div>
-    <label for="wcUri" data-i18n="wcUriLabel">Link WalletConnect (wc:...)</label>
+    <h2 data-i18n="panel3Title">3 · Connect Basenames through WalletConnect</h2>
+    <div class="note" data-i18n-html="panel3Note">On <b>base.org/names</b> choose to connect with <b>WalletConnect</b>, copy the connection link (the copy button below the QR code, it starts with <code>wc:</code>) and paste it here. Keep this page open while you use the site.</div>
+    <label for="wcUri" data-i18n="wcUriLabel">WalletConnect link (wc:...)</label>
     <input type="text" id="wcUri" placeholder="wc:...">
-    <button id="pairBtn" data-i18n="pairBtn">Collega</button>
-    <div class="status-box" id="wcStatus"><span class="empty" data-i18n="wcIdle">Nessuna sessione.</span></div>
-    <button id="disconnectBtn" class="secondary" disabled data-i18n="disconnectBtn">Disconnetti tutte le
-      sessioni</button>
+    <button id="pairBtn" data-i18n="pairBtn">Connect</button>
+    <div class="status-box" id="wcStatus"><span class="empty" data-i18n="wcIdle">No session.</span></div>
+    <button id="disconnectBtn" class="secondary" disabled data-i18n="disconnectBtn">Disconnect all sessions</button>
   </div>
 
   <div class="panel">
-    <h2 data-i18n="panel4Title">4 · Richiesta dalla dApp</h2>
+    <h2 data-i18n="panel4Title">4 · Request from the dApp</h2>
     <div class="check-row"><input type="checkbox" id="simulateOnly" checked><label for="simulateOnly" style="margin:0;"
-        data-i18n="simulateOnlyLabel">Solo simulazione (non inviare nulla)</label></div>
-    <div class="note" style="margin-top:6px;" data-i18n="simulateOnlyNote"></div>
-    <div id="requestBox" class="status-box"><span class="empty" data-i18n="noRequest">Nessuna richiesta in
-        attesa.</span></div>
-    <button id="sendBtn" class="danger" disabled data-i18n="sendBtn">Firma e invia (irreversibile)</button>
-    <button id="signBtn" class="danger" disabled data-i18n="signBtn">Firma il messaggio per la UP</button>
-    <button id="rejectBtn" class="secondary" disabled data-i18n="rejectBtn">Rifiuta la richiesta</button>
+        data-i18n="simulateOnlyLabel">Simulation only (send nothing)</label></div>
+    <div class="note" style="margin-top:6px;" data-i18n="simulateOnlyNote">When checked, the page runs every check and simulates the transaction on Base, then tells the site it was a simulation: nothing is sent and nothing is spent. This applies to transactions: signature requests cannot be simulated, they are always shown and signed only if you press "Sign the message".</div>
+    <div id="requestBox" class="status-box"><span class="empty" data-i18n="noRequest">No pending request.</span></div>
+    <button id="sendBtn" class="danger" disabled data-i18n="sendBtn">Sign and send (irreversible)</button>
+    <button id="signBtn" class="danger" disabled data-i18n="signBtn">Sign the message for the UP</button>
+    <button id="rejectBtn" class="secondary" disabled data-i18n="rejectBtn">Reject the request</button>
     <div id="log" class="line-dim" style="margin-top:10px;"></div>
   </div>
 
   <div class="site-footer">
     <div class="footer-row">
       <img src="logo.png" alt="ChainIntegrate" class="footer-logo" onerror="this.style.display='none'">
-      <div class="footer-text" data-i18n-html="footerHtml"></div>
+      <div class="footer-text" data-i18n-html="footerHtml">Data &amp; blockchain integration consulting by ChainIntegrate <a href="https://www.linkedin.com/company/chainintegrate" target="_blank" rel="noopener" aria-label="LinkedIn" class="footer-li"><svg width="20" height="20" viewBox="0 0 20 20"><rect width="20" height="20" rx="4" fill="#0A66C2"/><text x="10" y="15" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#fff">in</text></svg></a> · <a href="https://t.me/Simone_1977_2" target="_blank" rel="noopener">Support via Telegram</a> · <a href="https://github.com/ChainIntegrate/Cross_Chain" target="_blank" rel="noopener">Source code on GitHub</a><br><span style="font-size:11.5px;">WalletConnect: Portions © 2025 Reown, Inc. All Rights Reserved. <a href="vendor/walletkit-1.6.0.LICENSE.md" target="_blank" rel="noopener">License</a> · <a href="vendor/walletkit-1.6.0.THIRD-PARTY.txt" target="_blank" rel="noopener">third-party components</a></span></div>
     </div>
   </div>
 

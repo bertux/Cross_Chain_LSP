@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="referrer" content="no-referrer">
   <meta name="robots" content="noindex, nofollow">
-  <title>Gas pagato dal sito: configurazione della UP — ChainIntegrate</title>
+  <title data-i18n="pageTitle">Gas paid by the site: UP setup — ChainIntegrate</title>
   <link rel="icon" href="favicon.ico">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.4/ethers.umd.min.js"
     integrity="sha384-6Zl0Pc8zjSz8KvmNeXRvUQgY4ryFb+BwDvKCmLYcBME0joAaru491tQgi9B7zsMM" crossorigin="anonymous"
@@ -467,75 +467,127 @@
 
   <div class="top-row">
     <div>
-      <h1 data-i18n="h1">Gas pagato dal sito: configurazione della UP</h1>
-      <div class="subtitle" data-i18n="subtitle"></div>
+      <h1 data-i18n="h1">Gas paid by the paymaster (experimental)</h1>
+      <div class="subtitle" data-i18n="subtitle">Your UP operates while the controller holds no gas: the controller signs, a relayer sends, your paymaster pays. ERC-4337 (EntryPoint v0.6).</div>
     </div>
-    <button class="lang-btn" id="langToggle" data-i18n="langToggleBtn">English</button>
+    <button class="lang-btn" id="langToggle" data-i18n="langToggleBtn">Italiano</button>
   </div>
 
   <div class="panel">
-    <h2 data-i18n="panel0Title">0 · Come funziona</h2>
-    <div class="simple" data-i18n-html="simpleHtml"></div>
+    <h2 data-i18n="panel0Title">0 · How it works</h2>
+    <div class="simple" data-i18n-html="simpleHtml"><h4>In plain words</h4>
+<p>Every time your UP does something on a blockchain, for example sending money, a small fee is paid: the <b>gas</b>. Normally whoever signs pays it, so the controller would need to keep a little money on every network. With this page it no longer does.</p>
+<ul>
+<li><b>The cassa</b> is the wallet that pays. It puts money in a piggy bank, the <b>paymaster</b>, and decides which UPs may use it.</li>
+<li><b>The UP's controller</b> <b>only signs</b>, the way you sign a form. It pays nothing.</li>
+<li><b>The site relayer</b> takes the signed form to the blockchain, advances the fee and gets it back from the piggy bank.</li>
+</ul>
+<p><b>To prepare once:</b></p>
+<ol>
+<li>the cassa creates the piggy bank, fills it and sets the most it may pay for each operation (section 3);</li>
+<li>the cassa puts the UP on the list of those who may use it (section 4);</li>
+<li>the controller authorises the UP to use this system (section 4). It is the only time the controller pays a little gas.</li>
+</ol>
+<p><b>Then, every time:</b> the controller signs (A) and the site relayer sends (B). The piggy bank pays the fee; the UP pays only what it sends.</p></div>
     <details class="guide" id="guideBox">
-      <summary data-i18n="guideSummary">Guida passo passo</summary>
-      <div data-i18n-html="guideHtml"></div>
+      <summary data-i18n="guideSummary">📘 Step-by-step guide: who does what, several MetaMask accounts, order of the steps</summary>
+      <div data-i18n-html="guideHtml"><h4>Who does what</h4>
+<ul>
+<li><b>Cassa</b>, the paymaster owner: publishes, funds, sets the cap and withdraws (section 3), puts UPs on the allowlist or removes them (section 4). <b>All of these are done with the cassa active in MetaMask.</b></li>
+<li><b>The UP's controller</b>: sets up the UP, once per chain (section 4), and signs every operation (button A). The setup costs a little gas; operations do not.</li>
+<li><b>Site relayer</b>: sends the signed operation (button B). No MetaMask account is needed.</li>
+<li><b>UP extension</b> (optional): only reads the UP address. It signs nothing here.</li>
+</ul>
+<h4>The MetaMask accounts</h4>
+<ol>
+<li><b>Always connect the cassa first.</b> Make the cassa active in MetaMask, then press <b>Connect MetaMask</b>. In the MetaMask window you can tick the controller too: both stay connected.</li>
+<li>The <b>Owner</b> field in section 3 <b>must always be the cassa</b>. If the site runs a relayer, the page fills it in and remembers it. If you see another address, correct it: otherwise the page computes another paymaster, which does not exist.</li>
+<li>The page always uses the account <b>active</b> in MetaMask, and only that one. To switch, open MetaMask and pick the other account from the menu at the top; if MetaMask says it is not connected to this site, use its <b>Connect</b> button. Then check the <b>MetaMask</b> row in section 1; if it does not update, press <b>Connect MetaMask</b> again. An operation already signed is kept.</li>
+<li>UP extension and MetaMask active together is normal: they do two different jobs.</li>
+</ol>
+<h4>Every time you open or reload the page</h4>
+<ol>
+<li>Tick <b>I have read and accept</b> below: without it the buttons stay grey.</li>
+<li>Section 1: choose the network and enter the UP address.</li>
+<li>Section 2: the check runs by itself and says what is missing and where to do it.</li>
+<li>Section 3: check that the <b>Owner</b> is the cassa.</li>
+</ol>
+<h4>Once per chain, with the cassa active</h4>
+<ol><li>Publish the paymaster, if missing.</li><li>Fund it.</li><li>Set the cap per operation.</li><li>Section 4: if <b>Extension4337</b> shows <b>not published</b>, press <b>Publish Extension4337 on this network</b>. Here the cassa only pays the gas: the extension is a public contract, the same for everyone, and whoever publishes it gets no rights over any UP. Once per network.</li></ol>
+<p>Each button opens MetaMask to confirm a transaction of the cassa. The paymaster and Extension4337 are published through the standard contract factory <code>0x4e59b448…956C</code>: MetaMask may show it with no name or odd characters, that is normal.</p>
+<h4>For each UP</h4>
+<ol>
+<li>Enter the UP address in section 1.</li>
+<li><b>With the cassa active</b>, section 4, <b>Paymaster allowlist</b>: press <b>Add the UP to the allowlist</b>. After a few seconds <b>MetaMask opens and asks you to confirm a transaction</b>: check that the account is the cassa and confirm. It costs very little gas, paid by the cassa. After the confirmation the box says <b>The UP is on the allowlist</b>.</li>
+<li><b>Switch to the UP's controller</b> in MetaMask (the genesis key or the backup, <b>never the cassa</b>) and check section 1: the <b>Active account's permissions</b> row in section 4 must show the permissions, not "not a controller".</li>
+<li>Section 4, <b>Setup</b>: <b>Prepare and simulate</b>, read the plan, then <b>Sign and send</b> and confirm in MetaMask. One transaction, with a little gas paid by the controller (its account needs a little of the network's currency); the page verifies the result. The signing controller receives the 4337 permission: to sign operations with the other controller too, repeat the setup with it active.</li>
+<li>The UP must hold on this network the money it wants to send: the paymaster pays the gas, not the amount.</li>
+</ol>
+<h4>Every operation, with the controller active</h4>
+<ol>
+<li><b>A · Prepare and sign</b>: compare the fingerprint in MetaMask with the page's, then sign. No gas.</li>
+<li><b>B · Send</b>: done by the site relayer. No account switch, no signature.</li>
+</ol>
+<h4>While you wait</h4>
+<ul>
+<li>After each click a box at the bottom shows the status. Before MetaMask opens the page reads the data and simulates: it can take a few seconds. <b>Do not click again.</b></li>
+<li>When you switch account or network in MetaMask, the box <b>Updating the data</b> appears too: the page reads everything again and the buttons stay grey for a few seconds. Wait until it goes away.</li>
+<li>If MetaMask does not appear, open the extension: the request may be waiting there.</li>
+</ul>
+<h4>Checking the configuration</h4>
+<ul><li>Section 2, <b>Check the configuration</b>: read-only, no signature, no wallet. It needs only the network, the UP address and the paymaster owner. Each item shows ✅, ⚠️ or ❌; the most important one is <b>EntryPoint's permissions = 0x000500</b>. Run it after any change to the UP and on every network. The server also repeats it every hour and emails the operator if something changes.</li></ul>
+<h4>Going back</h4>
+<ul><li>Section 4, <b>Turning 4337 off on this UP</b>: one controller transaction restores the UP as it was. Section 4, <b>Remove from the allowlist</b>, with the cassa.</li></ul></div>
     </details>
-    <div class="warn-box" data-i18n-html="disclaimer"></div>
+    <div class="warn-box" data-i18n-html="disclaimer"><b>⚠️ Read before using this page</b><ul style="margin:8px 0 0; padding-left:20px;"><li><b>Experimental tool, not audited.</b> The paymaster and LUKSO's <code>Extension4337</code> have not been reviewed by third parties. Use small amounts.</li><li><b>It changes the UP's configuration on this chain:</b> the EntryPoint becomes a controller with call and value-transfer permissions. It only executes operations signed by a controller with the 4337 permission, within the signer's own permissions.</li><li><b>The paymaster deposit</b> is spent by every operation of allowlisted UPs: add only UPs you trust and keep the deposit low.</li><li><b>No warranty.</b> Software "as is" (MIT licence): use it at your own risk. No affiliation with LUKSO or anyone else.</li><li><b>This page never asks for private keys</b>: you sign everything in MetaMask.</li></ul></div>
     <div class="check-row"><input type="checkbox" id="ackRisk"><label for="ackRisk"
-        style="margin:0; color: var(--text);" data-i18n="ackLabel">Ho letto e accetto</label></div>
+        style="margin:0; color: var(--text);" data-i18n="ackLabel">I have read and accept</label></div>
   </div>
 
   <div class="panel">
-    <h2 data-i18n="panel1Title">1 · Rete, MetaMask e UP</h2>
+    <h2 data-i18n="panel1Title">1 · Network, MetaMask and UP</h2>
     <input type="text" id="networkFilter" data-i18n-placeholder="networkFilterPlaceholder"
-      placeholder="Filtra per nome...">
+      placeholder="Filter by name... (e.g. base, polygon)">
     <select id="network" style="margin-top:8px;"></select>
     <div id="customRpcWrap" style="display:none;">
-      <label data-i18n="customRpcLabel">RPC URL custom</label>
+      <label data-i18n="customRpcLabel">Custom RPC URL</label>
       <input type="text" id="customRpc" placeholder="https://...">
-      <label data-i18n="customExplorerLabel">Explorer URL custom (opzionale)</label>
+      <label data-i18n="customExplorerLabel">Custom explorer URL (optional)</label>
       <input type="text" id="customExplorer" placeholder="https://.../tx/">
     </div>
-    <label for="upAddress" data-i18n="upAddressLabel">Indirizzo della UP</label>
+    <label for="upAddress" data-i18n="upAddressLabel">UP address</label>
     <input type="text" id="upAddress" placeholder="0x...">
-    <button id="connectUp" class="secondary" data-i18n="connectUpBtn">Leggi l'indirizzo dall'estensione UP</button>
-    <div class="note" style="margin-top:12px;" data-i18n="panel1Note"></div>
-    <button id="connectSigner" data-i18n="connectSignerBtn">Connetti MetaMask</button>
-    <div class="status-box" id="netBox"><span class="empty" data-i18n="notChecked">Non ancora verificato.</span></div>
-    <button id="recheckBtn" class="secondary" data-i18n="recheckBtn">Ricontrolla tutto</button>
+    <button id="connectUp" class="secondary" data-i18n="connectUpBtn">Read the address from the UP extension</button>
+    <div class="note" style="margin-top:12px;" data-i18n="panel1Note">Each section uses the account active in MetaMask: the cassa for the paymaster and the allowlist, the UP's controller for the setup and the signature. Connect the cassa first: see the guide in section 0.</div>
+    <button id="connectSigner" data-i18n="connectSignerBtn">Connect MetaMask</button>
+    <div class="status-box" id="netBox"><span class="empty" data-i18n="notChecked">Not checked yet.</span></div>
+    <button id="recheckBtn" class="secondary" data-i18n="recheckBtn">Check everything again</button>
   </div>
 
   <div class="panel">
-    <h2 data-i18n="panel5Title">2 · Verifica della configurazione</h2>
-    <div class="note" data-i18n-html="panel5Note"></div>
-    <button id="checkCfgBtn" class="secondary" disabled data-i18n="checkCfgBtn">Verifica la configurazione (sola
-      lettura)</button>
-    <div class="status-box" id="cfgBox"><span class="empty" data-i18n="cfgNone">Nessuna verifica eseguita.</span></div>
+    <h2 data-i18n="panel5Title">2 · Configuration check</h2>
+    <div class="note" data-i18n-html="panel5Note">Read-only: no signature, no gas. It needs only the network and the UP address (section 1) and, for the paymaster, the owner (section 3); MetaMask is not needed. It checks that the UP, the extension, the EntryPoint, the controllers, the paymaster and the site relayer are set up as expected. The key point: the EntryPoint must have exactly the permissions <code>0x000500</code> (call and send value, no change of data or permissions). Run it again after any change to the UP and on every network.</div>
+    <button id="checkCfgBtn" class="secondary" disabled data-i18n="checkCfgBtn">Check the configuration (read-only)</button>
+    <div class="status-box" id="cfgBox"><span class="empty" data-i18n="cfgNone">No check run yet.</span></div>
   </div>
 
   <div class="panel">
-    <h2 data-i18n="panel3Title">3 · La UP</h2>
-    <h3 data-i18n="setupTitle">Configurazione della UP · con il controller</h3>
-    <div class="note" data-i18n-html="panel3Note"></div>
-    <div class="status-box" id="upBox"><span class="empty" data-i18n="notChecked">Non ancora verificato.</span></div>
-    <button id="publishExtBtn" class="secondary" disabled data-i18n="publishExtBtn">Pubblica l'Extension4337 su questa
-      rete</button>
-    <button id="prepareSetupBtn" disabled data-i18n="prepareSetupBtn">Prepara e simula la configurazione della
-      UP</button>
-    <div class="status-box plan" id="setupPlanBox"><span class="empty" data-i18n="noPlan">Nessuna operazione
-        preparata.</span></div>
-    <button id="sendSetupBtn" class="danger" disabled data-i18n="sendSetupBtn">Firma e invia la configurazione (una sola
-      transazione)</button>
-    <h3 data-i18n="revokeTitle">Disattivare il 4337 su questa UP</h3>
-    <div class="note" data-i18n-html="revokeNote"></div>
-    <button id="prepareRevokeBtn" class="secondary" disabled data-i18n="prepareRevokeBtn">Prepara e simula la
-      disattivazione</button>
-    <button id="sendRevokeBtn" class="danger" disabled data-i18n="sendRevokeBtn">Firma e invia la disattivazione (una
-      sola transazione)</button>
+    <h2 data-i18n="panel3Title">4 · The UP</h2>
+    <h3 data-i18n="setupTitle">UP setup · with the controller</h3>
+    <div class="note" data-i18n-html="panel3Note">Two steps, with different accounts:<br><b>1 · Publish Extension4337</b>, only if the box below says <b>not published</b>: once per network, then it serves every UP. <b>Any account can sign it</b>, for example the cassa: it only pays the gas and gets no rights over any UP, because the contract is public and the same for everyone. In MetaMask the transaction goes to the standard contract factory <code>0x4e59b448…956C</code>, which may show no name or odd characters: that is normal.<br><b>2 · Set up the UP</b> with the UP's <b>controller</b> active in MetaMask (the genesis key or the backup, <b>never the cassa</b>): one atomic Key Manager transaction, with a little gas paid by the controller; if any part fails, nothing changes. The signing controller receives the 4337 permission. Before signing you see the list of operations and the simulation.</div>
+    <div class="status-box" id="upBox"><span class="empty" data-i18n="notChecked">Not checked yet.</span></div>
+    <button id="publishExtBtn" class="secondary" disabled data-i18n="publishExtBtn">Publish Extension4337 on this network</button>
+    <button id="prepareSetupBtn" disabled data-i18n="prepareSetupBtn">Prepare and simulate the UP setup</button>
+    <div class="status-box plan" id="setupPlanBox"><span class="empty" data-i18n="noPlan">No operation prepared.</span></div>
+    <button id="sendSetupBtn" class="danger" disabled data-i18n="sendSetupBtn">Sign and send the setup (one transaction)</button>
+    <h3 data-i18n="revokeTitle">Turning 4337 off on this UP</h3>
+    <div class="note" data-i18n-html="revokeNote">Undoes the setup with <b>one transaction</b> of the controller: it removes the extension for <code>validateUserOp</code>, the EntryPoint's permissions and its place in the controllers list, and the 4337 permission of the active account. Afterwards no operation can go through the EntryPoint on this UP. The other permissions stay identical. It can be set up again at any time.</div>
+    <button id="prepareRevokeBtn" class="secondary" disabled data-i18n="prepareRevokeBtn">Prepare and simulate turning it off</button>
+    <button id="sendRevokeBtn" class="danger" disabled data-i18n="sendRevokeBtn">Sign and send turning it off (one transaction)</button>
   </div>
 
   <div class="panel">
-    <h2 data-i18n="logTitle">Registro</h2>
+    <h2 data-i18n="logTitle">Log</h2>
     <div id="log" class="line-dim"></div>
   </div>
 
@@ -547,7 +599,7 @@
   <div class="site-footer">
     <div class="footer-row">
       <img src="logo.png" alt="ChainIntegrate" class="footer-logo" onerror="this.style.display='none'">
-      <div class="footer-text" data-i18n-html="footerHtml"></div>
+      <div class="footer-text" data-i18n-html="footerHtml">Data &amp; blockchain integration consulting by ChainIntegrate <a href="https://www.linkedin.com/company/chainintegrate" target="_blank" rel="noopener" aria-label="LinkedIn" class="footer-li"><svg width="20" height="20" viewBox="0 0 20 20"><rect width="20" height="20" rx="4" fill="#0A66C2"/><text x="10" y="15" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#fff">in</text></svg></a> · <a href="https://t.me/Simone_1977_2" target="_blank" rel="noopener">Support via Telegram</a> · <a href="https://github.com/ChainIntegrate/Cross_Chain" target="_blank" rel="noopener">Source code on GitHub</a></div>
     </div>
   </div>
 

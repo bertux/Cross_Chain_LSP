@@ -30,7 +30,7 @@ html[data-theme="light"] .chip, html[data-theme="light"] .langbtn, html[data-the
 
   const label = () => {
     const light = root.getAttribute("data-theme") === "light";
-    const en = root.lang === "en";
+    const en = root.lang === "en" || !root.lang;
     return { icon: light ? "☾" : "☀", title: light ? (en ? "Dark theme" : "Tema scuro") : (en ? "Light theme" : "Tema chiaro") };
   };
   function place() {

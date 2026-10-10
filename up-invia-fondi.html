@@ -6,20 +6,20 @@
   <script src="theme.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="referrer" content="no-referrer">
-  <title data-i18n="pageTitle">UP Invia Fondi — ChainIntegrate</title>
+  <title data-i18n="pageTitle">UP Send Funds — ChainIntegrate</title>
   <meta name="description"
-    content="Invia valuta nativa, token e NFT dalla tua Universal Profile rideployata su una nuova rete.">
+    content="Send native currency, tokens and NFTs from your Universal Profile redeployed on a new network.">
   <link rel="icon" href="favicon.ico">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="UP Invia Fondi — ChainIntegrate">
+  <meta property="og:title" content="UP Send Funds — ChainIntegrate">
   <meta property="og:description"
-    content="Invia valuta nativa, token e NFT dalla tua Universal Profile rideployata su una nuova rete.">
+    content="Send native currency, tokens and NFTs from your Universal Profile redeployed on a new network.">
   <meta property="og:image" content="https://crosschain-lukso.juglas.name/banner.png">
   <meta property="og:url" content="https://crosschain-lukso.juglas.name/up-invia-fondi.html">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="UP Invia Fondi — ChainIntegrate">
+  <meta name="twitter:title" content="UP Send Funds — ChainIntegrate">
   <meta name="twitter:description"
-    content="Invia valuta nativa, token e NFT dalla tua Universal Profile rideployata su una nuova rete.">
+    content="Send native currency, tokens and NFTs from your Universal Profile redeployed on a new network.">
   <meta name="twitter:image" content="https://crosschain-lukso.juglas.name/banner.png">
   <script src="config.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.4/ethers.umd.min.js"
@@ -407,103 +407,96 @@
 
   <div class="top-row">
     <div>
-      <h1 data-i18n="h1">UP Invia Fondi</h1>
-      <div class="subtitle" data-i18n="subtitle"></div>
+      <h1 data-i18n="h1">UP Send Funds</h1>
+      <div class="subtitle" data-i18n="subtitle">Transfers what the UP holds to another address: native currency, ERC-20 tokens and NFTs (ERC-721, ERC-1155, and LSP7/LSP8) — signed by MetaMask with the controller, via Key Manager → ERC725X.execute.</div>
     </div>
-    <button class="lang-btn" id="langToggle" data-i18n="langToggleBtn">English</button>
+    <button class="lang-btn" id="langToggle" data-i18n="langToggleBtn">Italiano</button>
   </div>
 
   <div class="panel">
-    <h2 data-i18n="panel0Title">0 · Come funziona questa pagina</h2>
-    <div class="note" data-i18n-html="panel0Note"></div>
+    <h2 data-i18n="panel0Title">0 · How this page works</h2>
+    <div class="note" data-i18n-html="panel0Note">This operates on a UP that is <b>already deployed</b> on a network other than LUKSO — the UP itself doesn't sign this transaction. The one signing is the <b>controller wallet</b> (e.g. MetaMask) connected to the destination network, with the TRANSFERVALUE (native currency) and CALL (tokens and NFTs) permissions on that UP. That's why there are two separate connections here: (1) connect your UP only to read its address conveniently — no signature here; (2) connect MetaMask (or another wallet) on the <b>network where the UP was redeployed</b>, and that wallet is the one signing the funds transfer.</div>
   </div>
 
   <div class="panel">
-    <h2 data-i18n="panel3Title">1 · Rete</h2>
-    <div class="note" data-i18n="panel3Note"></div>
+    <h2 data-i18n="panel3Title">1 · Network</h2>
+    <div class="note" data-i18n="panel3Note">The network where your UP was redeployed (not LUKSO). The signing wallet from step 3 must be connected to this same network — the status in step 3 shows the wallet's current network, check it before proceeding.</div>
     <input type="text" id="networkFilter" data-i18n-placeholder="networkFilterPlaceholder"
-      placeholder="Filtra per nome... (es. base, polygon, arbitrum)">
+      placeholder="Filter by name... (e.g. base, polygon, arbitrum)">
     <select id="network" style="margin-top:8px;"></select>
     <div id="customRpcWrap" style="display:none;">
-      <label data-i18n="customRpcLabel">RPC URL custom</label>
+      <label data-i18n="customRpcLabel">Custom RPC URL</label>
       <input type="text" id="customRpc" placeholder="https://...">
-      <label data-i18n="customExplorerLabel">Explorer URL custom (opzionale)</label>
+      <label data-i18n="customExplorerLabel">Custom explorer URL (optional)</label>
       <input type="text" id="customExplorer" placeholder="https://.../tx/">
     </div>
-    <div class="status-box" id="balanceStatus"><span class="empty" data-i18n="balanceNotChecked">Saldo UP non ancora
-        controllato.</span></div>
+    <div class="status-box" id="balanceStatus"><span class="empty" data-i18n="balanceNotChecked">UP balance not checked yet.</span></div>
   </div>
 
   <div class="panel">
-    <h2 data-i18n="panel1Title">2 · Profilo (la UP da cui inviare)</h2>
-    <button id="connectUp" data-i18n="connectUpBtn">Connetti la tua Universal Profile</button>
-    <div class="status-box" id="profileStatus"><span class="empty" data-i18n="notConnected">Non connesso.</span></div>
-    <div class="note" style="margin-top:10px;" data-i18n="connectUpNote">
-      Serve solo per leggere l'indirizzo della UP — nessuna firma o transazione viene fatta a questo punto.
-      Se vuoi operare su una UP diversa da quella connessa nella tua estensione, puoi inserirne l'indirizzo a mano qui
-      sotto.
-    </div>
-    <label data-i18n="profileAddressLabel">Indirizzo UP da cui inviare</label>
+    <h2 data-i18n="panel1Title">2 · Profile (the UP to send from)</h2>
+    <button id="connectUp" data-i18n="connectUpBtn">Connect your Universal Profile</button>
+    <div class="status-box" id="profileStatus"><span class="empty" data-i18n="notConnected">Not connected.</span></div>
+    <div class="note" style="margin-top:10px;" data-i18n="connectUpNote">Only used to read the UP address — no signature or transaction happens at this point. If you want to operate on a UP other than the one connected in your extension, you can enter its address manually below.</div>
+    <label data-i18n="profileAddressLabel">UP address to send from</label>
     <input type="text" id="profileAddress" placeholder="0x...">
     <div id="backupAlert"></div>
   </div>
 
   <div class="panel">
-    <h2 data-i18n="panel2Title">3 · Wallet firmatario (il controller)</h2>
-    <div class="note" data-i18n="panel2Note"></div>
+    <h2 data-i18n="panel2Title">3 · Signing wallet (the controller)</h2>
+    <div class="note" data-i18n="panel2Note">This is the wallet that actually signs the funds transfer, on the network chosen in step 1 — it must be connected to that network, not to LUKSO. It's normal to have both the UP extension and MetaMask active in the browser at the same time: use the right one for each step.</div>
     <div class="note"
       style="margin-top:12px; padding:12px 14px; border:1px solid var(--warn); border-radius:8px; background:rgba(224,168,60,0.08); color:var(--text);"
-      data-i18n-html="fundsNote"></div>
-    <button id="connectSigner" data-i18n="connectSignerBtn">Connetti MetaMask / wallet firmatario</button>
-    <div class="status-box" id="signerStatus"><span class="empty" data-i18n="notConnected">Non connesso.</span></div>
+      data-i18n-html="fundsNote"><b>💡 Funds: two addresses, both yours</b><br>• <b>Your UP address</b> (the same on every network) is your <i>account</i>: send funds to it <b>only after</b> the deploy and the test on this network have succeeded: if something goes wrong (wrong controller key, failed deploy) funds sent earlier would stay stuck.<br>• <b>The controller address</b> (the wallet in MetaMask) is the <i>key</i> that signs. Every operation costs a small fee (gas), and <b>the controller pays it, not the UP</b>.<br>👉 So send some funds <b>to the controller too</b>, on the same network (e.g. POL on Polygon, ETH on Base or Arbitrum): enough for a few transactions. Without them the controller cannot sign anything, even if the UP is full.</div>
+    <button id="connectSigner" data-i18n="connectSignerBtn">Connect MetaMask / signing wallet</button>
+    <div class="status-box" id="signerStatus"><span class="empty" data-i18n="notConnected">Not connected.</span></div>
   </div>
 
 
   <div class="panel">
-    <h2 data-i18n="panel4Title">4 · Cosa inviare, destinazione e importo</h2>
-    <label data-i18n="assetKindLabel">Cosa inviare</label>
+    <h2 data-i18n="panel4Title">4 · What to send, destination and amount</h2>
+    <label data-i18n="assetKindLabel">What to send</label>
     <select id="assetKind">
-      <option value="native" data-i18n="assetNativeOpt">Valuta nativa della rete (ETH, POL, …)</option>
-      <option value="token" data-i18n="assetTokenOpt">Token o NFT (indirizzo del contratto)</option>
+      <option value="native" data-i18n="assetNativeOpt">The network's native currency (ETH, POL, …)</option>
+      <option value="token" data-i18n="assetTokenOpt">Token or NFT (contract address)</option>
     </select>
     <div id="tokenWrap" hidden>
-      <button id="alchemyBtn" type="button" data-i18n="alchemyBtn">Cerca token e NFT della UP</button>
+      <button id="alchemyBtn" type="button" data-i18n="alchemyBtn">Find the UP's tokens and NFTs</button>
       <div class="note" id="alchemyNote" style="margin-top:8px;"></div>
       <details class="alt-search">
-        <summary data-i18n="blockscoutSummary">Alternativa senza chiave: Blockscout</summary>
-        <label data-i18n="blockscoutLabel">Explorer Blockscout della rete</label>
+        <summary data-i18n="blockscoutSummary">Alternative without a key: Blockscout</summary>
+        <label data-i18n="blockscoutLabel">The network's Blockscout explorer</label>
         <input type="text" id="blockscoutUrl" placeholder="https://....blockscout.com">
-        <div class="note" style="margin-top:8px;" data-i18n-html="blockscoutNote"></div>
-        <button id="discoverBtn" type="button" class="secondary" data-i18n="discoverBtn">Cerca con Blockscout</button>
+        <div class="note" style="margin-top:8px;" data-i18n-html="blockscoutNote">Uses Blockscout's public API, no key. Its index can be incomplete: on Polygon, for example, it may miss tokens the UP holds. For the most common networks the address is already filled in.</div>
+        <button id="discoverBtn" type="button" class="secondary" data-i18n="discoverBtn">Search with Blockscout</button>
       </details>
       <div id="discoverStatus" class="note" style="margin-top:8px;"></div>
       <div id="discoverList" class="asset-list"></div>
-      <label data-i18n="tokenAddressLabel">Indirizzo del contratto (token o collezione NFT)</label>
+      <label data-i18n="tokenAddressLabel">Contract address (token or NFT collection)</label>
       <input type="text" id="tokenAddress" placeholder="0x...">
-      <div class="note" style="margin-top:8px;" data-i18n="tokenAddressNote"></div>
-      <button id="detectBtn" type="button" class="secondary" data-i18n="detectBtn">Leggi il contratto</button>
-      <div class="status-box" id="assetStatus"><span class="empty" data-i18n="assetNotRead">Contratto non ancora
-          letto.</span></div>
+      <div class="note" style="margin-top:8px;" data-i18n="tokenAddressNote">You can find it on the network's explorer, on the UP's page (tokens or NFTs tab), or on the marketplace. The page reads from the contract what type it is: ERC-20, ERC-721, ERC-1155, LSP7 or LSP8.</div>
+      <button id="detectBtn" type="button" class="secondary" data-i18n="detectBtn">Read the contract</button>
+      <div class="status-box" id="assetStatus"><span class="empty" data-i18n="assetNotRead">Contract not read yet.</span></div>
       <div id="tokenIdWrap" hidden>
-        <label data-i18n="tokenIdLabel">ID del token (NFT)</label>
+        <label data-i18n="tokenIdLabel">Token ID (NFT)</label>
         <input type="text" id="tokenId" placeholder="1">
         <div id="ownedIds" class="chips"></div>
       </div>
     </div>
-    <label data-i18n="recipientLabel">Indirizzo destinatario</label>
+    <label data-i18n="recipientLabel">Recipient address</label>
     <input type="text" id="recipient" placeholder="0x...">
     <div id="amountWrap">
       <label id="amountLabel">Importo</label>
       <div class="amount-row">
         <input type="text" id="amount" placeholder="0.001">
-        <button id="maxBtn" type="button" class="secondary" data-i18n="maxBtn">Tutto</button>
+        <button id="maxBtn" type="button" class="secondary" data-i18n="maxBtn">All</button>
       </div>
     </div>
     <div id="relayBox"></div>
-    <button id="checkBtn" data-i18n="checkBtn">Verifica</button>
-    <button id="sendBtn" class="danger" disabled data-i18n="sendBtn">Invia (irreversibile)</button>
-    <div id="log" class="line-dim" style="margin-top:10px;"><span data-i18n="logInitial">In attesa dei collegamenti
-        sopra.</span></div>
+    <button id="checkBtn" data-i18n="checkBtn">Check</button>
+    <button id="sendBtn" class="danger" disabled data-i18n="sendBtn">Send (irreversible)</button>
+    <div id="log" class="line-dim" style="margin-top:10px;"><span data-i18n="logInitial">Waiting for the connections above.</span></div>
   </div>
 
   <div id="busyToast" role="status" aria-live="polite">
@@ -514,7 +507,7 @@
   <div class="site-footer">
     <div class="footer-row">
       <img src="logo.png" alt="ChainIntegrate" class="footer-logo" onerror="this.style.display='none'">
-      <div class="footer-text" data-i18n-html="footerHtml"></div>
+      <div class="footer-text" data-i18n-html="footerHtml">Data &amp; blockchain integration consulting by ChainIntegrate <a href="https://www.linkedin.com/company/chainintegrate" target="_blank" rel="noopener" aria-label="LinkedIn" class="footer-li"><svg width="20" height="20" viewBox="0 0 20 20"><rect width="20" height="20" rx="4" fill="#0A66C2"/><text x="10" y="15" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#fff">in</text></svg></a> · <a href="https://t.me/Simone_1977_2" target="_blank" rel="noopener">Support via Telegram</a> · <a href="https://github.com/ChainIntegrate/Cross_Chain" target="_blank" rel="noopener">Source code on GitHub</a></div>
     </div>
   </div>
 
@@ -529,7 +522,7 @@
 
     const I18N = {
       it: {
-        pageTitle: "UP Invia Fondi — ChainIntegrate",
+        pageTitle: "UP Send Funds — ChainIntegrate",
         h1: "UP Invia Fondi",
         subtitle: "Trasferisce dalla UP a un altro indirizzo quello che possiede: valuta nativa, token ERC-20 e NFT (ERC-721, ERC-1155, e LSP7/LSP8) — firmato da MetaMask con il controller, tramite Key Manager → ERC725X.execute.",
         langToggleBtn: "English",

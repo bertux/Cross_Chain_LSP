@@ -6,14 +6,14 @@
   <script src="theme.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="referrer" content="no-referrer">
-  <title>UP Identity Cross-Chain — ChainIntegrate</title>
+  <title data-i18n="pageTitle">UP Identity Cross-Chain — ChainIntegrate</title>
   <meta name="description"
-    content="Legge e mostra il profilo LSP3 (nome, immagini, link) di una Universal Profile su qualsiasi rete dove è deployata, e lo confronta con quello su LUKSO, con token e NFT; può allinearlo a LUKSO con una transazione firmata dal tuo controller.">
+    content="Reads and displays the LSP3 profile (name, images, links) of a Universal Profile on any network where it is deployed, and compares it with LUKSO, with tokens and NFTs; can align it to LUKSO with a transaction signed by your controller.">
   <link rel="icon" href="favicon.ico">
   <meta property="og:type" content="website">
   <meta property="og:title" content="UP Identity Cross-Chain — ChainIntegrate">
   <meta property="og:description"
-    content="Il profilo LSP3 di una Universal Profile su Base, Polygon e le altre reti, confrontato con LUKSO, con token e NFT, e allineabile con una transazione.">
+    content="The LSP3 profile of a Universal Profile on Base, Polygon and other networks, compared with LUKSO, with tokens and NFTs, and alignable with one transaction.">
   <meta property="og:image" content="https://crosschain-lukso.juglas.name/banner.png">
   <meta property="og:url" content="https://crosschain-lukso.juglas.name/up-identity.html">
   <meta name="twitter:card" content="summary_large_image">
@@ -490,40 +490,40 @@
 
   <div class="header-row">
     <div>
-      <h1 data-i18n="h1">Identità della UP su altre reti</h1>
-      <div class="subtitle" data-i18n="subtitle"></div>
+      <h1 data-i18n="h1">The UP's identity on other networks</h1>
+      <div class="subtitle" data-i18n="subtitle">A Universal Profile's LSP3 profile (name, description, images, links), read on the network you choose and compared with the current one on LUKSO, with the UP's tokens and NFTs. Reading needs no wallet and no signature; only section 6, if you use it, writes the profile with a transaction signed by your controller.</div>
     </div>
-    <button id="langToggle" type="button">English</button>
+    <button id="langToggle" type="button">Italiano</button>
   </div>
 
   <div class="panel">
-    <h2 data-i18n="panel0Title">0 · Cos'è</h2>
-    <div class="note" data-i18n-html="panel0Note"></div>
-    <div class="disclaimer" data-i18n-html="disclaimer"></div>
+    <h2 data-i18n="panel0Title">0 · What this is</h2>
+    <div class="note" data-i18n-html="panel0Note">Your Universal Profile exists at the same address on every network where you deployed it. Its identity data sits in the UP's <b>LSP3Profile</b> key: a reference to a JSON file (usually on IPFS) with its hash. This page reads that key on the chosen network and on LUKSO, downloads the file, <b>checks that the hash matches</b> and shows the profile. A deploy on another network copies only the original creation data: there the profile is the one from the day of creation, or missing, and the page tells you.</div>
+    <div class="disclaimer" data-i18n-html="disclaimer"><b>This is ChainIntegrate's reading</b> of the UP's ERC725Y data, following the LUKSO standards (LSP2, LSP3). Base, Polygon and the other networks do not "know" what a Universal Profile is: no claim that the network, its explorers or other services recognise this profile.</div>
   </div>
 
   <div class="panel">
-    <h2 data-i18n="panel1Title">1 · Rete</h2>
+    <h2 data-i18n="panel1Title">1 · Network</h2>
     <input type="text" id="networkFilter" data-i18n-placeholder="networkFilterPlaceholder"
-      placeholder="Filtra per nome...">
+      placeholder="Filter by name...">
     <select id="network" style="margin-top:8px;"></select>
     <div id="customRpcWrap" style="display:none;">
-      <label data-i18n="customRpcLabel">RPC URL custom</label>
+      <label data-i18n="customRpcLabel">Custom RPC URL</label>
       <input type="text" id="customRpc" placeholder="https://...">
     </div>
   </div>
 
   <div class="panel">
     <h2 data-i18n="panel2Title">2 · Universal Profile</h2>
-    <button id="connectUp" class="secondary" data-i18n="connectUpBtn">Leggi l'indirizzo dall'estensione UP</button>
-    <label for="upAddress" data-i18n="upAddressLabel">Indirizzo della UP</label>
+    <button id="connectUp" class="secondary" data-i18n="connectUpBtn">Read the address from the UP extension</button>
+    <label for="upAddress" data-i18n="upAddressLabel">UP address</label>
     <input type="text" id="upAddress" placeholder="0x...">
-    <button id="readBtn" data-i18n="readBtn">Leggi il profilo</button>
+    <button id="readBtn" data-i18n="readBtn">Read the profile</button>
     <div class="status" id="status"></div>
   </div>
 
   <div class="panel" id="resultPanel" hidden>
-    <h2 data-i18n="panel3Title">3 · Profilo</h2>
+    <h2 data-i18n="panel3Title">3 · Profile</h2>
     <div class="status" id="compare"></div>
     <div class="cols" style="margin-top:12px;">
       <div class="card" id="cardNet"></div>
@@ -532,30 +532,28 @@
   </div>
 
   <div class="panel" id="ctrlPanel" hidden>
-    <h2 data-i18n="panel4Title">4 · Chi controlla la UP su questa rete</h2>
-    <div class="note" data-i18n="panel4Note"></div>
+    <h2 data-i18n="panel4Title">4 · Who controls the UP on this network</h2>
+    <div class="note" data-i18n="panel4Note">The UP's controllers on the chosen network, what each is for, and whether there is a backup controller.</div>
     <div class="status" id="ctrlStatus"></div>
     <div id="ctrlList"></div>
-    <h3 style="font-size:13.5px; margin:18px 0 6px;" data-i18n="capTitle">Cosa può fare la UP su questa rete</h3>
-    <div class="note" data-i18n="capNote"></div>
+    <h3 style="font-size:13.5px; margin:18px 0 6px;" data-i18n="capTitle">What the UP can do on this network</h3>
+    <div class="note" data-i18n="capNote">Read from the UP's data on this network: each feature is enabled once per network, from the page shown.</div>
     <div id="capList"></div>
   </div>
 
   <div class="panel" id="pubPanel" hidden>
-    <h2 data-i18n="panel6Title">6 · Allinea il profilo a LUKSO su questa rete</h2>
-    <div class="note" data-i18n-html="panel6Note"></div>
+    <h2 data-i18n="panel6Title">6 · Align the profile with LUKSO on this network</h2>
+    <div class="note" data-i18n-html="panel6Note">Copies to this network the profile the UP has on LUKSO today: <b>one transaction</b> signed by a controller of the UP on this network, which pays the gas. It writes only the <b>LSP3Profile</b> key, with the same value as on LUKSO: the same file and the same hash. It changes neither the UP's address nor its controllers. It is not automatic: if you later change the profile on LUKSO, this network keeps this version until you publish again. It needs a controller with SUPER_SETDATA, or SETDATA with the LSP3Profile key among the allowed ones.</div>
     <div class="status" id="pubState"></div>
-    <button id="pubConnect" class="secondary" data-i18n="pubConnectBtn">Connetti il controller della UP
-      (MetaMask)</button>
+    <button id="pubConnect" class="secondary" data-i18n="pubConnectBtn">Connect the UP's controller (MetaMask)</button>
     <div class="status" id="pubSigner"></div>
-    <button id="pubBtn" class="danger" disabled data-i18n="pubBtn">Pubblica il profilo di LUKSO su questa rete (una
-      transazione)</button>
+    <button id="pubBtn" class="danger" disabled data-i18n="pubBtn">Publish LUKSO's profile on this network (one transaction)</button>
     <div id="pubLog"></div>
   </div>
 
   <div class="panel" id="assetPanel" hidden>
-    <h2 data-i18n="panel5Title">5 · Token e NFT</h2>
-    <div class="note" data-i18n-html="panel5Note"></div>
+    <h2 data-i18n="panel5Title">5 · Tokens and NFTs</h2>
+    <div class="note" data-i18n-html="panel5Note">What the UP holds on each network: the network's currency, LUKSO tokens and NFTs (LSP7, LSP8) from the UP's <b>LSP5ReceivedAssets</b> list, read from the chain, and the other tokens and NFTs (ERC-20, ERC-721, ERC-1155) from an <b>indexer</b> (Alchemy or Blockscout), which can be incomplete. Contracts flagged as spam are grouped apart. No token here is verified as genuine: a name or symbol can imitate another token's.</div>
     <div class="cols" style="margin-top:12px;">
       <div class="assets" id="assetsNet"></div>
       <div class="assets" id="assetsLukso"></div>
@@ -565,7 +563,7 @@
   <div class="site-footer">
     <div class="footer-row">
       <img src="logo.png" alt="ChainIntegrate" class="footer-logo" onerror="this.style.display='none'">
-      <div class="footer-text" data-i18n-html="footerHtml"></div>
+      <div class="footer-text" data-i18n-html="footerHtml">Data &amp; blockchain integration consulting by ChainIntegrate <a href="https://www.linkedin.com/company/chainintegrate" target="_blank" rel="noopener" aria-label="LinkedIn" class="footer-li"><svg width="20" height="20" viewBox="0 0 20 20"><rect width="20" height="20" rx="4" fill="#0A66C2"/><text x="10" y="15" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#fff">in</text></svg></a> · <a href="https://t.me/Simone_1977_2" target="_blank" rel="noopener">Support via Telegram</a> · <a href="https://github.com/ChainIntegrate/Cross_Chain" target="_blank" rel="noopener">Source code on GitHub</a></div>
     </div>
   </div>
 

@@ -6,20 +6,20 @@
   <script src="theme.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="referrer" content="no-referrer">
-  <title data-i18n="pageTitle">UP Test Operazione — ChainIntegrate</title>
+  <title data-i18n="pageTitle">UP Test Operation — ChainIntegrate</title>
   <meta name="description"
-    content="Testa la tua Universal Profile rideployata scrivendo e leggendo un timestamp on-chain tramite il Key Manager.">
+    content="Test your redeployed Universal Profile by writing and reading an on-chain timestamp via the Key Manager.">
   <link rel="icon" href="favicon.ico">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="UP Test Operazione — ChainIntegrate">
+  <meta property="og:title" content="UP Test Operation — ChainIntegrate">
   <meta property="og:description"
-    content="Testa la tua Universal Profile rideployata scrivendo e leggendo un timestamp on-chain tramite il Key Manager.">
+    content="Test your redeployed Universal Profile by writing and reading an on-chain timestamp via the Key Manager.">
   <meta property="og:image" content="https://crosschain-lukso.juglas.name/banner.png">
   <meta property="og:url" content="https://crosschain-lukso.juglas.name/up-test-operazione.html">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="UP Test Operazione — ChainIntegrate">
+  <meta name="twitter:title" content="UP Test Operation — ChainIntegrate">
   <meta name="twitter:description"
-    content="Testa la tua Universal Profile rideployata scrivendo e leggendo un timestamp on-chain tramite il Key Manager.">
+    content="Test your redeployed Universal Profile by writing and reading an on-chain timestamp via the Key Manager.">
   <meta name="twitter:image" content="https://crosschain-lukso.juglas.name/banner.png">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.4/ethers.umd.min.js"
     integrity="sha384-6Zl0Pc8zjSz8KvmNeXRvUQgY4ryFb+BwDvKCmLYcBME0joAaru491tQgi9B7zsMM" crossorigin="anonymous"
@@ -271,69 +271,63 @@
 
   <div class="top-row">
     <div>
-      <h1 data-i18n="h1">UP Test Operazione</h1>
-      <div class="subtitle" data-i18n="subtitle">Scrive un piccolo dato di prova su una UP già deployata, tramite il Key
-        Manager — per verificare che un controller sappia davvero operare, senza fare un deploy.</div>
+      <h1 data-i18n="h1">UP Test Operation</h1>
+      <div class="subtitle" data-i18n="subtitle">Writes a small test value to an already-deployed UP, via the Key Manager — to verify a controller can actually operate it, without doing a deploy.</div>
     </div>
-    <button class="lang-btn" id="langToggle" data-i18n="langToggleBtn">English</button>
+    <button class="lang-btn" id="langToggle" data-i18n="langToggleBtn">Italiano</button>
   </div>
 
   <div class="panel">
-    <h2 data-i18n="panel0Title">0 · Come funziona questa pagina</h2>
-    <div class="note" data-i18n-html="panel0Note"></div>
+    <h2 data-i18n="panel0Title">0 · How this page works</h2>
+    <div class="note" data-i18n-html="panel0Note">This page operates on a UP that is <b>already deployed</b> on a network other than LUKSO — it's not the same as just connecting the UP extension. The UP itself doesn't sign transactions on another network: the one signing is the <b>controller wallet</b> (e.g. MetaMask) connected to that network, with the right permissions on the UP. That's why the page asks for two separate connections: (1) connect your UP only to read its address conveniently — no signature here; (2) connect MetaMask (or another wallet) on the <b>destination network</b> where you redeployed the UP, and that wallet is the one sending the test transaction.</div>
   </div>
 
   <div class="panel">
-    <h2 data-i18n="panel3Title">1 · Rete su cui operare</h2>
-    <div class="note" data-i18n="panel3Note"></div>
+    <h2 data-i18n="panel3Title">1 · Network to operate on</h2>
+    <div class="note" data-i18n="panel3Note">The network where your UP was redeployed (not LUKSO). The signing wallet from step 3 must be connected to this same network — the status in step 3 shows the wallet's current network, check it before proceeding.</div>
     <input type="text" id="networkFilter" data-i18n-placeholder="networkFilterPlaceholder"
-      placeholder="Filtra per nome... (es. base, polygon, arbitrum)">
+      placeholder="Filter by name... (e.g. base, polygon, arbitrum)">
     <select id="network" style="margin-top:8px;"></select>
     <div id="customRpcWrap" style="display:none;">
-      <label data-i18n="customRpcLabel">RPC URL custom</label>
+      <label data-i18n="customRpcLabel">Custom RPC URL</label>
       <input type="text" id="customRpc" placeholder="https://...">
-      <label data-i18n="customExplorerLabel">Explorer URL custom (opzionale)</label>
+      <label data-i18n="customExplorerLabel">Custom explorer URL (optional)</label>
       <input type="text" id="customExplorer" placeholder="https://.../tx/">
     </div>
   </div>
 
   <div class="panel">
-    <h2 data-i18n="panel1Title">2 · Profilo da testare</h2>
-    <button id="connectUp" data-i18n="connectUpBtn">Connetti la tua Universal Profile</button>
-    <div class="status-box" id="profileStatus"><span class="empty" data-i18n="notConnected">Non connesso.</span></div>
-    <div class="note" style="margin-top:10px;" data-i18n="connectUpNote">
-      Serve solo per leggere l'indirizzo della UP — nessuna firma o transazione viene fatta a questo punto.
-      Se vuoi testare una UP diversa da quella connessa nella tua estensione, puoi inserirne l'indirizzo a mano qui
-      sotto.
-    </div>
-    <label data-i18n="profileAddressLabel">Indirizzo UP da testare</label>
+    <h2 data-i18n="panel1Title">2 · Profile to test</h2>
+    <button id="connectUp" data-i18n="connectUpBtn">Connect your Universal Profile</button>
+    <div class="status-box" id="profileStatus"><span class="empty" data-i18n="notConnected">Not connected.</span></div>
+    <div class="note" style="margin-top:10px;" data-i18n="connectUpNote">Only used to read the UP address — no signature or transaction happens at this point. If you want to test a UP other than the one connected in your extension, you can enter its address manually below.</div>
+    <label data-i18n="profileAddressLabel">UP address to test</label>
     <input type="text" id="profileAddress" placeholder="0x...">
     <div id="backupAlert"></div>
   </div>
 
   <div class="panel">
-    <h2 data-i18n="panel2Title">3 · Wallet firmatario (il controller)</h2>
-    <div class="note" data-i18n="panel2Note"></div>
+    <h2 data-i18n="panel2Title">3 · Signing wallet (the controller)</h2>
+    <div class="note" data-i18n="panel2Note">This is the wallet that actually operates the UP on the network chosen in step 1 — it must be connected to that network, not to LUKSO. It's normal to have both the UP extension and MetaMask active in the browser at the same time: use the right one for each step.</div>
     <div class="note"
       style="margin-top:12px; padding:12px 14px; border:1px solid var(--warn); border-radius:8px; background:rgba(224,168,60,0.08); color:var(--text);"
-      data-i18n-html="fundsNote"></div>
-    <button id="connectSigner" data-i18n="connectSignerBtn">Connetti MetaMask / wallet firmatario</button>
-    <div class="status-box" id="signerStatus"><span class="empty" data-i18n="notConnected">Non connesso.</span></div>
+      data-i18n-html="fundsNote"><b>💡 Funds: two addresses, both yours</b><br>• <b>Your UP address</b> (the same on every network) is your <i>account</i>: send funds to it <b>only after</b> the deploy and the test on this network have succeeded: if something goes wrong (wrong controller key, failed deploy) funds sent earlier would stay stuck.<br>• <b>The controller address</b> (the wallet in MetaMask) is the <i>key</i> that signs. Every operation costs a small fee (gas), and <b>the controller pays it, not the UP</b>.<br>👉 So send some funds <b>to the controller too</b>, on the same network (e.g. POL on Polygon, ETH on Base or Arbitrum): enough for a few transactions. Without them the controller cannot sign anything, even if the UP is full.</div>
+    <button id="connectSigner" data-i18n="connectSignerBtn">Connect MetaMask / signing wallet</button>
+    <div class="status-box" id="signerStatus"><span class="empty" data-i18n="notConnected">Not connected.</span></div>
   </div>
 
 
   <div class="panel">
     <h2 data-i18n="panel4Title">4 · Test</h2>
-    <div class="note" data-i18n-html="panel4Note"></div>
-    <button id="testBtn" data-i18n="testBtn">Scrivi dato di prova</button>
-    <div id="log" class="line-dim" style="margin-top:10px;"><span data-i18n="logInitial">In attesa dei collegamenti
-        sopra.</span></div>
+    <div class="note" data-i18n-html="panel4Note">Writes a test key (<code>up.test.ping</code>) with a unique value, then reads it back on-chain to confirm. Doesn't touch existing data, doesn't require funds on the UP — only gas for the transaction from the signing wallet.</div>
+    <button id="testBtn" data-i18n="testBtn">Write test value</button>
+    <div id="log" class="line-dim" style="margin-top:10px;"><span data-i18n="logInitial">Waiting for the connections above.</span></div>
   </div>
 
   <div class="site-footer">
     <div class="footer-row">
       <img src="logo.png" alt="ChainIntegrate" class="footer-logo" onerror="this.style.display='none'">
-      <div class="footer-text" data-i18n-html="footerHtml"></div>
+      <div class="footer-text" data-i18n-html="footerHtml">Data &amp; blockchain integration consulting by ChainIntegrate <a href="https://www.linkedin.com/company/chainintegrate" target="_blank" rel="noopener" aria-label="LinkedIn" class="footer-li"><svg width="20" height="20" viewBox="0 0 20 20"><rect width="20" height="20" rx="4" fill="#0A66C2"/><text x="10" y="15" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#fff">in</text></svg></a> · <a href="https://t.me/Simone_1977_2" target="_blank" rel="noopener">Support via Telegram</a> · <a href="https://github.com/ChainIntegrate/Cross_Chain" target="_blank" rel="noopener">Source code on GitHub</a></div>
     </div>
   </div>
 
@@ -348,7 +342,7 @@
 
     const I18N = {
       it: {
-        pageTitle: "UP Test Operazione — ChainIntegrate",
+        pageTitle: "UP Test Operation — ChainIntegrate",
         h1: "UP Test Operazione",
         subtitle: "Scrive un piccolo dato di prova su una UP già deployata, tramite il Key Manager — per verificare che un controller sappia davvero operare, senza fare un deploy.",
         langToggleBtn: "English",

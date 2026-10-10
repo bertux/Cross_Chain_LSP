@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="referrer" content="no-referrer">
   <meta name="robots" content="noindex, nofollow">
-  <title>Ricezione NFT sulla UP — ChainIntegrate</title>
+  <title data-i18n="pageTitle">NFT reception on the UP — ChainIntegrate</title>
   <link rel="icon" href="favicon.ico">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.4/ethers.umd.min.js"
     integrity="sha384-6Zl0Pc8zjSz8KvmNeXRvUQgY4ryFb+BwDvKCmLYcBME0joAaru491tQgi9B7zsMM" crossorigin="anonymous"
@@ -332,68 +332,64 @@
 
   <div class="top-row">
     <div>
-      <h1 data-i18n="h1">Ricezione NFT sulla UP (sperimentale)</h1>
-      <div class="subtitle" data-i18n="subtitle"></div>
+      <h1 data-i18n="h1">NFT reception on the UP (experimental)</h1>
+      <div class="subtitle" data-i18n="subtitle">Let your Universal Profile receive ERC-721 and ERC-1155 NFTs on a network where you redeployed it (for example purchases on OpenSea).</div>
     </div>
-    <button class="lang-btn" id="langToggle" data-i18n="langToggleBtn">English</button>
+    <button class="lang-btn" id="langToggle" data-i18n="langToggleBtn">Italiano</button>
   </div>
 
   <div class="panel">
-    <h2 data-i18n="panel0Title">0 · Come funziona</h2>
-    <div class="note" data-i18n-html="panel0Note"></div>
-    <div class="warn-box" data-i18n-html="disclaimer"></div>
+    <h2 data-i18n="panel0Title">0 · How it works</h2>
+    <div class="note" data-i18n-html="panel0Note">When a standard NFT is delivered with a "safe transfer", the token contract asks the recipient whether it can receive it. A UP answers only through an <b>extension</b> (LSP17) registered in its data; redeployed UPs usually have none, so purchases fail ("wallet cannot receive").<br><br>This page: <b>(1)</b> if needed, takes you to the publishing page to publish on the network the <code>NFTReceiverExtension</code>, a minimal contract with no owner, data or funds, always at the same address on every network; <b>(2)</b> registers it on the UP with <b>a single atomic Key Manager transaction</b>: it grants the controller the permission to add extensions, registers the extension, and sets the controller's permissions back to <b>exactly</b> what they were. If any part fails, nothing changes. Before signing you see the list of operations and the simulation result.</div>
+    <div class="warn-box" data-i18n-html="disclaimer"><b>⚠️ Read before using this page</b><ul style="margin:8px 0 0; padding-left:20px;"><li><b>Experimental tool, not externally audited.</b> Real, irreversible transactions.</li><li><b>It changes the UP's configuration on this network:</b> it adds the extension keys to receive NFTs (repeat it on other networks). The controller's permissions stay the same as before.</li><li><b>The extension</b> answers only NFT-reception calls and <code>supportsInterface</code>: the UP calls it with a normal call, so it cannot read or change the UP's data or funds. Source, bytecode and verification steps are in the repository's <code>contracts/</code> folder.</li><li><b>Receiving NFTs</b> also means being able to receive unwanted NFTs (spam): never give approvals or signatures for NFTs you do not know.</li><li><b>No warranty.</b> Software "as is" (MIT license): you use it at your own risk. ChainIntegrate is not liable for any loss or damage. No affiliation with LUKSO or others.</li><li><b>This page never asks for private keys</b>: you sign everything in MetaMask.</li></ul></div>
     <div class="check-row"><input type="checkbox" id="ackRisk"><label for="ackRisk"
-        style="margin:0; color: var(--text);" data-i18n="ackLabel">Ho letto e accetto</label></div>
+        style="margin:0; color: var(--text);" data-i18n="ackLabel">I have read and accept: I use this tool at my own risk.</label></div>
   </div>
 
   <div class="panel">
-    <h2 data-i18n="panel1Title">1 · Rete</h2>
+    <h2 data-i18n="panel1Title">1 · Network</h2>
     <input type="text" id="networkFilter" data-i18n-placeholder="networkFilterPlaceholder"
-      placeholder="Filtra per nome...">
+      placeholder="Filter by name... (e.g. base, polygon, arbitrum)">
     <select id="network" style="margin-top:8px;"></select>
     <div id="customRpcWrap" style="display:none;">
-      <label data-i18n="customRpcLabel">RPC URL custom</label>
+      <label data-i18n="customRpcLabel">Custom RPC URL</label>
       <input type="text" id="customRpc" placeholder="https://...">
-      <label data-i18n="customExplorerLabel">Explorer URL custom (opzionale)</label>
+      <label data-i18n="customExplorerLabel">Custom explorer URL (optional)</label>
       <input type="text" id="customExplorer" placeholder="https://.../tx/">
     </div>
   </div>
 
   <div class="panel">
-    <h2 data-i18n="panel2Title">2 · La tua UP</h2>
-    <button id="connectUp" class="secondary" data-i18n="connectUpBtn">Leggi l'indirizzo dall'estensione UP</button>
-    <label for="upAddress" data-i18n="upAddressLabel">Indirizzo della UP</label>
+    <h2 data-i18n="panel2Title">2 · Your UP</h2>
+    <button id="connectUp" class="secondary" data-i18n="connectUpBtn">Read the address from the UP extension</button>
+    <label for="upAddress" data-i18n="upAddressLabel">UP address</label>
     <input type="text" id="upAddress" placeholder="0x...">
   </div>
 
   <div class="panel">
-    <h2 data-i18n="panel3Title">3 · Controller (MetaMask) e verifica</h2>
-    <div class="note" data-i18n="panel3Note"></div>
-    <button id="connectSigner" data-i18n="connectSignerBtn">Connetti MetaMask (controller)</button>
-    <div class="status-box" id="checkBox"><span class="empty" data-i18n="checkIdle">La verifica parte da sola quando
-        rete, UP e MetaMask sono impostati.</span></div>
-    <button id="recheckBtn" class="secondary" data-i18n="recheckBtn">Ricontrolla</button>
+    <h2 data-i18n="panel3Title">3 · Controller (MetaMask) and check</h2>
+    <div class="note" data-i18n="panel3Note">MetaMask with the UP controller's key, on the chosen network. It pays the gas. The check starts by itself and runs again if you change network, UP, account or MetaMask's network.</div>
+    <button id="connectSigner" data-i18n="connectSignerBtn">Connect MetaMask (controller)</button>
+    <div class="status-box" id="checkBox"><span class="empty" data-i18n="checkIdle">The check starts by itself once network, UP and MetaMask are set.</span></div>
+    <button id="recheckBtn" class="secondary" data-i18n="recheckBtn">Check again</button>
   </div>
 
   <div class="panel">
-    <h2 data-i18n="panel4Title">4 · Azioni</h2>
-    <div class="note" data-i18n-html="panel4Note"></div>
-    <a id="publishLink" class="link-btn" hidden target="_blank" rel="noopener" data-i18n="publishLinkText">Pubblica
-      l'estensione su questa rete (pagina di pubblicazione) →</a>
-    <button id="prepareBtn" disabled data-i18n="prepareBtn">Prepara e simula l'abilitazione</button>
-    <div class="status-box plan" id="planBox"><span class="empty" data-i18n="noPlan">Nessuna operazione
-        preparata.</span></div>
+    <h2 data-i18n="panel4Title">4 · Actions</h2>
+    <div class="note" data-i18n-html="panel4Note">If the extension does not exist on this network yet, the page gives you the link to the <b>publishing page</b>: there anyone can publish it, with any wallet and without a UP; it only costs gas and gives no control over any UP. Then, here, with the UP's controller you prepare the enabling: the page shows every operation and simulates it; only then can you sign.</div>
+    <a id="publishLink" class="link-btn" hidden target="_blank" rel="noopener" data-i18n="publishLinkText">Publish the extension on this network (publishing page) →</a>
+    <button id="prepareBtn" disabled data-i18n="prepareBtn">Prepare and simulate the enabling</button>
+    <div class="status-box plan" id="planBox"><span class="empty" data-i18n="noPlan">No operation prepared.</span></div>
     <div class="check-row" id="replaceRow" style="display:none;"><input type="checkbox" id="ackReplace"><label
-        for="ackReplace" style="margin:0; color: var(--warn);" data-i18n="ackReplaceLabel">Ho capito che sostituisco le
-        estensioni esistenti indicate sopra</label></div>
-    <button id="enableBtn" class="danger" disabled data-i18n="enableBtn">Firma e invia (una sola transazione)</button>
+        for="ackReplace" style="margin:0; color: var(--warn);" data-i18n="ackReplaceLabel">I understand that I am replacing the existing extensions listed above</label></div>
+    <button id="enableBtn" class="danger" disabled data-i18n="enableBtn">Sign and send (a single transaction)</button>
     <div id="log" class="line-dim" style="margin-top:10px;"></div>
   </div>
 
   <div class="site-footer">
     <div class="footer-row">
       <img src="logo.png" alt="ChainIntegrate" class="footer-logo" onerror="this.style.display='none'">
-      <div class="footer-text" data-i18n-html="footerHtml"></div>
+      <div class="footer-text" data-i18n-html="footerHtml">Data &amp; blockchain integration consulting by ChainIntegrate <a href="https://www.linkedin.com/company/chainintegrate" target="_blank" rel="noopener" aria-label="LinkedIn" class="footer-li"><svg width="20" height="20" viewBox="0 0 20 20"><rect width="20" height="20" rx="4" fill="#0A66C2"/><text x="10" y="15" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#fff">in</text></svg></a> · <a href="https://t.me/Simone_1977_2" target="_blank" rel="noopener">Support via Telegram</a> · <a href="https://github.com/ChainIntegrate/Cross_Chain" target="_blank" rel="noopener">Source code on GitHub</a></div>
     </div>
   </div>
 

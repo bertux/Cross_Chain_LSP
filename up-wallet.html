@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="referrer" content="no-referrer">
   <meta name="robots" content="noindex, nofollow">
-  <title>UP Wallet — ChainIntegrate</title>
+  <title data-i18n="pageTitle">UP Wallet — ChainIntegrate</title>
   <link rel="icon" href="favicon.ico">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.4/ethers.umd.min.js"
     integrity="sha384-6Zl0Pc8zjSz8KvmNeXRvUQgY4ryFb+BwDvKCmLYcBME0joAaru491tQgi9B7zsMM" crossorigin="anonymous"
@@ -468,70 +468,67 @@
 
   <div class="top-row">
     <div>
-      <h1 data-i18n="h1">UP Wallet (sperimentale)</h1>
-      <div class="subtitle" data-i18n="subtitle"></div>
+      <h1 data-i18n="h1">UP Wallet (experimental)</h1>
+      <div class="subtitle" data-i18n="subtitle">Use your Universal Profile as the account on any dApp, on any network where you deployed it: the dApp sees the UP address, your controller signs.</div>
     </div>
-    <button class="lang-btn" id="langToggle" data-i18n="langToggleBtn">English</button>
+    <button class="lang-btn" id="langToggle" data-i18n="langToggleBtn">Italiano</button>
   </div>
 
   <div class="panel">
-    <h2 data-i18n="panel0Title">0 · Come funziona</h2>
-    <div class="note" data-i18n-html="panel0Note"></div>
-    <div class="warn-box" data-i18n-html="disclaimer"></div>
+    <h2 data-i18n="panel0Title">0 · How it works</h2>
+    <div class="note" data-i18n-html="panel0Note">This page is a <b>WalletConnect bridge</b> between a dApp and your UP. The dApp sees the UP address as the account. Every <b>transaction</b> is wrapped into <code>KeyManager.execute(UP.execute(...))</code> and signed by your controller in MetaMask: the call comes from the UP and any value is paid from the UP's balance, while the controller pays the gas. Every <b>message signature</b> is made by the controller and the UP recognises it as its own (ERC-1271). First of all, the page checks that the UP and the controller are compatible on the chosen network. Every request is shown in full, checked and (for transactions) simulated; nothing happens without your click and your confirmation in MetaMask.</div>
+    <div class="warn-box" data-i18n-html="disclaimer"><b>⚠️ Read before using this page</b><ul style="margin:8px 0 0; padding-left:20px;"><li><b>Experimental tool, not audited.</b> It may contain bugs.</li><li><b>Real, irreversible transactions.</b> Nobody can undo a confirmed transaction. Use minimal amounts and always start in simulation mode.</li><li><b>The page does not know the dApps.</b> It decodes only part of the calls (standard tokens and common cases); for the rest it shows you the raw data. If you do not understand what a request does, <b>reject it</b>.</li><li><b>Message signatures.</b> A signature can authorise actions even without a transaction: logins, orders, permissions to spend tokens. The page shows the content and the result of the checks, but cannot know what the signature will be used for.</li><li><b>Token approvals stay valid</b> after you close the page: whoever receives them can move the UP's tokens until you revoke them.</li><li><b>Responsibility.</b> ChainIntegrate takes no responsibility for signatures or transactions approved on unclear content, nor for what dApps do with them. The software is provided "as is" (MIT license), without warranty: you use it at your own risk.</li><li><b>What security relies on:</b> the architecture (you always sign in your own wallet, permissions are enforced by the UP's Key Manager) and the services used (WalletConnect/Reown domain verification, the network's RPCs). The page shows the result of these checks but cannot guarantee them.</li><li><b>One controller per UP.</b> If the same controller governs several UPs, a signature valid for this UP is valid for the others too.</li><li><b>This page never asks for private keys</b> or seed phrases.</li><li><b>Privacy:</b> the WalletConnect connection goes through Reown's servers, which see the session metadata (addresses, network). Checks use the chosen network's public RPC.</li><li><b>No affiliation</b> with LUKSO, WalletConnect/Reown, MetaMask or the dApps you connect. This is not financial advice.</li></ul><div style="margin-top:8px;">Always rejected: <code>eth_sign</code> and legacy signature formats, contract creation, transactions from the UP to itself or to its own Key Manager (they could change its controllers and permissions), requests on a network other than the chosen one.</div></div>
     <div class="check-row"><input type="checkbox" id="ackRisk"><label for="ackRisk"
-        style="margin:0; color: var(--text);" data-i18n="ackLabel">Ho letto e accetto</label></div>
+        style="margin:0; color: var(--text);" data-i18n="ackLabel">I have read and accept: I use this tool at my own risk.</label></div>
   </div>
 
   <div class="panel">
-    <h2 data-i18n="panel1Title">1 · Rete</h2>
-    <div class="note" data-i18n="panel1Note"></div>
+    <h2 data-i18n="panel1Title">1 · Network</h2>
+    <div class="note" data-i18n="panel1Note">The network where the UP is deployed and where you want to use the dApp. One network at a time: changing it closes the active WalletConnect sessions.</div>
     <input type="text" id="networkFilter" data-i18n-placeholder="networkFilterPlaceholder"
-      placeholder="Filtra per nome...">
+      placeholder="Filter by name... (e.g. base, polygon, arbitrum)">
     <select id="network" style="margin-top:8px;"></select>
     <div id="customRpcWrap" style="display:none;">
-      <label data-i18n="customRpcLabel">RPC URL custom</label>
+      <label data-i18n="customRpcLabel">Custom RPC URL</label>
       <input type="text" id="customRpc" placeholder="https://...">
-      <label data-i18n="customExplorerLabel">Explorer URL custom (opzionale)</label>
+      <label data-i18n="customExplorerLabel">Custom explorer URL (optional)</label>
       <input type="text" id="customExplorer" placeholder="https://.../tx/">
     </div>
   </div>
 
   <div class="panel">
-    <h2 data-i18n="panel2Title">2 · La tua UP</h2>
-    <button id="connectUp" class="secondary" data-i18n="connectUpBtn">Leggi l'indirizzo dall'estensione UP</button>
-    <label for="upAddress" data-i18n="upAddressLabel">Indirizzo della UP</label>
+    <h2 data-i18n="panel2Title">2 · Your UP</h2>
+    <button id="connectUp" class="secondary" data-i18n="connectUpBtn">Read the address from the UP extension</button>
+    <label for="upAddress" data-i18n="upAddressLabel">UP address</label>
     <input type="text" id="upAddress" placeholder="0x...">
     <div id="backupAlert"></div>
   </div>
 
   <div class="panel">
-    <h2 data-i18n="panel3Title">3 · Controller (MetaMask) e verifica</h2>
-    <div class="note" data-i18n="panel3Note"></div>
-    <button id="connectSigner" data-i18n="connectSignerBtn">Connetti MetaMask (controller)</button>
-    <div class="status-box" id="complianceBox"><span class="empty" data-i18n="complianceIdle">La verifica parte da sola
-        quando rete, UP e MetaMask sono impostati.</span></div>
-    <button id="recheckBtn" class="secondary" data-i18n="recheckBtn">Ricontrolla</button>
+    <h2 data-i18n="panel3Title">3 · Controller (MetaMask) and check</h2>
+    <div class="note" data-i18n="panel3Note">MetaMask with the UP controller's key, on the chosen network. It pays the gas: it needs some of the network's coin. The compatibility check between UP and controller starts by itself and runs again if you change network, UP, account or MetaMask's network.</div>
+    <button id="connectSigner" data-i18n="connectSignerBtn">Connect MetaMask (controller)</button>
+    <div class="status-box" id="complianceBox"><span class="empty" data-i18n="complianceIdle">The check starts by itself once network, UP and MetaMask are set.</span></div>
+    <button id="recheckBtn" class="secondary" data-i18n="recheckBtn">Check again</button>
     <div id="relayBox"></div>
   </div>
 
   <div class="panel">
-    <h2 data-i18n="panel4Title">4 · Collega una dApp con WalletConnect</h2>
-    <div class="note" data-i18n-html="panel4Note"></div>
-    <label for="wcUri" data-i18n="wcUriLabel">Link WalletConnect (wc:...)</label>
+    <h2 data-i18n="panel4Title">4 · Connect a dApp through WalletConnect</h2>
+    <div class="note" data-i18n-html="panel4Note">On the dApp choose to connect with <b>WalletConnect</b>, copy the connection link (below the QR code, it starts with <code>wc:</code>) and paste it here. It is enabled only when the check in panel 3 is green. Keep this page open while you use the dApp.</div>
+    <label for="wcUri" data-i18n="wcUriLabel">WalletConnect link (wc:...)</label>
     <input type="text" id="wcUri" placeholder="wc:...">
-    <button id="pairBtn" disabled data-i18n="pairBtn">Collega</button>
-    <div class="status-box" id="wcStatus"><span class="empty" data-i18n="wcIdle">Nessuna sessione.</span></div>
-    <button id="disconnectBtn" class="secondary" disabled data-i18n="disconnectBtn">Disconnetti tutte le
-      sessioni</button>
+    <button id="pairBtn" disabled data-i18n="pairBtn">Connect</button>
+    <div class="status-box" id="wcStatus"><span class="empty" data-i18n="wcIdle">No session.</span></div>
+    <button id="disconnectBtn" class="secondary" disabled data-i18n="disconnectBtn">Disconnect all sessions</button>
   </div>
 
   <div class="panel">
-    <h2 data-i18n="panel5Title">5 · Richieste della dApp</h2>
+    <h2 data-i18n="panel5Title">5 · Requests from the dApp</h2>
     <div class="check-row"><input type="checkbox" id="simulateOnly" checked><label for="simulateOnly" style="margin:0;"
-        data-i18n="simulateOnlyLabel">Solo simulazione (non inviare nulla)</label></div>
-    <div class="note" style="margin-top:6px;" data-i18n="simulateOnlyNote"></div>
-    <div id="requestBox" class="status-box"><span class="empty" data-i18n="noRequest">Nessuna richiesta in
-        attesa.</span></div>
+        data-i18n="simulateOnlyLabel">Simulation only (send nothing)</label></div>
+    <div class="note" style="margin-top:6px;" data-i18n="simulateOnlyNote">When checked, transactions are checked and simulated, then the dApp is told it was a simulation: nothing is sent and nothing is spent. Message signatures cannot be simulated: they are always shown and signed only if you press "Sign the message".</div>
+    <div id="requestBox" class="status-box"><span class="empty" data-i18n="noRequest">No pending request.</span></div>
     <div id="log" class="line-dim" style="margin-top:10px;"></div>
   </div>
 
@@ -539,17 +536,16 @@
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
       <div class="modal-head">
         <div class="modal-title" id="modalTitle"></div>
-        <div class="modal-sub" data-i18n="modalSub">Leggi tutto prima di decidere.</div>
+        <div class="modal-sub" data-i18n="modalSub">Read everything before deciding: checks, warnings and request details. Nothing happens without your click and your confirmation in MetaMask. The request also stays in the page's history.</div>
       </div>
       <div class="modal-body">
         <div class="modal-notes" id="modalNotes"></div>
         <div id="modalDetails"></div>
       </div>
       <div class="modal-foot">
-        <button id="sendBtn" class="danger" disabled hidden data-i18n="sendBtn">Firma e invia la transazione
-          (irreversibile)</button>
-        <button id="signBtn" class="danger" disabled hidden data-i18n="signBtn">Firma il messaggio per la UP</button>
-        <button id="rejectBtn" class="secondary" disabled data-i18n="rejectBtn">Rifiuta la richiesta</button>
+        <button id="sendBtn" class="danger" disabled hidden data-i18n="sendBtn">Sign and send the transaction (irreversible)</button>
+        <button id="signBtn" class="danger" disabled hidden data-i18n="signBtn">Sign the message for the UP</button>
+        <button id="rejectBtn" class="secondary" disabled data-i18n="rejectBtn">Reject the request</button>
       </div>
     </div>
   </div>
@@ -562,7 +558,7 @@
   <div class="site-footer">
     <div class="footer-row">
       <img src="logo.png" alt="ChainIntegrate" class="footer-logo" onerror="this.style.display='none'">
-      <div class="footer-text" data-i18n-html="footerHtml"></div>
+      <div class="footer-text" data-i18n-html="footerHtml">Data &amp; blockchain integration consulting by ChainIntegrate <a href="https://www.linkedin.com/company/chainintegrate" target="_blank" rel="noopener" aria-label="LinkedIn" class="footer-li"><svg width="20" height="20" viewBox="0 0 20 20"><rect width="20" height="20" rx="4" fill="#0A66C2"/><text x="10" y="15" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#fff">in</text></svg></a> · <a href="https://t.me/Simone_1977_2" target="_blank" rel="noopener">Support via Telegram</a> · <a href="https://github.com/ChainIntegrate/Cross_Chain" target="_blank" rel="noopener">Source code on GitHub</a><br><span style="font-size:11.5px;">WalletConnect: Portions © 2025 Reown, Inc. All Rights Reserved. <a href="vendor/walletkit-1.6.0.LICENSE.md" target="_blank" rel="noopener">License</a> · <a href="vendor/walletkit-1.6.0.THIRD-PARTY.txt" target="_blank" rel="noopener">third-party components</a></span></div>
     </div>
   </div>
 
