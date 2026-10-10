@@ -1,177 +1,568 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<script src="theme.js"></script>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="referrer" content="no-referrer">
-<meta name="robots" content="noindex, nofollow">
-<title>Gas pagato dal sito: configurazione della UP — ChainIntegrate</title>
-<link rel="icon" href="favicon.ico">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.4/ethers.umd.min.js" integrity="sha384-6Zl0Pc8zjSz8KvmNeXRvUQgY4ryFb+BwDvKCmLYcBME0joAaru491tQgi9B7zsMM" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script src="chains.js"></script>
-<script src="gas-relay-client.js"></script>
-<style>
-  :root {
-    --bg: #0f1115; --panel: #171a21; --border: #2a2f3a; --field: #10131a; --chip: #2a2f3a; --disabled: #3a3f4b; --raised: #1d2330;
-    --text: #e6e8ec; --text-dim: #9aa1ad;
-    --accent: #5b8cff; --ok: #3fbf6f; --warn: #e0a83c; --err: #e05a5a;
-  }
-  * { box-sizing: border-box; }
-  body { background: var(--bg); color: var(--text); font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
-         max-width: 760px; margin: 0 auto; padding: 32px 20px 80px; }
-  h1 { font-size: 20px; margin-bottom: 4px; }
-  .subtitle { color: var(--text-dim); font-size: 13px; margin-bottom: 28px; }
-  .panel { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 20px; margin-bottom: 20px; }
-  .panel h2 { font-size: 14px; margin: 0 0 14px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.03em; }
-  .panel h3 { font-size: 13px; margin: 18px 0 4px; color: var(--text); }
-  .note { font-size: 12.5px; color: var(--text-dim); line-height: 1.5; margin-bottom: 12px; }
-  label { display: block; font-size: 13px; color: var(--text-dim); margin: 14px 0 6px; }
-  select, input { width: 100%; background: var(--field); border: 1px solid var(--border); color: var(--text);
-                  border-radius: 6px; padding: 10px 12px; font-size: 14px; font-family: inherit; }
-  button { width: 100%; background: var(--accent); color: white; border: none; border-radius: 6px;
-           padding: 12px; font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 12px; }
-  button:disabled { background: var(--disabled); cursor: not-allowed; }
-  button.danger { background: var(--err); }
-  button.secondary { background: var(--chip); }
-  .row { display: flex; gap: 8px; align-items: flex-end; }
-  .row > * { flex: 1; }
-  .row button { flex: 0 0 auto; width: auto; padding: 10px 14px; }
-  .status-box { background: var(--field); border: 1px solid var(--border); border-radius: 6px; padding: 12px;
-                font-family: monospace; font-size: 12.5px; margin-top: 12px; }
-  .status-box .empty { color: var(--text-dim); }
-  #log { font-family: monospace; font-size: 12.5px; white-space: pre-wrap; word-break: break-all; line-height: 1.6; }
-  .line-ok { color: var(--ok); } .line-warn { color: var(--warn); } .line-err { color: var(--err); } .line-dim { color: var(--text-dim); }
-  .line-compare { color: var(--warn); font-weight: 700; border: 1px solid var(--warn); border-radius: 6px; padding: 8px 10px; margin: 6px 0; }
-  .brand-row { margin-bottom: 24px; }
-  .brand-logo { display: block; width: 100%; height: auto; border-radius: 10px; }
-  .top-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
-  .lang-btn { width: auto; background: var(--chip); padding: 6px 14px; font-size: 12px; margin-top: 0; flex-shrink: 0; }
-  .site-footer { margin-top: 40px; padding: 18px 20px; background: #f5f6f8; border: 1px solid #e3e5ea; border-radius: 10px; color: #4b4f58; }
-  .footer-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
-  .footer-logo { height: 48px; width: auto; flex-shrink: 0; }
-  .footer-text { font-size: 13px; line-height: 1.6; }
-  .footer-li { display: inline-flex; vertical-align: middle; margin: 0 2px; }
-  .site-footer a { color: #2563eb; text-decoration: none; font-weight: 600; }
-  .kv { display: grid; grid-template-columns: 200px 1fr; gap: 6px 12px; font-size: 13px; }
-  .kv .k { color: var(--text-dim); }
-  .kv .v { font-family: monospace; word-break: break-all; white-space: pre-wrap; }
-  .kv .v.ok { color: var(--ok); } .kv .v.warn { color: var(--warn); } .kv .v.err { color: var(--err); }
-  .check-row { display: flex; align-items: center; gap: 8px; margin-top: 14px; font-size: 13.5px; }
-  .check-row input { width: auto; }
-  .warn-box { margin-top: 12px; padding: 12px 14px; border: 1px solid var(--err); border-radius: 8px; background: rgba(224,90,90,0.08); font-size: 13px; line-height: 1.5; }
-  .plan { font-family: monospace; font-size: 12.5px; line-height: 1.6; white-space: pre-wrap; word-break: break-word; }
-  .simple { border: 2px solid var(--accent); border-radius: 10px; padding: 14px 18px; background: rgba(91,140,255,0.08); font-size: 14.5px; line-height: 1.65; margin-bottom: 12px; }
-  .simple h4 { margin: 0 0 6px; font-size: 16px; }
-  .simple p { margin: 8px 0; } .simple ul, .simple ol { margin: 6px 0; padding-left: 22px; } .simple li { margin: 4px 0; }
-  .read-on { font-weight: 700; font-size: 14px; margin: 0 0 12px; color: var(--warn); }
-  details.guide { margin: 4px 0 14px; border: 1px solid var(--accent); border-radius: 8px; padding: 10px 14px; background: rgba(91,140,255,0.06); }
-  details.guide summary { cursor: pointer; font-weight: 600; font-size: 14px; color: var(--text); }
-  details.guide > div { font-size: 13px; line-height: 1.6; color: var(--text); margin-top: 8px; }
-  details.guide h4 { font-size: 13.5px; margin: 14px 0 4px; color: var(--accent); }
-  details.guide ol, details.guide ul { margin: 4px 0; padding-left: 22px; }
-  details.guide li { margin: 3px 0; }
-  /* While an action runs: a fixed box that says what is happening, so the wait before the wallet opens is never silent. */
-  #busyToast { display: none; position: fixed; left: 50%; bottom: 16px; transform: translateX(-50%); z-index: 50;
-               width: calc(100% - 32px); max-width: 720px; background: var(--raised); border: 2px solid var(--warn); border-radius: 10px;
-               padding: 12px 16px; font-size: 14px; line-height: 1.5; color: var(--text); box-shadow: 0 6px 24px rgba(0,0,0,0.5); }
-  #busyToast.on { display: flex; gap: 12px; align-items: center; }
-  #busyToast .spin { width: 18px; height: 18px; flex: 0 0 18px; border: 3px solid var(--warn); border-top-color: transparent; border-radius: 50%; animation: spin 0.9s linear infinite; }
-  #busyToast .msg { word-break: break-word; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  @media (prefers-reduced-motion: reduce) { #busyToast .spin { animation: none; } }
-  media (max-width: 560px) { .kv { grid-template-columns: 1fr; } .row { flex-wrap: wrap; } .row button { width: 100%; } }
-</style>
+  <meta charset="UTF-8">
+  <script src="theme.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Gas pagato dal sito: configurazione della UP — ChainIntegrate</title>
+  <link rel="icon" href="favicon.ico">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.4/ethers.umd.min.js"
+    integrity="sha384-6Zl0Pc8zjSz8KvmNeXRvUQgY4ryFb+BwDvKCmLYcBME0joAaru491tQgi9B7zsMM" crossorigin="anonymous"
+    referrerpolicy="no-referrer"></script>
+  <script src="chains.js"></script>
+  <script src="gas-relay-client.js"></script>
+  <style>
+    :root {
+      --bg: #0f1115;
+      --panel: #171a21;
+      --border: #2a2f3a;
+      --field: #10131a;
+      --chip: #2a2f3a;
+      --disabled: #3a3f4b;
+      --raised: #1d2330;
+      --text: #e6e8ec;
+      --text-dim: #9aa1ad;
+      --accent: #5b8cff;
+      --ok: #3fbf6f;
+      --warn: #e0a83c;
+      --err: #e05a5a;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 32px 20px 80px;
+    }
+
+    h1 {
+      font-size: 20px;
+      margin-bottom: 4px;
+    }
+
+    .subtitle {
+      color: var(--text-dim);
+      font-size: 13px;
+      margin-bottom: 28px;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .panel h2 {
+      font-size: 14px;
+      margin: 0 0 14px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .panel h3 {
+      font-size: 13px;
+      margin: 18px 0 4px;
+      color: var(--text);
+    }
+
+    .note {
+      font-size: 12.5px;
+      color: var(--text-dim);
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      color: var(--text-dim);
+      margin: 14px 0 6px;
+    }
+
+    select,
+    input {
+      width: 100%;
+      background: var(--field);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 6px;
+      padding: 10px 12px;
+      font-size: 14px;
+      font-family: inherit;
+    }
+
+    button {
+      width: 100%;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 12px;
+    }
+
+    button:disabled {
+      background: var(--disabled);
+      cursor: not-allowed;
+    }
+
+    button.danger {
+      background: var(--err);
+    }
+
+    button.secondary {
+      background: var(--chip);
+    }
+
+    .row {
+      display: flex;
+      gap: 8px;
+      align-items: flex-end;
+    }
+
+    .row>* {
+      flex: 1;
+    }
+
+    .row button {
+      flex: 0 0 auto;
+      width: auto;
+      padding: 10px 14px;
+    }
+
+    .status-box {
+      background: var(--field);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 12px;
+      font-family: monospace;
+      font-size: 12.5px;
+      margin-top: 12px;
+    }
+
+    .status-box .empty {
+      color: var(--text-dim);
+    }
+
+    #log {
+      font-family: monospace;
+      font-size: 12.5px;
+      white-space: pre-wrap;
+      word-break: break-all;
+      line-height: 1.6;
+    }
+
+    .line-ok {
+      color: var(--ok);
+    }
+
+    .line-warn {
+      color: var(--warn);
+    }
+
+    .line-err {
+      color: var(--err);
+    }
+
+    .line-dim {
+      color: var(--text-dim);
+    }
+
+    .line-compare {
+      color: var(--warn);
+      font-weight: 700;
+      border: 1px solid var(--warn);
+      border-radius: 6px;
+      padding: 8px 10px;
+      margin: 6px 0;
+    }
+
+    .brand-row {
+      margin-bottom: 24px;
+    }
+
+    .brand-logo {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 10px;
+    }
+
+    .top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .lang-btn {
+      width: auto;
+      background: var(--chip);
+      padding: 6px 14px;
+      font-size: 12px;
+      margin-top: 0;
+      flex-shrink: 0;
+    }
+
+    .site-footer {
+      margin-top: 40px;
+      padding: 18px 20px;
+      background: #f5f6f8;
+      border: 1px solid #e3e5ea;
+      border-radius: 10px;
+      color: #4b4f58;
+    }
+
+    .footer-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .footer-logo {
+      height: 48px;
+      width: auto;
+      flex-shrink: 0;
+    }
+
+    .footer-text {
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .footer-li {
+      display: inline-flex;
+      vertical-align: middle;
+      margin: 0 2px;
+    }
+
+    .site-footer a {
+      color: #2563eb;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .kv {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 6px 12px;
+      font-size: 13px;
+    }
+
+    .kv .k {
+      color: var(--text-dim);
+    }
+
+    .kv .v {
+      font-family: monospace;
+      word-break: break-all;
+      white-space: pre-wrap;
+    }
+
+    .kv .v.ok {
+      color: var(--ok);
+    }
+
+    .kv .v.warn {
+      color: var(--warn);
+    }
+
+    .kv .v.err {
+      color: var(--err);
+    }
+
+    .check-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 14px;
+      font-size: 13.5px;
+    }
+
+    .check-row input {
+      width: auto;
+    }
+
+    .warn-box {
+      margin-top: 12px;
+      padding: 12px 14px;
+      border: 1px solid var(--err);
+      border-radius: 8px;
+      background: rgba(224, 90, 90, 0.08);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .plan {
+      font-family: monospace;
+      font-size: 12.5px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .simple {
+      border: 2px solid var(--accent);
+      border-radius: 10px;
+      padding: 14px 18px;
+      background: rgba(91, 140, 255, 0.08);
+      font-size: 14.5px;
+      line-height: 1.65;
+      margin-bottom: 12px;
+    }
+
+    .simple h4 {
+      margin: 0 0 6px;
+      font-size: 16px;
+    }
+
+    .simple p {
+      margin: 8px 0;
+    }
+
+    .simple ul,
+    .simple ol {
+      margin: 6px 0;
+      padding-left: 22px;
+    }
+
+    .simple li {
+      margin: 4px 0;
+    }
+
+    .read-on {
+      font-weight: 700;
+      font-size: 14px;
+      margin: 0 0 12px;
+      color: var(--warn);
+    }
+
+    details.guide {
+      margin: 4px 0 14px;
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      padding: 10px 14px;
+      background: rgba(91, 140, 255, 0.06);
+    }
+
+    details.guide summary {
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--text);
+    }
+
+    details.guide>div {
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--text);
+      margin-top: 8px;
+    }
+
+    details.guide h4 {
+      font-size: 13.5px;
+      margin: 14px 0 4px;
+      color: var(--accent);
+    }
+
+    details.guide ol,
+    details.guide ul {
+      margin: 4px 0;
+      padding-left: 22px;
+    }
+
+    details.guide li {
+      margin: 3px 0;
+    }
+
+    /* While an action runs: a fixed box that says what is happening, so the wait before the wallet opens is never silent. */
+    #busyToast {
+      display: none;
+      position: fixed;
+      left: 50%;
+      bottom: 16px;
+      transform: translateX(-50%);
+      z-index: 50;
+      width: calc(100% - 32px);
+      max-width: 720px;
+      background: var(--raised);
+      border: 2px solid var(--warn);
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--text);
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5);
+    }
+
+    #busyToast.on {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    #busyToast .spin {
+      width: 18px;
+      height: 18px;
+      flex: 0 0 18px;
+      border: 3px solid var(--warn);
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+    }
+
+    #busyToast .msg {
+      word-break: break-word;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      #busyToast .spin {
+        animation: none;
+      }
+    }
+
+    media (max-width: 560px) {
+      .kv {
+        grid-template-columns: 1fr;
+      }
+
+      .row {
+        flex-wrap: wrap;
+      }
+
+      .row button {
+        width: 100%;
+      }
+    }
+  </style>
 </head>
+
 <body>
 
-<div class="brand-row">
-  <img src="banner.png" alt="ChainIntegrate" class="brand-logo" onerror="this.style.display='none'">
-</div>
-
-<div class="top-row">
-  <div>
-    <h1 data-i18n="h1">Gas pagato dal sito: configurazione della UP</h1>
-    <div class="subtitle" data-i18n="subtitle"></div>
+  <div class="brand-row">
+    <img src="banner.png" alt="ChainIntegrate" class="brand-logo" onerror="this.style.display='none'">
   </div>
-  <button class="lang-btn" id="langToggle" data-i18n="langToggleBtn">English</button>
-</div>
 
-<div class="panel">
-  <h2 data-i18n="panel0Title">0 · Come funziona</h2>
-  <div class="simple" data-i18n-html="simpleHtml"></div>
-  <details class="guide" id="guideBox"><summary data-i18n="guideSummary">Guida passo passo</summary><div data-i18n-html="guideHtml"></div></details>
-  <div class="warn-box" data-i18n-html="disclaimer"></div>
-  <div class="check-row"><input type="checkbox" id="ackRisk"><label for="ackRisk" style="margin:0; color: var(--text);" data-i18n="ackLabel">Ho letto e accetto</label></div>
-</div>
-
-<div class="panel">
-  <h2 data-i18n="panel1Title">1 · Rete, MetaMask e UP</h2>
-  <input type="text" id="networkFilter" data-i18n-placeholder="networkFilterPlaceholder" placeholder="Filtra per nome...">
-  <select id="network" style="margin-top:8px;"></select>
-  <div id="customRpcWrap" style="display:none;">
-    <label data-i18n="customRpcLabel">RPC URL custom</label>
-    <input type="text" id="customRpc" placeholder="https://...">
-    <label data-i18n="customExplorerLabel">Explorer URL custom (opzionale)</label>
-    <input type="text" id="customExplorer" placeholder="https://.../tx/">
+  <div class="top-row">
+    <div>
+      <h1 data-i18n="h1">Gas pagato dal sito: configurazione della UP</h1>
+      <div class="subtitle" data-i18n="subtitle"></div>
+    </div>
+    <button class="lang-btn" id="langToggle" data-i18n="langToggleBtn">English</button>
   </div>
-  <label for="upAddress" data-i18n="upAddressLabel">Indirizzo della UP</label>
-  <input type="text" id="upAddress" placeholder="0x...">
-  <button id="connectUp" class="secondary" data-i18n="connectUpBtn">Leggi l'indirizzo dall'estensione UP</button>
-  <div class="note" style="margin-top:12px;" data-i18n="panel1Note"></div>
-  <button id="connectSigner" data-i18n="connectSignerBtn">Connetti MetaMask</button>
-  <div class="status-box" id="netBox"><span class="empty" data-i18n="notChecked">Non ancora verificato.</span></div>
-  <button id="recheckBtn" class="secondary" data-i18n="recheckBtn">Ricontrolla tutto</button>
-</div>
 
-<div class="panel">
-  <h2 data-i18n="panel5Title">2 · Verifica della configurazione</h2>
-  <div class="note" data-i18n-html="panel5Note"></div>
-  <button id="checkCfgBtn" class="secondary" disabled data-i18n="checkCfgBtn">Verifica la configurazione (sola lettura)</button>
-  <div class="status-box" id="cfgBox"><span class="empty" data-i18n="cfgNone">Nessuna verifica eseguita.</span></div>
-</div>
-
-<div class="panel">
-  <h2 data-i18n="panel3Title">3 · La UP</h2>
-  <h3 data-i18n="setupTitle">Configurazione della UP · con il controller</h3>
-  <div class="note" data-i18n-html="panel3Note"></div>
-  <div class="status-box" id="upBox"><span class="empty" data-i18n="notChecked">Non ancora verificato.</span></div>
-  <button id="publishExtBtn" class="secondary" disabled data-i18n="publishExtBtn">Pubblica l'Extension4337 su questa rete</button>
-  <button id="prepareSetupBtn" disabled data-i18n="prepareSetupBtn">Prepara e simula la configurazione della UP</button>
-  <div class="status-box plan" id="setupPlanBox"><span class="empty" data-i18n="noPlan">Nessuna operazione preparata.</span></div>
-  <button id="sendSetupBtn" class="danger" disabled data-i18n="sendSetupBtn">Firma e invia la configurazione (una sola transazione)</button>
-  <h3 data-i18n="revokeTitle">Disattivare il 4337 su questa UP</h3>
-  <div class="note" data-i18n-html="revokeNote"></div>
-  <button id="prepareRevokeBtn" class="secondary" disabled data-i18n="prepareRevokeBtn">Prepara e simula la disattivazione</button>
-  <button id="sendRevokeBtn" class="danger" disabled data-i18n="sendRevokeBtn">Firma e invia la disattivazione (una sola transazione)</button>
-</div>
-
-<div class="panel">
-  <h2 data-i18n="logTitle">Registro</h2>
-  <div id="log" class="line-dim"></div>
-</div>
-
-<div id="busyToast" role="status" aria-live="polite"><div class="spin"></div><div class="msg" id="busyMsg"></div></div>
-
-<div class="site-footer">
-  <div class="footer-row">
-    <img src="logo.png" alt="ChainIntegrate" class="footer-logo" onerror="this.style.display='none'">
-    <div class="footer-text" data-i18n-html="footerHtml"></div>
+  <div class="panel">
+    <h2 data-i18n="panel0Title">0 · Come funziona</h2>
+    <div class="simple" data-i18n-html="simpleHtml"></div>
+    <details class="guide" id="guideBox">
+      <summary data-i18n="guideSummary">Guida passo passo</summary>
+      <div data-i18n-html="guideHtml"></div>
+    </details>
+    <div class="warn-box" data-i18n-html="disclaimer"></div>
+    <div class="check-row"><input type="checkbox" id="ackRisk"><label for="ackRisk"
+        style="margin:0; color: var(--text);" data-i18n="ackLabel">Ho letto e accetto</label></div>
   </div>
-</div>
 
-<script>
-// User page of the gas relay: check, set up and turn off 4337 on your UP. The paymasters, the allowlist and
-// the test operation are on the operator's page (up-gas-relay-admin.html). The code is shared (gas-relay-page.js).
-window.GAS_PAGE = {
-  mode: "user",
-  owner: "0x6C5d0fa04aE90371e809114E9C3932ea7a3715C9", // the operator's cassa: owner of the site's paymasters
-  i18n: {
-    it: {
-      pageTitle: "Gas pagato dal sito: configurazione della UP — ChainIntegrate",
-      h1: "Gas pagato dal sito: configurazione della UP (sperimentale)",
-      subtitle: "Prepara la tua UP perché il sito possa pagarne il gas: il controller firma un messaggio, il relayer del sito invia, il paymaster del sito paga. ERC-4337 (EntryPoint v0.6).",
-      simpleHtml: `<h4>In parole semplici</h4>
+  <div class="panel">
+    <h2 data-i18n="panel1Title">1 · Rete, MetaMask e UP</h2>
+    <input type="text" id="networkFilter" data-i18n-placeholder="networkFilterPlaceholder"
+      placeholder="Filtra per nome...">
+    <select id="network" style="margin-top:8px;"></select>
+    <div id="customRpcWrap" style="display:none;">
+      <label data-i18n="customRpcLabel">RPC URL custom</label>
+      <input type="text" id="customRpc" placeholder="https://...">
+      <label data-i18n="customExplorerLabel">Explorer URL custom (opzionale)</label>
+      <input type="text" id="customExplorer" placeholder="https://.../tx/">
+    </div>
+    <label for="upAddress" data-i18n="upAddressLabel">Indirizzo della UP</label>
+    <input type="text" id="upAddress" placeholder="0x...">
+    <button id="connectUp" class="secondary" data-i18n="connectUpBtn">Leggi l'indirizzo dall'estensione UP</button>
+    <div class="note" style="margin-top:12px;" data-i18n="panel1Note"></div>
+    <button id="connectSigner" data-i18n="connectSignerBtn">Connetti MetaMask</button>
+    <div class="status-box" id="netBox"><span class="empty" data-i18n="notChecked">Non ancora verificato.</span></div>
+    <button id="recheckBtn" class="secondary" data-i18n="recheckBtn">Ricontrolla tutto</button>
+  </div>
+
+  <div class="panel">
+    <h2 data-i18n="panel5Title">2 · Verifica della configurazione</h2>
+    <div class="note" data-i18n-html="panel5Note"></div>
+    <button id="checkCfgBtn" class="secondary" disabled data-i18n="checkCfgBtn">Verifica la configurazione (sola
+      lettura)</button>
+    <div class="status-box" id="cfgBox"><span class="empty" data-i18n="cfgNone">Nessuna verifica eseguita.</span></div>
+  </div>
+
+  <div class="panel">
+    <h2 data-i18n="panel3Title">3 · La UP</h2>
+    <h3 data-i18n="setupTitle">Configurazione della UP · con il controller</h3>
+    <div class="note" data-i18n-html="panel3Note"></div>
+    <div class="status-box" id="upBox"><span class="empty" data-i18n="notChecked">Non ancora verificato.</span></div>
+    <button id="publishExtBtn" class="secondary" disabled data-i18n="publishExtBtn">Pubblica l'Extension4337 su questa
+      rete</button>
+    <button id="prepareSetupBtn" disabled data-i18n="prepareSetupBtn">Prepara e simula la configurazione della
+      UP</button>
+    <div class="status-box plan" id="setupPlanBox"><span class="empty" data-i18n="noPlan">Nessuna operazione
+        preparata.</span></div>
+    <button id="sendSetupBtn" class="danger" disabled data-i18n="sendSetupBtn">Firma e invia la configurazione (una sola
+      transazione)</button>
+    <h3 data-i18n="revokeTitle">Disattivare il 4337 su questa UP</h3>
+    <div class="note" data-i18n-html="revokeNote"></div>
+    <button id="prepareRevokeBtn" class="secondary" disabled data-i18n="prepareRevokeBtn">Prepara e simula la
+      disattivazione</button>
+    <button id="sendRevokeBtn" class="danger" disabled data-i18n="sendRevokeBtn">Firma e invia la disattivazione (una
+      sola transazione)</button>
+  </div>
+
+  <div class="panel">
+    <h2 data-i18n="logTitle">Registro</h2>
+    <div id="log" class="line-dim"></div>
+  </div>
+
+  <div id="busyToast" role="status" aria-live="polite">
+    <div class="spin"></div>
+    <div class="msg" id="busyMsg"></div>
+  </div>
+
+  <div class="site-footer">
+    <div class="footer-row">
+      <img src="logo.png" alt="ChainIntegrate" class="footer-logo" onerror="this.style.display='none'">
+      <div class="footer-text" data-i18n-html="footerHtml"></div>
+    </div>
+  </div>
+
+  <script>
+    // User page of the gas relay: check, set up and turn off 4337 on your UP. The paymasters, the allowlist and
+    // the test operation are on the operator's page (up-gas-relay-admin.html). The code is shared (gas-relay-page.js).
+    window.GAS_PAGE = {
+      mode: "user",
+      owner: "0x6C5d0fa04aE90371e809114E9C3932ea7a3715C9", // the operator's cassa: owner of the site's paymasters
+      i18n: {
+        it: {
+          pageTitle: "Gas pagato dal sito: configurazione della UP — ChainIntegrate",
+          h1: "Gas pagato dal sito: configurazione della UP (sperimentale)",
+          subtitle: "Prepara la tua UP perché il sito possa pagarne il gas: il controller firma un messaggio, il relayer del sito invia, il paymaster del sito paga. ERC-4337 (EntryPoint v0.6).",
+          simpleHtml: `<h4>In parole semplici</h4>
 <p>Di solito ogni operazione della UP costa un po' di gas al suo <b>controller</b>. Con il <b>gas pagato dal sito</b> il controller firma solo un messaggio in MetaMask, senza gas: il relayer del sito invia l'operazione e il paymaster del sito la paga.</p>
 <p>Perché funzioni, la UP va <b>configurata una volta per ogni rete</b> (questa pagina):</p>
 <ul>
@@ -181,8 +572,8 @@ window.GAS_PAGE = {
 </ul>
 <p><b>Chi paga il gas dopo?</b> Il sito, per le UP con un'<a href="up-subscribe.html">iscrizione</a> attiva (5 USDC di saldo, scalati per operazione secondo il listino della rete) o nella lista del gestore. La configurazione serve anche per il pagamento dell'iscrizione stessa, che il sito paga.</p>
 <p><b>Poi:</b> nelle pagine <a href="up-invia-fondi.html">Invia</a> e <a href="up-wallet.html">UP Wallet</a> compare da sola l'opzione «Paga il gas con il relayer del sito».</p>`,
-      guideSummary: "Guida passo passo",
-      guideHtml: `<h4>Una volta per rete</h4>
+          guideSummary: "Guida passo passo",
+          guideHtml: `<h4>Una volta per rete</h4>
 <ol>
 <li>Sezione 1: scegli la rete e scrivi l'indirizzo della UP (o leggilo dall'estensione UP).</li>
 <li>Sezione 2: la verifica parte da sola, in sola lettura, e dice cosa manca e dove farlo.</li>
@@ -193,34 +584,34 @@ window.GAS_PAGE = {
 </ol>
 <h4>Per spegnere tutto</h4>
 <ul><li>Sezione 3, <b>Disattivare il 4337 su questa UP</b>: una transazione del controller riporta la UP com'era.</li></ul>`,
-      disclaimer: "<b>⚠️ Leggi prima di usare questa pagina</b><ul style=\"margin:8px 0 0; padding-left:20px;\"><li><b>Strumento sperimentale, senza audit professionale.</b> L'<code>Extension4337</code> di LUKSO non è mai stata sottoposta ad audit; neanche i paymaster del sito. Usa importi piccoli.</li><li><b>Modifica la configurazione della UP su questa rete:</b> l'EntryPoint diventa un controller con permessi di chiamata e invio. Esegue solo operazioni firmate da un controller con il permesso 4337 e nei limiti dei permessi di chi firma.</li><li><b>Chi ha la chiave del controller controlla la UP</b>, con o senza questa configurazione: tieni sulla UP solo quello che sei disposto a perdere se la chiave venisse rubata.</li><li><b>Nessuna garanzia.</b> Software \"così com'è\": lo usi a tuo rischio. Nessuna affiliazione con LUKSO o altri.</li><li><b>Questa pagina non chiede mai chiavi private</b>: firmi tutto in MetaMask.</li></ul>",
-      panel1Note: "Usa il controller della UP in MetaMask (la chiave di genesi o il backup). La verifica della sezione 2 non ha bisogno di MetaMask.",
-      panel5Note: "Sola lettura: nessuna firma, nessun gas, MetaMask non serve. Bastano la rete e l'indirizzo della UP (sezione 1). Controlla la UP, l'estensione, l'EntryPoint e i controller, e alla fine se il sito paga il gas di questa UP. Il punto più importante: l'EntryPoint deve avere esattamente i permessi <code>0x000500</code> (chiamare e inviare valore, niente modifica di dati o permessi). Rifalla dopo ogni modifica alla UP e su ogni rete.",
-      panel3Title: "3 · La UP",
-      panel3Note: "Due passaggi:<br><b>1 · Pubblica l'Extension4337</b>, solo se qui sotto risulta <b>non pubblicata</b>: una volta per rete, poi vale per tutte le UP. <b>Può firmarla qualsiasi account</b>: paga solo il gas e non ottiene nessun diritto sulle UP, perché il contratto è pubblico e uguale per tutti.<br><b>2 · Configura la UP</b> con il <b>controller</b> della UP attivo in MetaMask: una sola transazione atomica del Key Manager, con un po' di gas pagato dal controller; se una parte fallisce, non cambia niente. Il controller che firma riceve il permesso 4337. Prima di firmare vedi l'elenco delle operazioni e la simulazione.",
-      revokeAfter: "La UP è tornata com'era: il sito non può più pagarne il gas su questa rete finché non la riconfiguri.",
-      doPublishExt: "→ sezione 3: «Pubblica l'Extension4337 su questa rete» (una volta per rete, qualunque account con un po' di gas)",
-      doSetup: "→ sezione 3, con il controller: «Prepara e simula la configurazione della UP», poi «Firma e invia»",
-      doRedo: "→ sezione 3, con il controller: disattiva il 4337, poi rifai la configurazione",
-      upNotSet: "inserisci la UP nella sezione 1",
-      readyDone: "✅ UP configurata. Se il sito paga il gas di questa UP lo dice l'ultima riga della verifica (sezione 2).",
-      cfgGas: "Gas pagato dal sito",
-      cfgGasListed: "sì: la UP è nella lista del gestore",
-      cfgGasOn: "sì",
-      cfgGasActive: (v) => `sì: iscrizione attiva, saldo ${v.bal} USDC (questa rete: ${v.price} USDC per operazione)`,
-      cfgGasEmpty: (v) => `iscrizione attiva, ma il saldo (${v.bal} USDC) non basta per un'operazione`,
-      cfgGasPaid: "pagamento ricevuto, in attesa di attivazione (riceverai un'email)",
-      cfgGasNone: "non ancora: la UP non è iscritta",
-      cfgGasClosed: "non ancora: le iscrizioni non sono ancora aperte",
-      cfgGasDown: "il servizio non risponde: riprova più tardi",
-      doSubscribe: "→ pagina Iscrizione (up-subscribe.html), dopo questa configurazione",
-      doTopUp: "→ ricarica dalla pagina Iscrizione (up-subscribe.html)",
-    },
-    en: {
-      pageTitle: "Gas paid by the site: UP setup — ChainIntegrate",
-      h1: "Gas paid by the site: UP setup (experimental)",
-      subtitle: "Prepare your UP so the site can pay its gas: the controller signs a message, the site's relayer sends, the site's paymaster pays. ERC-4337 (EntryPoint v0.6).",
-      simpleHtml: `<h4>In plain words</h4>
+          disclaimer: "<b>⚠️ Leggi prima di usare questa pagina</b><ul style=\"margin:8px 0 0; padding-left:20px;\"><li><b>Strumento sperimentale, senza audit professionale.</b> L'<code>Extension4337</code> di LUKSO non è mai stata sottoposta ad audit; neanche i paymaster del sito. Usa importi piccoli.</li><li><b>Modifica la configurazione della UP su questa rete:</b> l'EntryPoint diventa un controller con permessi di chiamata e invio. Esegue solo operazioni firmate da un controller con il permesso 4337 e nei limiti dei permessi di chi firma.</li><li><b>Chi ha la chiave del controller controlla la UP</b>, con o senza questa configurazione: tieni sulla UP solo quello che sei disposto a perdere se la chiave venisse rubata.</li><li><b>Nessuna garanzia.</b> Software \"così com'è\": lo usi a tuo rischio. Nessuna affiliazione con LUKSO o altri.</li><li><b>Questa pagina non chiede mai chiavi private</b>: firmi tutto in MetaMask.</li></ul>",
+          panel1Note: "Usa il controller della UP in MetaMask (la chiave di genesi o il backup). La verifica della sezione 2 non ha bisogno di MetaMask.",
+          panel5Note: "Sola lettura: nessuna firma, nessun gas, MetaMask non serve. Bastano la rete e l'indirizzo della UP (sezione 1). Controlla la UP, l'estensione, l'EntryPoint e i controller, e alla fine se il sito paga il gas di questa UP. Il punto più importante: l'EntryPoint deve avere esattamente i permessi <code>0x000500</code> (chiamare e inviare valore, niente modifica di dati o permessi). Rifalla dopo ogni modifica alla UP e su ogni rete.",
+          panel3Title: "3 · La UP",
+          panel3Note: "Due passaggi:<br><b>1 · Pubblica l'Extension4337</b>, solo se qui sotto risulta <b>non pubblicata</b>: una volta per rete, poi vale per tutte le UP. <b>Può firmarla qualsiasi account</b>: paga solo il gas e non ottiene nessun diritto sulle UP, perché il contratto è pubblico e uguale per tutti.<br><b>2 · Configura la UP</b> con il <b>controller</b> della UP attivo in MetaMask: una sola transazione atomica del Key Manager, con un po' di gas pagato dal controller; se una parte fallisce, non cambia niente. Il controller che firma riceve il permesso 4337. Prima di firmare vedi l'elenco delle operazioni e la simulazione.",
+          revokeAfter: "La UP è tornata com'era: il sito non può più pagarne il gas su questa rete finché non la riconfiguri.",
+          doPublishExt: "→ sezione 3: «Pubblica l'Extension4337 su questa rete» (una volta per rete, qualunque account con un po' di gas)",
+          doSetup: "→ sezione 3, con il controller: «Prepara e simula la configurazione della UP», poi «Firma e invia»",
+          doRedo: "→ sezione 3, con il controller: disattiva il 4337, poi rifai la configurazione",
+          upNotSet: "inserisci la UP nella sezione 1",
+          readyDone: "✅ UP configurata. Se il sito paga il gas di questa UP lo dice l'ultima riga della verifica (sezione 2).",
+          cfgGas: "Gas pagato dal sito",
+          cfgGasListed: "sì: la UP è nella lista del gestore",
+          cfgGasOn: "sì",
+          cfgGasActive: (v) => `sì: iscrizione attiva, saldo ${v.bal} USDC (questa rete: ${v.price} USDC per operazione)`,
+          cfgGasEmpty: (v) => `iscrizione attiva, ma il saldo (${v.bal} USDC) non basta per un'operazione`,
+          cfgGasPaid: "pagamento ricevuto, in attesa di attivazione (riceverai un'email)",
+          cfgGasNone: "non ancora: la UP non è iscritta",
+          cfgGasClosed: "non ancora: le iscrizioni non sono ancora aperte",
+          cfgGasDown: "il servizio non risponde: riprova più tardi",
+          doSubscribe: "→ pagina Iscrizione (up-subscribe.html), dopo questa configurazione",
+          doTopUp: "→ ricarica dalla pagina Iscrizione (up-subscribe.html)",
+        },
+        en: {
+          pageTitle: "Gas paid by the site: UP setup — ChainIntegrate",
+          h1: "Gas paid by the site: UP setup (experimental)",
+          subtitle: "Prepare your UP so the site can pay its gas: the controller signs a message, the site's relayer sends, the site's paymaster pays. ERC-4337 (EntryPoint v0.6).",
+          simpleHtml: `<h4>In plain words</h4>
 <p>Usually every operation of the UP costs its <b>controller</b> a little gas. With <b>gas paid by the site</b> the controller only signs a message in MetaMask, with no gas: the site's relayer sends the operation and the site's paymaster pays for it.</p>
 <p>For this to work, the UP must be <b>set up once on each network</b> (this page):</p>
 <ul>
@@ -230,8 +621,8 @@ window.GAS_PAGE = {
 </ul>
 <p><b>Who pays the gas afterwards?</b> The site, for UPs with an active <a href="up-subscribe.html">subscription</a> (5 USDC of balance, charged per operation at the network's price) or on the operator's list. The setup is also needed for the subscription payment itself, whose gas the site pays.</p>
 <p><b>Then:</b> on the <a href="up-invia-fondi.html">Send</a> and <a href="up-wallet.html">UP Wallet</a> pages the option "Pay the gas with the site relayer" appears by itself.</p>`,
-      guideSummary: "Step-by-step guide",
-      guideHtml: `<h4>Once per network</h4>
+          guideSummary: "Step-by-step guide",
+          guideHtml: `<h4>Once per network</h4>
 <ol>
 <li>Section 1: choose the network and enter the UP address (or read it from the UP extension).</li>
 <li>Section 2: the check starts by itself, read-only, and says what is missing and where to do it.</li>
@@ -242,33 +633,34 @@ window.GAS_PAGE = {
 </ol>
 <h4>To turn it all off</h4>
 <ul><li>Section 3, <b>Turning 4337 off on this UP</b>: one controller transaction puts the UP back as it was.</li></ul>`,
-      disclaimer: "<b>⚠️ Read before using this page</b><ul style=\"margin:8px 0 0; padding-left:20px;\"><li><b>Experimental tool, no professional audit.</b> LUKSO's <code>Extension4337</code> has never been audited; neither have the site's paymasters. Use small amounts.</li><li><b>It changes the UP's configuration on this network:</b> the EntryPoint becomes a controller with call and value-transfer permissions. It only executes operations signed by a controller with the 4337 permission, within the signer's own permissions.</li><li><b>Whoever holds the controller key controls the UP</b>, with or without this setup: keep on the UP only what you are prepared to lose if the key were stolen.</li><li><b>No warranty.</b> Software \"as is\": use it at your own risk. No affiliation with LUKSO or anyone else.</li><li><b>This page never asks for private keys</b>: you sign everything in MetaMask.</li></ul>",
-      panel1Note: "Use the UP's controller in MetaMask (the genesis key or the backup). The check in section 2 does not need MetaMask.",
-      panel5Note: "Read-only: no signature, no gas, MetaMask not needed. It needs only the network and the UP address (section 1). It checks the UP, the extension, the EntryPoint and the controllers, and at the end whether the site pays this UP's gas. The key point: the EntryPoint must have exactly the permissions <code>0x000500</code> (call and send value, no change of data or permissions). Run it again after any change to the UP and on every network.",
-      panel3Title: "3 · The UP",
-      panel3Note: "Two steps:<br><b>1 · Publish Extension4337</b>, only if the box below says <b>not published</b>: once per network, then it serves every UP. <b>Any account can sign it</b>: it only pays the gas and gets no rights over any UP, because the contract is public and the same for everyone.<br><b>2 · Set up the UP</b> with the UP's <b>controller</b> active in MetaMask: one atomic Key Manager transaction, with a little gas paid by the controller; if any part fails, nothing changes. The signing controller receives the 4337 permission. Before signing you see the list of operations and the simulation.",
-      revokeAfter: "The UP is back as it was: the site can no longer pay its gas on this network until you set it up again.",
-      doPublishExt: "→ section 3: «Publish Extension4337 on this network» (once per network, any account with a little gas)",
-      doSetup: "→ section 3, with the controller: «Prepare and simulate the UP setup», then «Sign and send»",
-      doRedo: "→ section 3, with the controller: turn 4337 off, then set it up again",
-      upNotSet: "enter the UP in section 1",
-      readyDone: "✅ UP set up. Whether the site pays this UP's gas is in the last line of the check (section 2).",
-      cfgGas: "Gas paid by the site",
-      cfgGasListed: "yes: the UP is on the operator's list",
-      cfgGasOn: "yes",
-      cfgGasActive: (v) => `yes: subscription active, balance ${v.bal} USDC (this network: ${v.price} USDC per operation)`,
-      cfgGasEmpty: (v) => `subscription active, but the balance (${v.bal} USDC) does not cover an operation`,
-      cfgGasPaid: "payment received, waiting for activation (you will get an e-mail)",
-      cfgGasNone: "not yet: the UP is not subscribed",
-      cfgGasClosed: "not yet: subscriptions are not open yet",
-      cfgGasDown: "the service does not answer: try again later",
-      doSubscribe: "→ Subscription page (up-subscribe.html), after this setup",
-      doTopUp: "→ top up from the Subscription page (up-subscribe.html)",
-    },
-  },
-};
-</script>
-<script src="gas-relay-page.js"></script>
+          disclaimer: "<b>⚠️ Read before using this page</b><ul style=\"margin:8px 0 0; padding-left:20px;\"><li><b>Experimental tool, no professional audit.</b> LUKSO's <code>Extension4337</code> has never been audited; neither have the site's paymasters. Use small amounts.</li><li><b>It changes the UP's configuration on this network:</b> the EntryPoint becomes a controller with call and value-transfer permissions. It only executes operations signed by a controller with the 4337 permission, within the signer's own permissions.</li><li><b>Whoever holds the controller key controls the UP</b>, with or without this setup: keep on the UP only what you are prepared to lose if the key were stolen.</li><li><b>No warranty.</b> Software \"as is\": use it at your own risk. No affiliation with LUKSO or anyone else.</li><li><b>This page never asks for private keys</b>: you sign everything in MetaMask.</li></ul>",
+          panel1Note: "Use the UP's controller in MetaMask (the genesis key or the backup). The check in section 2 does not need MetaMask.",
+          panel5Note: "Read-only: no signature, no gas, MetaMask not needed. It needs only the network and the UP address (section 1). It checks the UP, the extension, the EntryPoint and the controllers, and at the end whether the site pays this UP's gas. The key point: the EntryPoint must have exactly the permissions <code>0x000500</code> (call and send value, no change of data or permissions). Run it again after any change to the UP and on every network.",
+          panel3Title: "3 · The UP",
+          panel3Note: "Two steps:<br><b>1 · Publish Extension4337</b>, only if the box below says <b>not published</b>: once per network, then it serves every UP. <b>Any account can sign it</b>: it only pays the gas and gets no rights over any UP, because the contract is public and the same for everyone.<br><b>2 · Set up the UP</b> with the UP's <b>controller</b> active in MetaMask: one atomic Key Manager transaction, with a little gas paid by the controller; if any part fails, nothing changes. The signing controller receives the 4337 permission. Before signing you see the list of operations and the simulation.",
+          revokeAfter: "The UP is back as it was: the site can no longer pay its gas on this network until you set it up again.",
+          doPublishExt: "→ section 3: «Publish Extension4337 on this network» (once per network, any account with a little gas)",
+          doSetup: "→ section 3, with the controller: «Prepare and simulate the UP setup», then «Sign and send»",
+          doRedo: "→ section 3, with the controller: turn 4337 off, then set it up again",
+          upNotSet: "enter the UP in section 1",
+          readyDone: "✅ UP set up. Whether the site pays this UP's gas is in the last line of the check (section 2).",
+          cfgGas: "Gas paid by the site",
+          cfgGasListed: "yes: the UP is on the operator's list",
+          cfgGasOn: "yes",
+          cfgGasActive: (v) => `yes: subscription active, balance ${v.bal} USDC (this network: ${v.price} USDC per operation)`,
+          cfgGasEmpty: (v) => `subscription active, but the balance (${v.bal} USDC) does not cover an operation`,
+          cfgGasPaid: "payment received, waiting for activation (you will get an e-mail)",
+          cfgGasNone: "not yet: the UP is not subscribed",
+          cfgGasClosed: "not yet: subscriptions are not open yet",
+          cfgGasDown: "the service does not answer: try again later",
+          doSubscribe: "→ Subscription page (up-subscribe.html), after this setup",
+          doTopUp: "→ top up from the Subscription page (up-subscribe.html)",
+        },
+      },
+    };
+  </script>
+  <script src="gas-relay-page.js"></script>
 
 </body>
+
 </html>
