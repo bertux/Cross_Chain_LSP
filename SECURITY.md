@@ -16,7 +16,7 @@ Please include the affected page or file, the steps to reproduce, and the impact
 - The HTML tools in the repository root, the shared scripts, and the offline script in `tools/`.
 - Our contracts in `contracts/`: `NFTReceiverExtension`, `UPPaymaster`, `UPVerifyingPaymaster`.
 - The site relayer (`tools/relayer/`) and the sponsored-gas service behind `/relay/` (its signing service is in a private repository, but reports about its behaviour are welcome).
-- The published site at https://crosschain-lukso.chainintegrate.it/.
+- The published site at https://crosschain-lukso.juglas.name/.
 
 Out of scope: vulnerabilities in the LUKSO contracts (including `Extension4337`, which we only publish), in the Universal Profile browser extension, in wallets or in public RPC providers. Please report those to their maintainers.
 

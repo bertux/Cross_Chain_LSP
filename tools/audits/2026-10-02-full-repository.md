@@ -1,7 +1,7 @@
 # Security audit — ChainIntegrate `Cross_Chain` (full repository)
 
 **Target:** `github.com/ChainIntegrate/Cross_Chain`, commit `40f0bc0a411c66cb0adf009b74edee148a0962c5` (branch `main`), full history (205 commits).
-**Published site:** `https://crosschain-lukso.chainintegrate.it/`.
+**Published site:** `https://crosschain-lukso.juglas.name/`.
 **Date:** 2026‑10‑02.
 **Prepared by:** Claude (AI assistant, Anthropic) in Claude Cowork. Settings are recorded in the signature at the end.
 
