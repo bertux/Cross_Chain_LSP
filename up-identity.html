@@ -6,12 +6,12 @@
   <script src="theme.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="referrer" content="no-referrer">
-  <title data-i18n="pageTitle">UP Identity Cross-Chain — ChainIntegrate</title>
+  <title data-i18n="pageTitle">UP Identity Cross-Chain — Bertrand Juglas</title>
   <meta name="description"
     content="Reads and displays the LSP3 profile (name, images, links) of a Universal Profile on any network where it is deployed, and compares it with LUKSO, with tokens and NFTs; can align it to LUKSO with a transaction signed by your controller.">
   <link rel="icon" href="favicon.ico">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="UP Identity Cross-Chain — ChainIntegrate">
+  <meta property="og:title" content="UP Identity Cross-Chain — Bertrand Juglas">
   <meta property="og:description"
     content="The LSP3 profile of a Universal Profile on Base, Polygon and other networks, compared with LUKSO, with tokens and NFTs, and alignable with one transaction.">
   <meta property="og:image" content="https://crosschain-lukso.juglas.name/banner.png">
@@ -485,21 +485,31 @@
 
 <body>
 
-  <div class="brand-row"><img src="banner.png" alt="ChainIntegrate" class="brand-logo"
-      onerror="this.style.display='none'"></div>
+  <div class="brand-row"><img src="banner.png" alt="banner" class="brand-logo" onerror="this.style.display='none'">
+  </div>
 
   <div class="header-row">
     <div>
       <h1 data-i18n="h1">The UP's identity on other networks</h1>
-      <div class="subtitle" data-i18n="subtitle">A Universal Profile's LSP3 profile (name, description, images, links), read on the network you choose and compared with the current one on LUKSO, with the UP's tokens and NFTs. Reading needs no wallet and no signature; only section 6, if you use it, writes the profile with a transaction signed by your controller.</div>
+      <div class="subtitle" data-i18n="subtitle">A Universal Profile's LSP3 profile (name, description, images, links),
+        read on the network you choose and compared with the current one on LUKSO, with the UP's tokens and NFTs.
+        Reading needs no wallet and no signature; only section 6, if you use it, writes the profile with a transaction
+        signed by your controller.</div>
     </div>
     <button id="langToggle" type="button">Italiano</button>
   </div>
 
   <div class="panel">
     <h2 data-i18n="panel0Title">0 · What this is</h2>
-    <div class="note" data-i18n-html="panel0Note">Your Universal Profile exists at the same address on every network where you deployed it. Its identity data sits in the UP's <b>LSP3Profile</b> key: a reference to a JSON file (usually on IPFS) with its hash. This page reads that key on the chosen network and on LUKSO, downloads the file, <b>checks that the hash matches</b> and shows the profile. A deploy on another network copies only the original creation data: there the profile is the one from the day of creation, or missing, and the page tells you.</div>
-    <div class="disclaimer" data-i18n-html="disclaimer"><b>This is ChainIntegrate's reading</b> of the UP's ERC725Y data, following the LUKSO standards (LSP2, LSP3). Base, Polygon and the other networks do not "know" what a Universal Profile is: no claim that the network, its explorers or other services recognise this profile.</div>
+    <div class="note" data-i18n-html="panel0Note">Your Universal Profile exists at the same address on every network
+      where you deployed it. Its identity data sits in the UP's <b>LSP3Profile</b> key: a reference to a JSON file
+      (usually on IPFS) with its hash. This page reads that key on the chosen network and on LUKSO, downloads the file,
+      <b>checks that the hash matches</b> and shows the profile. A deploy on another network copies only the original
+      creation data: there the profile is the one from the day of creation, or missing, and the page tells you.
+    </div>
+    <div class="disclaimer" data-i18n-html="disclaimer"><b>This is ChainIntegrate's reading</b> of the UP's ERC725Y
+      data, following the LUKSO standards (LSP2, LSP3). Base, Polygon and the other networks do not "know" what a
+      Universal Profile is: no claim that the network, its explorers or other services recognise this profile.</div>
   </div>
 
   <div class="panel">
@@ -533,27 +543,40 @@
 
   <div class="panel" id="ctrlPanel" hidden>
     <h2 data-i18n="panel4Title">4 · Who controls the UP on this network</h2>
-    <div class="note" data-i18n="panel4Note">The UP's controllers on the chosen network, what each is for, and whether there is a backup controller.</div>
+    <div class="note" data-i18n="panel4Note">The UP's controllers on the chosen network, what each is for, and whether
+      there is a backup controller.</div>
     <div class="status" id="ctrlStatus"></div>
     <div id="ctrlList"></div>
     <h3 style="font-size:13.5px; margin:18px 0 6px;" data-i18n="capTitle">What the UP can do on this network</h3>
-    <div class="note" data-i18n="capNote">Read from the UP's data on this network: each feature is enabled once per network, from the page shown.</div>
+    <div class="note" data-i18n="capNote">Read from the UP's data on this network: each feature is enabled once per
+      network, from the page shown.</div>
     <div id="capList"></div>
   </div>
 
   <div class="panel" id="pubPanel" hidden>
     <h2 data-i18n="panel6Title">6 · Align the profile with LUKSO on this network</h2>
-    <div class="note" data-i18n-html="panel6Note">Copies to this network the profile the UP has on LUKSO today: <b>one transaction</b> signed by a controller of the UP on this network, which pays the gas. It writes only the <b>LSP3Profile</b> key, with the same value as on LUKSO: the same file and the same hash. It changes neither the UP's address nor its controllers. It is not automatic: if you later change the profile on LUKSO, this network keeps this version until you publish again. It needs a controller with SUPER_SETDATA, or SETDATA with the LSP3Profile key among the allowed ones.</div>
+    <div class="note" data-i18n-html="panel6Note">Copies to this network the profile the UP has on LUKSO today: <b>one
+        transaction</b> signed by a controller of the UP on this network, which pays the gas. It writes only the
+      <b>LSP3Profile</b> key, with the same value as on LUKSO: the same file and the same hash. It changes neither the
+      UP's address nor its controllers. It is not automatic: if you later change the profile on LUKSO, this network
+      keeps this version until you publish again. It needs a controller with SUPER_SETDATA, or SETDATA with the
+      LSP3Profile key among the allowed ones.
+    </div>
     <div class="status" id="pubState"></div>
     <button id="pubConnect" class="secondary" data-i18n="pubConnectBtn">Connect the UP's controller (MetaMask)</button>
     <div class="status" id="pubSigner"></div>
-    <button id="pubBtn" class="danger" disabled data-i18n="pubBtn">Publish LUKSO's profile on this network (one transaction)</button>
+    <button id="pubBtn" class="danger" disabled data-i18n="pubBtn">Publish LUKSO's profile on this network (one
+      transaction)</button>
     <div id="pubLog"></div>
   </div>
 
   <div class="panel" id="assetPanel" hidden>
     <h2 data-i18n="panel5Title">5 · Tokens and NFTs</h2>
-    <div class="note" data-i18n-html="panel5Note">What the UP holds on each network: the network's currency, LUKSO tokens and NFTs (LSP7, LSP8) from the UP's <b>LSP5ReceivedAssets</b> list, read from the chain, and the other tokens and NFTs (ERC-20, ERC-721, ERC-1155) from an <b>indexer</b> (Alchemy or Blockscout), which can be incomplete. Contracts flagged as spam are grouped apart. No token here is verified as genuine: a name or symbol can imitate another token's.</div>
+    <div class="note" data-i18n-html="panel5Note">What the UP holds on each network: the network's currency, LUKSO
+      tokens and NFTs (LSP7, LSP8) from the UP's <b>LSP5ReceivedAssets</b> list, read from the chain, and the other
+      tokens and NFTs (ERC-20, ERC-721, ERC-1155) from an <b>indexer</b> (Alchemy or Blockscout), which can be
+      incomplete. Contracts flagged as spam are grouped apart. No token here is verified as genuine: a name or symbol
+      can imitate another token's.</div>
     <div class="cols" style="margin-top:12px;">
       <div class="assets" id="assetsNet"></div>
       <div class="assets" id="assetsLukso"></div>
@@ -562,8 +585,15 @@
 
   <div class="site-footer">
     <div class="footer-row">
-      <img src="logo.png" alt="ChainIntegrate" class="footer-logo" onerror="this.style.display='none'">
-      <div class="footer-text" data-i18n-html="footerHtml">Data &amp; blockchain integration consulting by ChainIntegrate <a href="https://www.linkedin.com/company/chainintegrate" target="_blank" rel="noopener" aria-label="LinkedIn" class="footer-li"><svg width="20" height="20" viewBox="0 0 20 20"><rect width="20" height="20" rx="4" fill="#0A66C2"/><text x="10" y="15" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#fff">in</text></svg></a> · <a href="https://t.me/Simone_1977_2" target="_blank" rel="noopener">Support via Telegram</a> · <a href="https://github.com/ChainIntegrate/Cross_Chain" target="_blank" rel="noopener">Source code on GitHub</a></div>
+      <img src="logo.png" alt="logo" class="footer-logo" onerror="this.style.display='none'">
+      <div class="footer-text" data-i18n-html="footerHtml">Data &amp; blockchain integration by
+        Bertrand Juglas <a href="https://www.linkedin.com/in/bjuglas" target="_blank" rel="noopener"
+          aria-label="LinkedIn" class="footer-li"><svg width="20" height="20" viewBox="0 0 20 20">
+            <rect width="20" height="20" rx="4" fill="#0A66C2" /><text x="10" y="15" text-anchor="middle"
+              font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#fff">in</text>
+          </svg></a> · <a href="https://t.me/bertux0x" target="_blank" rel="noopener">Support via Telegram</a> · <a
+          href="https://github.com/bertux/Cross_Chain_LSP" target="_blank" rel="noopener">Source code on GitHub</a>
+      </div>
     </div>
   </div>
 
@@ -574,7 +604,7 @@
     let LANG = "en";
     const I18N = {
       it: {
-        pageTitle: "UP Identity Cross-Chain — ChainIntegrate",
+        pageTitle: "UP Identity Cross-Chain — Bertrand Juglas",
         h1: "Identità della UP su altre reti",
         subtitle: "Il profilo LSP3 (nome, descrizione, immagini, link) di una Universal Profile, letto sulla rete che scegli e confrontato con quello attuale su LUKSO, con i token e gli NFT della UP. La lettura non usa wallet né firme; solo la sezione 6, se la usi, scrive il profilo con una transazione firmata dal tuo controller.",
         langToggleBtn: "English",
@@ -702,10 +732,10 @@
         srcIndexer: (v) => `${v.name} (indicizzatore): ${v.n} voci.`,
         srcIndexerFail: (v) => `${v.name} non raggiungibile: ${v.err}. Si vedono solo valuta e LSP5.`,
         srcNoIndexer: "Nessun indicizzatore per questa rete: si vedono solo valuta e LSP5 (token LUKSO). Per ERC-20 e NFT serve una rete coperta da Alchemy o Blockscout.",
-        footerHtml: `Servizi di consulenza in integrazione dati &amp; blockchain a cura di ChainIntegrate <a href="https://www.linkedin.com/company/chainintegrate" target="_blank" rel="noopener" aria-label="LinkedIn" class="footer-li"><svg width="20" height="20" viewBox="0 0 20 20"><rect width="20" height="20" rx="4" fill="#0A66C2"/><text x="10" y="15" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#fff">in</text></svg></a> · <a href="https://t.me/Simone_1977_2" target="_blank" rel="noopener">Assistenza via Telegram</a> · <a href="https://github.com/ChainIntegrate/Cross_Chain" target="_blank" rel="noopener">Codice sorgente su GitHub</a>`,
+        footerHtml: `Servizi di integrazione dati &amp; blockchain a cura di Bertrand Juglas <a href="https://www.linkedin.com/in/bjuglas" target="_blank" rel="noopener" aria-label="LinkedIn" class="footer-li"><svg width="20" height="20" viewBox="0 0 20 20"><rect width="20" height="20" rx="4" fill="#0A66C2"/><text x="10" y="15" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#fff">in</text></svg></a> · <a href="https://t.me/bertux0x" target="_blank" rel="noopener">Assistenza via Telegram</a> · <a href="https://github.com/bertux/Cross_Chain_LSP" target="_blank" rel="noopener">Codice sorgente su GitHub</a>`,
       },
       en: {
-        pageTitle: "UP Identity Cross-Chain — ChainIntegrate",
+        pageTitle: "UP Identity Cross-Chain — Bertrand Juglas",
         h1: "The UP's identity on other networks",
         subtitle: "A Universal Profile's LSP3 profile (name, description, images, links), read on the network you choose and compared with the current one on LUKSO, with the UP's tokens and NFTs. Reading needs no wallet and no signature; only section 6, if you use it, writes the profile with a transaction signed by your controller.",
         langToggleBtn: "Italiano",
@@ -833,7 +863,7 @@
         srcIndexer: (v) => `${v.name} (indexer): ${v.n} entries.`,
         srcIndexerFail: (v) => `${v.name} not reachable: ${v.err}. Only the currency and LSP5 are shown.`,
         srcNoIndexer: "No indexer for this network: only the currency and LSP5 (LUKSO tokens) are shown. ERC-20 and NFTs need a network covered by Alchemy or Blockscout.",
-        footerHtml: `Data &amp; blockchain integration consulting by ChainIntegrate <a href="https://www.linkedin.com/company/chainintegrate" target="_blank" rel="noopener" aria-label="LinkedIn" class="footer-li"><svg width="20" height="20" viewBox="0 0 20 20"><rect width="20" height="20" rx="4" fill="#0A66C2"/><text x="10" y="15" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#fff">in</text></svg></a> · <a href="https://t.me/Simone_1977_2" target="_blank" rel="noopener">Support via Telegram</a> · <a href="https://github.com/ChainIntegrate/Cross_Chain" target="_blank" rel="noopener">Source code on GitHub</a>`,
+        footerHtml: `Data &amp; blockchain integration by Bertrand Juglas <a href="https://www.linkedin.com/in/bjuglas" target="_blank" rel="noopener" aria-label="LinkedIn" class="footer-li"><svg width="20" height="20" viewBox="0 0 20 20"><rect width="20" height="20" rx="4" fill="#0A66C2"/><text x="10" y="15" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#fff">in</text></svg></a> · <a href="https://t.me/bertux0x" target="_blank" rel="noopener">Support via Telegram</a> · <a href="https://github.com/bertux/Cross_Chain_LSP" target="_blank" rel="noopener">Source code on GitHub</a>`,
       },
     };
     function t(key, vars) { const v = I18N[LANG][key]; return typeof v === "function" ? v(vars || {}) : v; }

@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="referrer" content="no-referrer">
   <meta name="robots" content="noindex, nofollow">
-  <title data-i18n="pageTitle">UP Wallet — ChainIntegrate</title>
+  <title data-i18n="pageTitle">UP Wallet — Bertrand Juglas</title>
   <link rel="icon" href="favicon.ico">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.4/ethers.umd.min.js"
     integrity="sha384-6Zl0Pc8zjSz8KvmNeXRvUQgY4ryFb+BwDvKCmLYcBME0joAaru491tQgi9B7zsMM" crossorigin="anonymous"
@@ -463,28 +463,68 @@
 <body>
 
   <div class="brand-row">
-    <img src="banner.png" alt="ChainIntegrate" class="brand-logo" onerror="this.style.display='none'">
+    <img src="banner.png" alt="banner" class="brand-logo" onerror="this.style.display='none'">
   </div>
 
   <div class="top-row">
     <div>
       <h1 data-i18n="h1">UP Wallet (experimental)</h1>
-      <div class="subtitle" data-i18n="subtitle">Use your Universal Profile as the account on any dApp, on any network where you deployed it: the dApp sees the UP address, your controller signs.</div>
+      <div class="subtitle" data-i18n="subtitle">Use your Universal Profile as the account on any dApp, on any network
+        where you deployed it: the dApp sees the UP address, your controller signs.</div>
     </div>
     <button class="lang-btn" id="langToggle" data-i18n="langToggleBtn">Italiano</button>
   </div>
 
   <div class="panel">
     <h2 data-i18n="panel0Title">0 · How it works</h2>
-    <div class="note" data-i18n-html="panel0Note">This page is a <b>WalletConnect bridge</b> between a dApp and your UP. The dApp sees the UP address as the account. Every <b>transaction</b> is wrapped into <code>KeyManager.execute(UP.execute(...))</code> and signed by your controller in MetaMask: the call comes from the UP and any value is paid from the UP's balance, while the controller pays the gas. Every <b>message signature</b> is made by the controller and the UP recognises it as its own (ERC-1271). First of all, the page checks that the UP and the controller are compatible on the chosen network. Every request is shown in full, checked and (for transactions) simulated; nothing happens without your click and your confirmation in MetaMask.</div>
-    <div class="warn-box" data-i18n-html="disclaimer"><b>⚠️ Read before using this page</b><ul style="margin:8px 0 0; padding-left:20px;"><li><b>Experimental tool, not audited.</b> It may contain bugs.</li><li><b>Real, irreversible transactions.</b> Nobody can undo a confirmed transaction. Use minimal amounts and always start in simulation mode.</li><li><b>The page does not know the dApps.</b> It decodes only part of the calls (standard tokens and common cases); for the rest it shows you the raw data. If you do not understand what a request does, <b>reject it</b>.</li><li><b>Message signatures.</b> A signature can authorise actions even without a transaction: logins, orders, permissions to spend tokens. The page shows the content and the result of the checks, but cannot know what the signature will be used for.</li><li><b>Token approvals stay valid</b> after you close the page: whoever receives them can move the UP's tokens until you revoke them.</li><li><b>Responsibility.</b> ChainIntegrate takes no responsibility for signatures or transactions approved on unclear content, nor for what dApps do with them. The software is provided "as is" (MIT license), without warranty: you use it at your own risk.</li><li><b>What security relies on:</b> the architecture (you always sign in your own wallet, permissions are enforced by the UP's Key Manager) and the services used (WalletConnect/Reown domain verification, the network's RPCs). The page shows the result of these checks but cannot guarantee them.</li><li><b>One controller per UP.</b> If the same controller governs several UPs, a signature valid for this UP is valid for the others too.</li><li><b>This page never asks for private keys</b> or seed phrases.</li><li><b>Privacy:</b> the WalletConnect connection goes through Reown's servers, which see the session metadata (addresses, network). Checks use the chosen network's public RPC.</li><li><b>No affiliation</b> with LUKSO, WalletConnect/Reown, MetaMask or the dApps you connect. This is not financial advice.</li></ul><div style="margin-top:8px;">Always rejected: <code>eth_sign</code> and legacy signature formats, contract creation, transactions from the UP to itself or to its own Key Manager (they could change its controllers and permissions), requests on a network other than the chosen one.</div></div>
+    <div class="note" data-i18n-html="panel0Note">This page is a <b>WalletConnect bridge</b> between a dApp and your UP.
+      The dApp sees the UP address as the account. Every <b>transaction</b> is wrapped into
+      <code>KeyManager.execute(UP.execute(...))</code> and signed by your controller in MetaMask: the call comes from
+      the UP and any value is paid from the UP's balance, while the controller pays the gas. Every <b>message
+        signature</b> is made by the controller and the UP recognises it as its own (ERC-1271). First of all, the page
+      checks that the UP and the controller are compatible on the chosen network. Every request is shown in full,
+      checked and (for transactions) simulated; nothing happens without your click and your confirmation in MetaMask.
+    </div>
+    <div class="warn-box" data-i18n-html="disclaimer"><b>⚠️ Read before using this page</b>
+      <ul style="margin:8px 0 0; padding-left:20px;">
+        <li><b>Experimental tool, not audited.</b> It may contain bugs.</li>
+        <li><b>Real, irreversible transactions.</b> Nobody can undo a confirmed transaction. Use minimal amounts and
+          always start in simulation mode.</li>
+        <li><b>The page does not know the dApps.</b> It decodes only part of the calls (standard tokens and common
+          cases); for the rest it shows you the raw data. If you do not understand what a request does, <b>reject
+            it</b>.</li>
+        <li><b>Message signatures.</b> A signature can authorise actions even without a transaction: logins, orders,
+          permissions to spend tokens. The page shows the content and the result of the checks, but cannot know what the
+          signature will be used for.</li>
+        <li><b>Token approvals stay valid</b> after you close the page: whoever receives them can move the UP's tokens
+          until you revoke them.</li>
+        <li><b>Responsibility.</b> Bertrand Juglas takes no responsibility for signatures or transactions approved on
+          unclear content, nor for what dApps do with them. The software is provided "as is" (MIT license), without
+          warranty: you use it at your own risk.</li>
+        <li><b>What security relies on:</b> the architecture (you always sign in your own wallet, permissions are
+          enforced by the UP's Key Manager) and the services used (WalletConnect/Reown domain verification, the
+          network's RPCs). The page shows the result of these checks but cannot guarantee them.</li>
+        <li><b>One controller per UP.</b> If the same controller governs several UPs, a signature valid for this UP is
+          valid for the others too.</li>
+        <li><b>This page never asks for private keys</b> or seed phrases.</li>
+        <li><b>Privacy:</b> the WalletConnect connection goes through Reown's servers, which see the session metadata
+          (addresses, network). Checks use the chosen network's public RPC.</li>
+        <li><b>No affiliation</b> with LUKSO, WalletConnect/Reown, MetaMask or the dApps you connect. This is not
+          financial advice.</li>
+      </ul>
+      <div style="margin-top:8px;">Always rejected: <code>eth_sign</code> and legacy signature formats, contract
+        creation, transactions from the UP to itself or to its own Key Manager (they could change its controllers and
+        permissions), requests on a network other than the chosen one.</div>
+    </div>
     <div class="check-row"><input type="checkbox" id="ackRisk"><label for="ackRisk"
-        style="margin:0; color: var(--text);" data-i18n="ackLabel">I have read and accept: I use this tool at my own risk.</label></div>
+        style="margin:0; color: var(--text);" data-i18n="ackLabel">I have read and accept: I use this tool at my own
+        risk.</label></div>
   </div>
 
   <div class="panel">
     <h2 data-i18n="panel1Title">1 · Network</h2>
-    <div class="note" data-i18n="panel1Note">The network where the UP is deployed and where you want to use the dApp. One network at a time: changing it closes the active WalletConnect sessions.</div>
+    <div class="note" data-i18n="panel1Note">The network where the UP is deployed and where you want to use the dApp.
+      One network at a time: changing it closes the active WalletConnect sessions.</div>
     <input type="text" id="networkFilter" data-i18n-placeholder="networkFilterPlaceholder"
       placeholder="Filter by name... (e.g. base, polygon, arbitrum)">
     <select id="network" style="margin-top:8px;"></select>
@@ -506,16 +546,21 @@
 
   <div class="panel">
     <h2 data-i18n="panel3Title">3 · Controller (MetaMask) and check</h2>
-    <div class="note" data-i18n="panel3Note">MetaMask with the UP controller's key, on the chosen network. It pays the gas: it needs some of the network's coin. The compatibility check between UP and controller starts by itself and runs again if you change network, UP, account or MetaMask's network.</div>
+    <div class="note" data-i18n="panel3Note">MetaMask with the UP controller's key, on the chosen network. It pays the
+      gas: it needs some of the network's coin. The compatibility check between UP and controller starts by itself and
+      runs again if you change network, UP, account or MetaMask's network.</div>
     <button id="connectSigner" data-i18n="connectSignerBtn">Connect MetaMask (controller)</button>
-    <div class="status-box" id="complianceBox"><span class="empty" data-i18n="complianceIdle">The check starts by itself once network, UP and MetaMask are set.</span></div>
+    <div class="status-box" id="complianceBox"><span class="empty" data-i18n="complianceIdle">The check starts by itself
+        once network, UP and MetaMask are set.</span></div>
     <button id="recheckBtn" class="secondary" data-i18n="recheckBtn">Check again</button>
     <div id="relayBox"></div>
   </div>
 
   <div class="panel">
     <h2 data-i18n="panel4Title">4 · Connect a dApp through WalletConnect</h2>
-    <div class="note" data-i18n-html="panel4Note">On the dApp choose to connect with <b>WalletConnect</b>, copy the connection link (below the QR code, it starts with <code>wc:</code>) and paste it here. It is enabled only when the check in panel 3 is green. Keep this page open while you use the dApp.</div>
+    <div class="note" data-i18n-html="panel4Note">On the dApp choose to connect with <b>WalletConnect</b>, copy the
+      connection link (below the QR code, it starts with <code>wc:</code>) and paste it here. It is enabled only when
+      the check in panel 3 is green. Keep this page open while you use the dApp.</div>
     <label for="wcUri" data-i18n="wcUriLabel">WalletConnect link (wc:...)</label>
     <input type="text" id="wcUri" placeholder="wc:...">
     <button id="pairBtn" disabled data-i18n="pairBtn">Connect</button>
@@ -527,7 +572,9 @@
     <h2 data-i18n="panel5Title">5 · Requests from the dApp</h2>
     <div class="check-row"><input type="checkbox" id="simulateOnly" checked><label for="simulateOnly" style="margin:0;"
         data-i18n="simulateOnlyLabel">Simulation only (send nothing)</label></div>
-    <div class="note" style="margin-top:6px;" data-i18n="simulateOnlyNote">When checked, transactions are checked and simulated, then the dApp is told it was a simulation: nothing is sent and nothing is spent. Message signatures cannot be simulated: they are always shown and signed only if you press "Sign the message".</div>
+    <div class="note" style="margin-top:6px;" data-i18n="simulateOnlyNote">When checked, transactions are checked and
+      simulated, then the dApp is told it was a simulation: nothing is sent and nothing is spent. Message signatures
+      cannot be simulated: they are always shown and signed only if you press "Sign the message".</div>
     <div id="requestBox" class="status-box"><span class="empty" data-i18n="noRequest">No pending request.</span></div>
     <div id="log" class="line-dim" style="margin-top:10px;"></div>
   </div>
@@ -536,14 +583,17 @@
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
       <div class="modal-head">
         <div class="modal-title" id="modalTitle"></div>
-        <div class="modal-sub" data-i18n="modalSub">Read everything before deciding: checks, warnings and request details. Nothing happens without your click and your confirmation in MetaMask. The request also stays in the page's history.</div>
+        <div class="modal-sub" data-i18n="modalSub">Read everything before deciding: checks, warnings and request
+          details. Nothing happens without your click and your confirmation in MetaMask. The request also stays in the
+          page's history.</div>
       </div>
       <div class="modal-body">
         <div class="modal-notes" id="modalNotes"></div>
         <div id="modalDetails"></div>
       </div>
       <div class="modal-foot">
-        <button id="sendBtn" class="danger" disabled hidden data-i18n="sendBtn">Sign and send the transaction (irreversible)</button>
+        <button id="sendBtn" class="danger" disabled hidden data-i18n="sendBtn">Sign and send the transaction
+          (irreversible)</button>
         <button id="signBtn" class="danger" disabled hidden data-i18n="signBtn">Sign the message for the UP</button>
         <button id="rejectBtn" class="secondary" disabled data-i18n="rejectBtn">Reject the request</button>
       </div>
@@ -557,8 +607,18 @@
 
   <div class="site-footer">
     <div class="footer-row">
-      <img src="logo.png" alt="ChainIntegrate" class="footer-logo" onerror="this.style.display='none'">
-      <div class="footer-text" data-i18n-html="footerHtml">Data &amp; blockchain integration consulting by ChainIntegrate <a href="https://www.linkedin.com/company/chainintegrate" target="_blank" rel="noopener" aria-label="LinkedIn" class="footer-li"><svg width="20" height="20" viewBox="0 0 20 20"><rect width="20" height="20" rx="4" fill="#0A66C2"/><text x="10" y="15" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#fff">in</text></svg></a> · <a href="https://t.me/Simone_1977_2" target="_blank" rel="noopener">Support via Telegram</a> · <a href="https://github.com/ChainIntegrate/Cross_Chain" target="_blank" rel="noopener">Source code on GitHub</a><br><span style="font-size:11.5px;">WalletConnect: Portions © 2025 Reown, Inc. All Rights Reserved. <a href="vendor/walletkit-1.6.0.LICENSE.md" target="_blank" rel="noopener">License</a> · <a href="vendor/walletkit-1.6.0.THIRD-PARTY.txt" target="_blank" rel="noopener">third-party components</a></span></div>
+      <img src="logo.png" alt="logo" class="footer-logo" onerror="this.style.display='none'">
+      <div class="footer-text" data-i18n-html="footerHtml">Data &amp; blockchain integration by
+        Bertrand Juglas <a href="https://www.linkedin.com/in/bjuglas" target="_blank" rel="noopener"
+          aria-label="LinkedIn" class="footer-li"><svg width="20" height="20" viewBox="0 0 20 20">
+            <rect width="20" height="20" rx="4" fill="#0A66C2" /><text x="10" y="15" text-anchor="middle"
+              font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#fff">in</text>
+          </svg></a> · <a href="https://t.me/bertux0x" target="_blank" rel="noopener">Support via Telegram</a> · <a
+          href="https://github.com/bertux/Cross_Chain_LSP" target="_blank" rel="noopener">Source code on
+          GitHub</a><br><span style="font-size:11.5px;">WalletConnect: Portions © 2025 Reown, Inc. All Rights Reserved.
+          <a href="vendor/walletkit-1.6.0.LICENSE.md" target="_blank" rel="noopener">License</a> · <a
+            href="vendor/walletkit-1.6.0.THIRD-PARTY.txt" target="_blank" rel="noopener">third-party
+            components</a></span></div>
     </div>
   </div>
 
@@ -648,13 +708,13 @@
     let LANG = "en";
     const I18N = {
       it: {
-        pageTitle: "UP Wallet — ChainIntegrate",
+        pageTitle: "UP Wallet — Bertrand Juglas",
         h1: "UP Wallet (sperimentale)",
         subtitle: "Usa la tua Universal Profile come account su qualsiasi dApp, su qualsiasi rete dove l'hai deployata: la dApp vede l'indirizzo della UP, il tuo controller firma.",
         langToggleBtn: "English",
         panel0Title: "0 · Come funziona",
         panel0Note: "Questa pagina fa da <b>ponte WalletConnect</b> tra una dApp e la tua UP. La dApp vede come account l'indirizzo della UP. Ogni <b>transazione</b> viene incapsulata in <code>KeyManager.execute(UP.execute(...))</code> e firmata dal tuo controller in MetaMask: la chiamata parte dalla UP e il valore esce dal saldo della UP, il gas lo paga il controller. Ogni <b>firma di messaggio</b> la fa il controller e la UP la riconosce come propria (ERC-1271). Prima di tutto la pagina verifica che UP e controller siano compatibili sulla rete scelta. Ogni richiesta viene mostrata per intero, controllata e (per le transazioni) simulata; niente parte senza il tuo clic e la tua conferma in MetaMask.",
-        disclaimer: "<b>⚠️ Leggi prima di usare questa pagina</b><ul style=\"margin:8px 0 0; padding-left:20px;\"><li><b>Strumento sperimentale, non sottoposto ad audit.</b> Può contenere errori.</li><li><b>Transazioni reali e irreversibili.</b> Nessuno può annullare una transazione confermata. Usa importi minimi e parti sempre in modalità simulazione.</li><li><b>La pagina non conosce le dApp.</b> Decodifica solo una parte delle chiamate (token standard e casi comuni); per il resto ti mostra i dati grezzi. Se non capisci cosa fa una richiesta, <b>rifiutala</b>.</li><li><b>Firme di messaggi.</b> Una firma può autorizzare azioni anche senza transazione: accessi, ordini, permessi a spendere token. La pagina mostra il contenuto e l'esito dei controlli, ma non può sapere a cosa servirà la firma.</li><li><b>Le approvazioni di token restano valide</b> anche dopo aver chiuso la pagina: chi le riceve può spostare i token della UP finché non le revochi.</li><li><b>Responsabilità.</b> ChainIntegrate non si assume alcuna responsabilità per firme o transazioni approvate su contenuto poco chiaro, né per l'uso che le dApp ne fanno. Il software è fornito \"così com'è\" (licenza MIT), senza garanzie: lo usi a tuo rischio.</li><li><b>Da cosa dipende la sicurezza:</b> dall'architettura (firmi sempre tu nel tuo wallet, i permessi li applica il Key Manager della UP) e dai servizi usati (la verifica del dominio di WalletConnect/Reown, gli RPC della rete). La pagina mostra l'esito di queste verifiche ma non può garantirle.</li><li><b>Un controller per ogni UP.</b> Se lo stesso controller governa più UP, una firma valida per questa UP vale anche per le altre.</li><li><b>Questa pagina non chiede mai chiavi private</b> né seed phrase.</li><li><b>Privacy:</b> la connessione WalletConnect passa dai server di Reown, che vedono i metadati della sessione (indirizzi, rete). Le verifiche usano l'RPC pubblico della rete scelta.</li><li><b>Nessuna affiliazione</b> con LUKSO, WalletConnect/Reown, MetaMask o le dApp che colleghi. Non è una consulenza finanziaria.</li></ul><div style=\"margin-top:8px;\">Sempre rifiutati: <code>eth_sign</code> e i formati di firma vecchi, la creazione di contratti, le transazioni della UP verso se stessa o verso il proprio Key Manager (potrebbero cambiarne controller e permessi), le richieste su una rete diversa da quella scelta.</div>",
+        disclaimer: "<b>⚠️ Leggi prima di usare questa pagina</b><ul style=\"margin:8px 0 0; padding-left:20px;\"><li><b>Strumento sperimentale, non sottoposto ad audit.</b> Può contenere errori.</li><li><b>Transazioni reali e irreversibili.</b> Nessuno può annullare una transazione confermata. Usa importi minimi e parti sempre in modalità simulazione.</li><li><b>La pagina non conosce le dApp.</b> Decodifica solo una parte delle chiamate (token standard e casi comuni); per il resto ti mostra i dati grezzi. Se non capisci cosa fa una richiesta, <b>rifiutala</b>.</li><li><b>Firme di messaggi.</b> Una firma può autorizzare azioni anche senza transazione: accessi, ordini, permessi a spendere token. La pagina mostra il contenuto e l'esito dei controlli, ma non può sapere a cosa servirà la firma.</li><li><b>Le approvazioni di token restano valide</b> anche dopo aver chiuso la pagina: chi le riceve può spostare i token della UP finché non le revochi.</li><li><b>Responsabilità.</b> Bertrand Juglas non si assume alcuna responsabilità per firme o transazioni approvate su contenuto poco chiaro, né per l'uso che le dApp ne fanno. Il software è fornito \"così com'è\" (licenza MIT), senza garanzie: lo usi a tuo rischio.</li><li><b>Da cosa dipende la sicurezza:</b> dall'architettura (firmi sempre tu nel tuo wallet, i permessi li applica il Key Manager della UP) e dai servizi usati (la verifica del dominio di WalletConnect/Reown, gli RPC della rete). La pagina mostra l'esito di queste verifiche ma non può garantirle.</li><li><b>Un controller per ogni UP.</b> Se lo stesso controller governa più UP, una firma valida per questa UP vale anche per le altre.</li><li><b>Questa pagina non chiede mai chiavi private</b> né seed phrase.</li><li><b>Privacy:</b> la connessione WalletConnect passa dai server di Reown, che vedono i metadati della sessione (indirizzi, rete). Le verifiche usano l'RPC pubblico della rete scelta.</li><li><b>Nessuna affiliazione</b> con LUKSO, WalletConnect/Reown, MetaMask o le dApp che colleghi. Non è una consulenza finanziaria.</li></ul><div style=\"margin-top:8px;\">Sempre rifiutati: <code>eth_sign</code> e i formati di firma vecchi, la creazione di contratti, le transazioni della UP verso se stessa o verso il proprio Key Manager (potrebbero cambiarne controller e permessi), le richieste su una rete diversa da quella scelta.</div>",
         ackLabel: "Ho letto e accetto: uso questo strumento a mio rischio.",
         ackRequired: "Prima accetta le condizioni nel pannello 0.",
         panel1Title: "1 · Rete",
@@ -823,16 +883,16 @@
         signInvalid: (v) => `❌ La UP NON riconosce la firma (risposta ${v.r}): non viene inviata alla dApp.`,
         ctText: "testo leggibile", ctOpaque: "dati non leggibili (hash o binario)", ctTyped: "dati strutturati EIP-712",
 
-        footerHtml: `Servizi di consulenza in integrazione dati &amp; blockchain a cura di ChainIntegrate <a href="https://www.linkedin.com/company/chainintegrate" target="_blank" rel="noopener" aria-label="LinkedIn" class="footer-li"><svg width="20" height="20" viewBox="0 0 20 20"><rect width="20" height="20" rx="4" fill="#0A66C2"/><text x="10" y="15" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#fff">in</text></svg></a> · <a href="https://t.me/Simone_1977_2" target="_blank" rel="noopener">Assistenza via Telegram</a> · <a href="https://github.com/ChainIntegrate/Cross_Chain" target="_blank" rel="noopener">Codice sorgente su GitHub</a><br><span style="font-size:11.5px;">WalletConnect: Portions © 2025 Reown, Inc. All Rights Reserved. <a href="vendor/walletkit-1.6.0.LICENSE.md" target="_blank" rel="noopener">Licenza</a> · <a href="vendor/walletkit-1.6.0.THIRD-PARTY.txt" target="_blank" rel="noopener">componenti di terzi</a></span>`,
+        footerHtml: `Servizi di integrazione dati &amp; blockchain a cura di Bertrand Juglas <a href="https://www.linkedin.com/in/bjuglas" target="_blank" rel="noopener" aria-label="LinkedIn" class="footer-li"><svg width="20" height="20" viewBox="0 0 20 20"><rect width="20" height="20" rx="4" fill="#0A66C2"/><text x="10" y="15" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#fff">in</text></svg></a> · <a href="https://t.me/bertux0x" target="_blank" rel="noopener">Assistenza via Telegram</a> · <a href="https://github.com/bertux/Cross_Chain_LSP" target="_blank" rel="noopener">Codice sorgente su GitHub</a><br><span style="font-size:11.5px;">WalletConnect: Portions © 2025 Reown, Inc. All Rights Reserved. <a href="vendor/walletkit-1.6.0.LICENSE.md" target="_blank" rel="noopener">Licenza</a> · <a href="vendor/walletkit-1.6.0.THIRD-PARTY.txt" target="_blank" rel="noopener">componenti di terzi</a></span>`,
       },
       en: {
-        pageTitle: "UP Wallet — ChainIntegrate",
+        pageTitle: "UP Wallet — Bertrand Juglas",
         h1: "UP Wallet (experimental)",
         subtitle: "Use your Universal Profile as the account on any dApp, on any network where you deployed it: the dApp sees the UP address, your controller signs.",
         langToggleBtn: "Italiano",
         panel0Title: "0 · How it works",
         panel0Note: "This page is a <b>WalletConnect bridge</b> between a dApp and your UP. The dApp sees the UP address as the account. Every <b>transaction</b> is wrapped into <code>KeyManager.execute(UP.execute(...))</code> and signed by your controller in MetaMask: the call comes from the UP and any value is paid from the UP's balance, while the controller pays the gas. Every <b>message signature</b> is made by the controller and the UP recognises it as its own (ERC-1271). First of all, the page checks that the UP and the controller are compatible on the chosen network. Every request is shown in full, checked and (for transactions) simulated; nothing happens without your click and your confirmation in MetaMask.",
-        disclaimer: "<b>⚠️ Read before using this page</b><ul style=\"margin:8px 0 0; padding-left:20px;\"><li><b>Experimental tool, not audited.</b> It may contain bugs.</li><li><b>Real, irreversible transactions.</b> Nobody can undo a confirmed transaction. Use minimal amounts and always start in simulation mode.</li><li><b>The page does not know the dApps.</b> It decodes only part of the calls (standard tokens and common cases); for the rest it shows you the raw data. If you do not understand what a request does, <b>reject it</b>.</li><li><b>Message signatures.</b> A signature can authorise actions even without a transaction: logins, orders, permissions to spend tokens. The page shows the content and the result of the checks, but cannot know what the signature will be used for.</li><li><b>Token approvals stay valid</b> after you close the page: whoever receives them can move the UP's tokens until you revoke them.</li><li><b>Responsibility.</b> ChainIntegrate takes no responsibility for signatures or transactions approved on unclear content, nor for what dApps do with them. The software is provided \"as is\" (MIT license), without warranty: you use it at your own risk.</li><li><b>What security relies on:</b> the architecture (you always sign in your own wallet, permissions are enforced by the UP's Key Manager) and the services used (WalletConnect/Reown domain verification, the network's RPCs). The page shows the result of these checks but cannot guarantee them.</li><li><b>One controller per UP.</b> If the same controller governs several UPs, a signature valid for this UP is valid for the others too.</li><li><b>This page never asks for private keys</b> or seed phrases.</li><li><b>Privacy:</b> the WalletConnect connection goes through Reown's servers, which see the session metadata (addresses, network). Checks use the chosen network's public RPC.</li><li><b>No affiliation</b> with LUKSO, WalletConnect/Reown, MetaMask or the dApps you connect. This is not financial advice.</li></ul><div style=\"margin-top:8px;\">Always rejected: <code>eth_sign</code> and legacy signature formats, contract creation, transactions from the UP to itself or to its own Key Manager (they could change its controllers and permissions), requests on a network other than the chosen one.</div>",
+        disclaimer: "<b>⚠️ Read before using this page</b><ul style=\"margin:8px 0 0; padding-left:20px;\"><li><b>Experimental tool, not audited.</b> It may contain bugs.</li><li><b>Real, irreversible transactions.</b> Nobody can undo a confirmed transaction. Use minimal amounts and always start in simulation mode.</li><li><b>The page does not know the dApps.</b> It decodes only part of the calls (standard tokens and common cases); for the rest it shows you the raw data. If you do not understand what a request does, <b>reject it</b>.</li><li><b>Message signatures.</b> A signature can authorise actions even without a transaction: logins, orders, permissions to spend tokens. The page shows the content and the result of the checks, but cannot know what the signature will be used for.</li><li><b>Token approvals stay valid</b> after you close the page: whoever receives them can move the UP's tokens until you revoke them.</li><li><b>Responsibility.</b> Bertrand Juglas takes no responsibility for signatures or transactions approved on unclear content, nor for what dApps do with them. The software is provided \"as is\" (MIT license), without warranty: you use it at your own risk.</li><li><b>What security relies on:</b> the architecture (you always sign in your own wallet, permissions are enforced by the UP's Key Manager) and the services used (WalletConnect/Reown domain verification, the network's RPCs). The page shows the result of these checks but cannot guarantee them.</li><li><b>One controller per UP.</b> If the same controller governs several UPs, a signature valid for this UP is valid for the others too.</li><li><b>This page never asks for private keys</b> or seed phrases.</li><li><b>Privacy:</b> the WalletConnect connection goes through Reown's servers, which see the session metadata (addresses, network). Checks use the chosen network's public RPC.</li><li><b>No affiliation</b> with LUKSO, WalletConnect/Reown, MetaMask or the dApps you connect. This is not financial advice.</li></ul><div style=\"margin-top:8px;\">Always rejected: <code>eth_sign</code> and legacy signature formats, contract creation, transactions from the UP to itself or to its own Key Manager (they could change its controllers and permissions), requests on a network other than the chosen one.</div>",
         ackLabel: "I have read and accept: I use this tool at my own risk.",
         ackRequired: "Accept the conditions in panel 0 first.",
         panel1Title: "1 · Network",
@@ -997,7 +1057,7 @@
         signInvalid: (v) => `❌ The UP does NOT recognise the signature (answer ${v.r}): it is not sent to the dApp.`,
         ctText: "readable text", ctOpaque: "unreadable data (hash or binary)", ctTyped: "EIP-712 structured data",
 
-        footerHtml: `Data &amp; blockchain integration consulting by ChainIntegrate <a href="https://www.linkedin.com/company/chainintegrate" target="_blank" rel="noopener" aria-label="LinkedIn" class="footer-li"><svg width="20" height="20" viewBox="0 0 20 20"><rect width="20" height="20" rx="4" fill="#0A66C2"/><text x="10" y="15" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#fff">in</text></svg></a> · <a href="https://t.me/Simone_1977_2" target="_blank" rel="noopener">Support via Telegram</a> · <a href="https://github.com/ChainIntegrate/Cross_Chain" target="_blank" rel="noopener">Source code on GitHub</a><br><span style="font-size:11.5px;">WalletConnect: Portions © 2025 Reown, Inc. All Rights Reserved. <a href="vendor/walletkit-1.6.0.LICENSE.md" target="_blank" rel="noopener">License</a> · <a href="vendor/walletkit-1.6.0.THIRD-PARTY.txt" target="_blank" rel="noopener">third-party components</a></span>`,
+        footerHtml: `Data &amp; blockchain integration by Bertrand Juglas <a href="https://www.linkedin.com/in/bjuglas" target="_blank" rel="noopener" aria-label="LinkedIn" class="footer-li"><svg width="20" height="20" viewBox="0 0 20 20"><rect width="20" height="20" rx="4" fill="#0A66C2"/><text x="10" y="15" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#fff">in</text></svg></a> · <a href="https://t.me/bertux0x" target="_blank" rel="noopener">Support via Telegram</a> · <a href="https://github.com/bertux/Cross_Chain_LSP" target="_blank" rel="noopener">Source code on GitHub</a><br><span style="font-size:11.5px;">WalletConnect: Portions © 2025 Reown, Inc. All Rights Reserved. <a href="vendor/walletkit-1.6.0.LICENSE.md" target="_blank" rel="noopener">License</a> · <a href="vendor/walletkit-1.6.0.THIRD-PARTY.txt" target="_blank" rel="noopener">third-party components</a></span>`,
       },
     };
 

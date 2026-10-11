@@ -148,4 +148,4 @@ Released under the [MIT License](LICENSE), with these exceptions:
 
 The software is provided "as is", without warranty of any kind: these tools prepare irreversible on-chain transactions, and you use them at your own risk.
 
-The site relayer in `tools/relayer/` is run by ChainIntegrate. It relays the operations of the UPs on the allowlist paymaster's list and of the UPs with an active subscription (sponsor paymaster, `up-subscribe.html`). Both are experimental and offered as they are.
+The site relayer in `tools/relayer/` is run by Bertrand Juglas. It relays the operations of the UPs on the allowlist paymaster's list and of the UPs with an active subscription (sponsor paymaster, `up-subscribe.html`). Both are experimental and offered as they are.

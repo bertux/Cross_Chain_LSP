@@ -66,7 +66,7 @@ which node       # e.g. /usr/bin/node: not under /root or /home (the service can
 
 ```bash
 sudo useradd --system --no-create-home --shell /usr/sbin/nologin up-relayer
-sudo git clone --filter=blob:none --no-checkout https://github.com/ChainIntegrate/Cross_Chain.git /opt/crosschain-relayer
+sudo git clone --filter=blob:none --no-checkout https://github.com/bertux/Cross_Chain_LSP.git /opt/crosschain-relayer
 cd /opt/crosschain-relayer
 sudo git sparse-checkout set --no-cone '/tools/relayer/'
 sudo git checkout main

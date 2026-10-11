@@ -6,18 +6,18 @@
   <script src="theme.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="referrer" content="no-referrer">
-  <title data-i18n="pageTitle">UP Deploy — Verify Only — ChainIntegrate</title>
+  <title data-i18n="pageTitle">UP Deploy — Verify Only — Bertrand Juglas</title>
   <meta name="description"
     content="Read-only verification of whether your LUKSO Universal Profile can be correctly redeployed on another network — no wallet connection required.">
   <link rel="icon" href="favicon.ico">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="UP Deploy — Verify Only — ChainIntegrate">
+  <meta property="og:title" content="UP Deploy — Verify Only — Bertrand Juglas">
   <meta property="og:description"
     content="Read-only verification of whether your LUKSO Universal Profile can be correctly redeployed on another network.">
   <meta property="og:image" content="https://crosschain-lukso.juglas.name/banner.png">
   <meta property="og:url" content="https://crosschain-lukso.juglas.name/up-verify-only.html">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="UP Deploy — Verify Only — ChainIntegrate">
+  <meta name="twitter:title" content="UP Deploy — Verify Only — Bertrand Juglas">
   <meta name="twitter:description"
     content="Read-only verification of whether your LUKSO Universal Profile can be correctly redeployed on another network.">
   <meta name="twitter:image" content="https://crosschain-lukso.juglas.name/banner.png">
@@ -271,27 +271,36 @@
 <body>
 
   <div class="brand-row">
-    <img src="banner.png" alt="ChainIntegrate" class="brand-logo" onerror="this.style.display='none'">
+    <img src="banner.png" alt="banner" class="brand-logo" onerror="this.style.display='none'">
   </div>
 
   <div class="top-row">
     <div>
       <h1 data-i18n="h1">UP Deploy — Verify Only</h1>
-      <div class="subtitle" data-i18n="subtitle">Check, without signing or spending anything, whether a Universal Profile is correctly deployed on a network, starting from its original calldata. Read-only — no signature required.</div>
+      <div class="subtitle" data-i18n="subtitle">Check, without signing or spending anything, whether a Universal
+        Profile is correctly deployed on a network, starting from its original calldata. Read-only — no signature
+        required.</div>
     </div>
     <button class="lang-btn" id="langToggle" data-i18n="langToggleBtn">Italiano</button>
   </div>
 
   <div class="panel">
     <h2 data-i18n="panel0Title">0 · How this page works</h2>
-    <div class="note" data-i18n-html="panel0Note">This page never signs or sends any transaction: it only queries a public RPC in read mode, to tell you whether, starting from a given calldata, a valid deploy already exists on a given network. Connecting your Universal Profile below is <b>optional</b> — it's purely a convenience, to auto-fill the "Expected UP address" field with your address instead of copying it by hand from an explorer or the extension. You can also leave it blank, or enter any other address, to check the deploy of a profile that isn't yours.</div>
+    <div class="note" data-i18n-html="panel0Note">This page never signs or sends any transaction: it only queries a
+      public RPC in read mode, to tell you whether, starting from a given calldata, a valid deploy already exists on a
+      given network. Connecting your Universal Profile below is <b>optional</b> — it's purely a convenience, to
+      auto-fill the "Expected UP address" field with your address instead of copying it by hand from an explorer or the
+      extension. You can also leave it blank, or enter any other address, to check the deploy of a profile that isn't
+      yours.</div>
   </div>
 
   <div class="panel">
     <h2 data-i18n="panel1Title">1 · Data</h2>
     <button id="connectUp" class="secondary" data-i18n="connectUpBtn">Connect your Universal Profile</button>
     <div class="status-box" id="upStatus"><span class="empty" data-i18n="notConnected">Not connected.</span></div>
-    <div class="note" style="margin-top:10px;" data-i18n="connectUpNote">Only used to conveniently fill the field below with your address — no signature or transaction happens at this point. You can also enter any address manually, without connecting anything.</div>
+    <div class="note" style="margin-top:10px;" data-i18n="connectUpNote">Only used to conveniently fill the field below
+      with your address — no signature or transaction happens at this point. You can also enter any address manually,
+      without connecting anything.</div>
     <label data-i18n="expectedAddressLabel">Expected UP address</label>
     <input type="text" id="expectedAddress" placeholder="0x...">
     <label data-i18n="calldataLabel">Original deploy calldata (0x6a66a753...)</label>
@@ -319,8 +328,15 @@
 
   <div class="site-footer">
     <div class="footer-row">
-      <img src="logo.png" alt="ChainIntegrate" class="footer-logo" onerror="this.style.display='none'">
-      <div class="footer-text" data-i18n-html="footerHtml">Data &amp; blockchain integration consulting by ChainIntegrate <a href="https://www.linkedin.com/company/chainintegrate" target="_blank" rel="noopener" aria-label="LinkedIn" class="footer-li"><svg width="20" height="20" viewBox="0 0 20 20"><rect width="20" height="20" rx="4" fill="#0A66C2"/><text x="10" y="15" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#fff">in</text></svg></a> · <a href="https://t.me/Simone_1977_2" target="_blank" rel="noopener">Support via Telegram</a> · <a href="https://github.com/ChainIntegrate/Cross_Chain" target="_blank" rel="noopener">Source code on GitHub</a></div>
+      <img src="logo.png" alt="logo" class="footer-logo" onerror="this.style.display='none'">
+      <div class="footer-text" data-i18n-html="footerHtml">Data &amp; blockchain integration by
+        Bertrand Juglas <a href="https://www.linkedin.com/in/bjuglas" target="_blank" rel="noopener"
+          aria-label="LinkedIn" class="footer-li"><svg width="20" height="20" viewBox="0 0 20 20">
+            <rect width="20" height="20" rx="4" fill="#0A66C2" /><text x="10" y="15" text-anchor="middle"
+              font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#fff">in</text>
+          </svg></a> · <a href="https://t.me/bertux0x" target="_blank" rel="noopener">Support via Telegram</a> · <a
+          href="https://github.com/bertux/Cross_Chain_LSP" target="_blank" rel="noopener">Source code on GitHub</a>
+      </div>
     </div>
   </div>
 
@@ -335,7 +351,7 @@
 
     const I18N = {
       it: {
-        pageTitle: "UP Deploy — Verify Only — ChainIntegrate",
+        pageTitle: "UP Deploy — Verify Only — Bertrand Juglas",
         h1: "UP Deploy — Sola Verifica",
         subtitle: "Controlla, senza firmare né spendere nulla, se una Universal Profile risulta correttamente deployata su una rete a partire dalla sua calldata originale. Solo lettura — nessuna firma richiesta.",
         langToggleBtn: "English",
@@ -408,10 +424,10 @@
         rpcChainMismatchErr: (v) => `❌ L'RPC risponde con chainId ${v.rpcChainId}, ma la rete selezionata è ${v.netName} (chainId ${v.chainId}): il risultato non sarebbe affidabile.`,
         invalidExpectedErr: "❌ L'indirizzo UP atteso non è un indirizzo valido.",
 
-        footerHtml: `Servizi di consulenza in integrazione dati &amp; blockchain a cura di ChainIntegrate <a href="https://www.linkedin.com/company/chainintegrate" target="_blank" rel="noopener" aria-label="LinkedIn" class="footer-li"><svg width="20" height="20" viewBox="0 0 20 20"><rect width="20" height="20" rx="4" fill="#0A66C2"/><text x="10" y="15" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#fff">in</text></svg></a> · <a href="https://t.me/Simone_1977_2" target="_blank" rel="noopener">Assistenza via Telegram</a> · <a href="https://github.com/ChainIntegrate/Cross_Chain" target="_blank" rel="noopener">Codice sorgente su GitHub</a>`,
+        footerHtml: `Servizi di integrazione dati &amp; blockchain a cura di Bertrand Juglas <a href="https://www.linkedin.com/in/bjuglas" target="_blank" rel="noopener" aria-label="LinkedIn" class="footer-li"><svg width="20" height="20" viewBox="0 0 20 20"><rect width="20" height="20" rx="4" fill="#0A66C2"/><text x="10" y="15" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#fff">in</text></svg></a> · <a href="https://t.me/bertux0x" target="_blank" rel="noopener">Assistenza via Telegram</a> · <a href="https://github.com/bertux/Cross_Chain_LSP" target="_blank" rel="noopener">Codice sorgente su GitHub</a>`,
       },
       en: {
-        pageTitle: "UP Deploy — Verify Only — ChainIntegrate",
+        pageTitle: "UP Deploy — Verify Only — Bertrand Juglas",
         h1: "UP Deploy — Verify Only",
         subtitle: "Check, without signing or spending anything, whether a Universal Profile is correctly deployed on a network, starting from its original calldata. Read-only — no signature required.",
         langToggleBtn: "Italiano",
@@ -484,7 +500,7 @@
         rpcChainMismatchErr: (v) => `❌ The RPC answers with chainId ${v.rpcChainId}, but the selected network is ${v.netName} (chainId ${v.chainId}): the result would not be reliable.`,
         invalidExpectedErr: "❌ The expected UP address is not a valid address.",
 
-        footerHtml: `Data &amp; blockchain integration consulting by ChainIntegrate <a href="https://www.linkedin.com/company/chainintegrate" target="_blank" rel="noopener" aria-label="LinkedIn" class="footer-li"><svg width="20" height="20" viewBox="0 0 20 20"><rect width="20" height="20" rx="4" fill="#0A66C2"/><text x="10" y="15" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#fff">in</text></svg></a> · <a href="https://t.me/Simone_1977_2" target="_blank" rel="noopener">Support via Telegram</a> · <a href="https://github.com/ChainIntegrate/Cross_Chain" target="_blank" rel="noopener">Source code on GitHub</a>`,
+        footerHtml: `Data &amp; blockchain integration by Bertrand Juglas <a href="https://www.linkedin.com/in/bjuglas" target="_blank" rel="noopener" aria-label="LinkedIn" class="footer-li"><svg width="20" height="20" viewBox="0 0 20 20"><rect width="20" height="20" rx="4" fill="#0A66C2"/><text x="10" y="15" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#fff">in</text></svg></a> · <a href="https://t.me/bertux0x" target="_blank" rel="noopener">Support via Telegram</a> · <a href="https://github.com/bertux/Cross_Chain_LSP" target="_blank" rel="noopener">Source code on GitHub</a>`,
       },
     };
 

@@ -22,7 +22,7 @@ Out of scope: vulnerabilities in the LUKSO contracts (including `Extension4337`,
 
 ## What we will never ask you
 
-ChainIntegrate will **never** ask for a private key, seed phrase or backup password: not by email, Telegram, GitHub or any other channel. Anyone who does is attempting a scam.
+Bertrand Juglas will **never** ask for a private key, seed phrase or backup password: not by email, Telegram, GitHub or any other channel. Anyone who does is attempting a scam.
 
 ## Past audits
 

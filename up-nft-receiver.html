@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="referrer" content="no-referrer">
   <meta name="robots" content="noindex, nofollow">
-  <title data-i18n="pageTitle">NFT reception on the UP — ChainIntegrate</title>
+  <title data-i18n="pageTitle">NFT reception on the UP — Bertrand Juglas</title>
   <link rel="icon" href="favicon.ico">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.4/ethers.umd.min.js"
     integrity="sha384-6Zl0Pc8zjSz8KvmNeXRvUQgY4ryFb+BwDvKCmLYcBME0joAaru491tQgi9B7zsMM" crossorigin="anonymous"
@@ -327,23 +327,48 @@
 <body>
 
   <div class="brand-row">
-    <img src="banner.png" alt="ChainIntegrate" class="brand-logo" onerror="this.style.display='none'">
+    <img src="banner.png" alt="banner" class="brand-logo" onerror="this.style.display='none'">
   </div>
 
   <div class="top-row">
     <div>
       <h1 data-i18n="h1">NFT reception on the UP (experimental)</h1>
-      <div class="subtitle" data-i18n="subtitle">Let your Universal Profile receive ERC-721 and ERC-1155 NFTs on a network where you redeployed it (for example purchases on OpenSea).</div>
+      <div class="subtitle" data-i18n="subtitle">Let your Universal Profile receive ERC-721 and ERC-1155 NFTs on a
+        network where you redeployed it (for example purchases on OpenSea).</div>
     </div>
     <button class="lang-btn" id="langToggle" data-i18n="langToggleBtn">Italiano</button>
   </div>
 
   <div class="panel">
     <h2 data-i18n="panel0Title">0 · How it works</h2>
-    <div class="note" data-i18n-html="panel0Note">When a standard NFT is delivered with a "safe transfer", the token contract asks the recipient whether it can receive it. A UP answers only through an <b>extension</b> (LSP17) registered in its data; redeployed UPs usually have none, so purchases fail ("wallet cannot receive").<br><br>This page: <b>(1)</b> if needed, takes you to the publishing page to publish on the network the <code>NFTReceiverExtension</code>, a minimal contract with no owner, data or funds, always at the same address on every network; <b>(2)</b> registers it on the UP with <b>a single atomic Key Manager transaction</b>: it grants the controller the permission to add extensions, registers the extension, and sets the controller's permissions back to <b>exactly</b> what they were. If any part fails, nothing changes. Before signing you see the list of operations and the simulation result.</div>
-    <div class="warn-box" data-i18n-html="disclaimer"><b>⚠️ Read before using this page</b><ul style="margin:8px 0 0; padding-left:20px;"><li><b>Experimental tool, not externally audited.</b> Real, irreversible transactions.</li><li><b>It changes the UP's configuration on this network:</b> it adds the extension keys to receive NFTs (repeat it on other networks). The controller's permissions stay the same as before.</li><li><b>The extension</b> answers only NFT-reception calls and <code>supportsInterface</code>: the UP calls it with a normal call, so it cannot read or change the UP's data or funds. Source, bytecode and verification steps are in the repository's <code>contracts/</code> folder.</li><li><b>Receiving NFTs</b> also means being able to receive unwanted NFTs (spam): never give approvals or signatures for NFTs you do not know.</li><li><b>No warranty.</b> Software "as is" (MIT license): you use it at your own risk. ChainIntegrate is not liable for any loss or damage. No affiliation with LUKSO or others.</li><li><b>This page never asks for private keys</b>: you sign everything in MetaMask.</li></ul></div>
+    <div class="note" data-i18n-html="panel0Note">When a standard NFT is delivered with a "safe transfer", the token
+      contract asks the recipient whether it can receive it. A UP answers only through an <b>extension</b> (LSP17)
+      registered in its data; redeployed UPs usually have none, so purchases fail ("wallet cannot receive").<br><br>This
+      page: <b>(1)</b> if needed, takes you to the publishing page to publish on the network the
+      <code>NFTReceiverExtension</code>, a minimal contract with no owner, data or funds, always at the same address on
+      every network; <b>(2)</b> registers it on the UP with <b>a single atomic Key Manager transaction</b>: it grants
+      the controller the permission to add extensions, registers the extension, and sets the controller's permissions
+      back to <b>exactly</b> what they were. If any part fails, nothing changes. Before signing you see the list of
+      operations and the simulation result.
+    </div>
+    <div class="warn-box" data-i18n-html="disclaimer"><b>⚠️ Read before using this page</b>
+      <ul style="margin:8px 0 0; padding-left:20px;">
+        <li><b>Experimental tool, not externally audited.</b> Real, irreversible transactions.</li>
+        <li><b>It changes the UP's configuration on this network:</b> it adds the extension keys to receive NFTs (repeat
+          it on other networks). The controller's permissions stay the same as before.</li>
+        <li><b>The extension</b> answers only NFT-reception calls and <code>supportsInterface</code>: the UP calls it
+          with a normal call, so it cannot read or change the UP's data or funds. Source, bytecode and verification
+          steps are in the repository's <code>contracts/</code> folder.</li>
+        <li><b>Receiving NFTs</b> also means being able to receive unwanted NFTs (spam): never give approvals or
+          signatures for NFTs you do not know.</li>
+        <li><b>No warranty.</b> Software "as is" (MIT license): you use it at your own risk. Bertrand Juglas is not
+          liable for any loss or damage. No affiliation with LUKSO or others.</li>
+        <li><b>This page never asks for private keys</b>: you sign everything in MetaMask.</li>
+      </ul>
+    </div>
     <div class="check-row"><input type="checkbox" id="ackRisk"><label for="ackRisk"
-        style="margin:0; color: var(--text);" data-i18n="ackLabel">I have read and accept: I use this tool at my own risk.</label></div>
+        style="margin:0; color: var(--text);" data-i18n="ackLabel">I have read and accept: I use this tool at my own
+        risk.</label></div>
   </div>
 
   <div class="panel">
@@ -368,28 +393,42 @@
 
   <div class="panel">
     <h2 data-i18n="panel3Title">3 · Controller (MetaMask) and check</h2>
-    <div class="note" data-i18n="panel3Note">MetaMask with the UP controller's key, on the chosen network. It pays the gas. The check starts by itself and runs again if you change network, UP, account or MetaMask's network.</div>
+    <div class="note" data-i18n="panel3Note">MetaMask with the UP controller's key, on the chosen network. It pays the
+      gas. The check starts by itself and runs again if you change network, UP, account or MetaMask's network.</div>
     <button id="connectSigner" data-i18n="connectSignerBtn">Connect MetaMask (controller)</button>
-    <div class="status-box" id="checkBox"><span class="empty" data-i18n="checkIdle">The check starts by itself once network, UP and MetaMask are set.</span></div>
+    <div class="status-box" id="checkBox"><span class="empty" data-i18n="checkIdle">The check starts by itself once
+        network, UP and MetaMask are set.</span></div>
     <button id="recheckBtn" class="secondary" data-i18n="recheckBtn">Check again</button>
   </div>
 
   <div class="panel">
     <h2 data-i18n="panel4Title">4 · Actions</h2>
-    <div class="note" data-i18n-html="panel4Note">If the extension does not exist on this network yet, the page gives you the link to the <b>publishing page</b>: there anyone can publish it, with any wallet and without a UP; it only costs gas and gives no control over any UP. Then, here, with the UP's controller you prepare the enabling: the page shows every operation and simulates it; only then can you sign.</div>
-    <a id="publishLink" class="link-btn" hidden target="_blank" rel="noopener" data-i18n="publishLinkText">Publish the extension on this network (publishing page) →</a>
+    <div class="note" data-i18n-html="panel4Note">If the extension does not exist on this network yet, the page gives
+      you the link to the <b>publishing page</b>: there anyone can publish it, with any wallet and without a UP; it only
+      costs gas and gives no control over any UP. Then, here, with the UP's controller you prepare the enabling: the
+      page shows every operation and simulates it; only then can you sign.</div>
+    <a id="publishLink" class="link-btn" hidden target="_blank" rel="noopener" data-i18n="publishLinkText">Publish the
+      extension on this network (publishing page) →</a>
     <button id="prepareBtn" disabled data-i18n="prepareBtn">Prepare and simulate the enabling</button>
     <div class="status-box plan" id="planBox"><span class="empty" data-i18n="noPlan">No operation prepared.</span></div>
     <div class="check-row" id="replaceRow" style="display:none;"><input type="checkbox" id="ackReplace"><label
-        for="ackReplace" style="margin:0; color: var(--warn);" data-i18n="ackReplaceLabel">I understand that I am replacing the existing extensions listed above</label></div>
+        for="ackReplace" style="margin:0; color: var(--warn);" data-i18n="ackReplaceLabel">I understand that I am
+        replacing the existing extensions listed above</label></div>
     <button id="enableBtn" class="danger" disabled data-i18n="enableBtn">Sign and send (a single transaction)</button>
     <div id="log" class="line-dim" style="margin-top:10px;"></div>
   </div>
 
   <div class="site-footer">
     <div class="footer-row">
-      <img src="logo.png" alt="ChainIntegrate" class="footer-logo" onerror="this.style.display='none'">
-      <div class="footer-text" data-i18n-html="footerHtml">Data &amp; blockchain integration consulting by ChainIntegrate <a href="https://www.linkedin.com/company/chainintegrate" target="_blank" rel="noopener" aria-label="LinkedIn" class="footer-li"><svg width="20" height="20" viewBox="0 0 20 20"><rect width="20" height="20" rx="4" fill="#0A66C2"/><text x="10" y="15" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#fff">in</text></svg></a> · <a href="https://t.me/Simone_1977_2" target="_blank" rel="noopener">Support via Telegram</a> · <a href="https://github.com/ChainIntegrate/Cross_Chain" target="_blank" rel="noopener">Source code on GitHub</a></div>
+      <img src="logo.png" alt="logo" class="footer-logo" onerror="this.style.display='none'">
+      <div class="footer-text" data-i18n-html="footerHtml">Data &amp; blockchain integration by
+        Bertrand Juglas <a href="https://www.linkedin.com/in/bjuglas" target="_blank" rel="noopener"
+          aria-label="LinkedIn" class="footer-li"><svg width="20" height="20" viewBox="0 0 20 20">
+            <rect width="20" height="20" rx="4" fill="#0A66C2" /><text x="10" y="15" text-anchor="middle"
+              font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#fff">in</text>
+          </svg></a> · <a href="https://t.me/bertux0x" target="_blank" rel="noopener">Support via Telegram</a> · <a
+          href="https://github.com/bertux/Cross_Chain_LSP" target="_blank" rel="noopener">Source code on GitHub</a>
+      </div>
     </div>
   </div>
 
@@ -450,13 +489,13 @@
     let LANG = "en";
     const I18N = {
       it: {
-        pageTitle: "Ricezione NFT sulla UP — ChainIntegrate",
+        pageTitle: "Ricezione NFT sulla UP — Bertrand Juglas",
         h1: "Ricezione NFT sulla UP (sperimentale)",
         subtitle: "Permetti alla tua Universal Profile di ricevere NFT ERC-721 ed ERC-1155 su una rete dove l'hai rideployata (per esempio acquisti su OpenSea).",
         langToggleBtn: "English",
         panel0Title: "0 · Come funziona",
         panel0Note: "Quando un NFT standard viene consegnato con un \"trasferimento sicuro\", il contratto del token chiede al destinatario se sa riceverlo. Una UP risponde solo tramite un'<b>estensione</b> (LSP17) registrata nei suoi dati; le UP rideployate di solito non ne hanno, e gli acquisti falliscono (\"il wallet non può ricevere\").<br><br>Questa pagina: <b>(1)</b> se serve, ti porta alla pagina di pubblicazione per pubblicare sulla rete l'estensione <code>NFTReceiverExtension</code>, un contratto minimo senza proprietario, dati o fondi, sempre allo stesso indirizzo su ogni rete; <b>(2)</b> la registra sulla UP con <b>una sola transazione atomica</b> del Key Manager: concede al controller il permesso di aggiungere estensioni, registra l'estensione, e riporta i permessi del controller <b>esattamente</b> a quelli di prima. Se una parte fallisce, non cambia niente. Prima di firmare vedi l'elenco delle operazioni e il risultato della simulazione.",
-        disclaimer: "<b>⚠️ Leggi prima di usare questa pagina</b><ul style=\"margin:8px 0 0; padding-left:20px;\"><li><b>Strumento sperimentale, non sottoposto ad audit esterno.</b> Transazioni reali e irreversibili.</li><li><b>Modifica la configurazione della UP su questa rete:</b> aggiunge le chiavi di estensione per ricevere NFT (su altre reti va ripetuta). I permessi del controller restano uguali a prima.</li><li><b>L'estensione</b> risponde solo alle chiamate di ricezione NFT e a <code>supportsInterface</code>: viene chiamata dalla UP con una chiamata normale, quindi non può leggere né modificare dati o fondi della UP. Sorgente, bytecode e istruzioni per verificarlo sono nella cartella <code>contracts/</code> del repository.</li><li><b>Ricevere NFT</b> significa anche poter ricevere NFT indesiderati (spam): non dare mai approvazioni o firme per NFT che non conosci.</li><li><b>Nessuna garanzia.</b> Software \"così com'è\" (licenza MIT): lo usi a tuo rischio. ChainIntegrate non risponde di perdite o danni. Nessuna affiliazione con LUKSO o altri.</li><li><b>Questa pagina non chiede mai chiavi private</b>: firmi tutto in MetaMask.</li></ul>",
+        disclaimer: "<b>⚠️ Leggi prima di usare questa pagina</b><ul style=\"margin:8px 0 0; padding-left:20px;\"><li><b>Strumento sperimentale, non sottoposto ad audit esterno.</b> Transazioni reali e irreversibili.</li><li><b>Modifica la configurazione della UP su questa rete:</b> aggiunge le chiavi di estensione per ricevere NFT (su altre reti va ripetuta). I permessi del controller restano uguali a prima.</li><li><b>L'estensione</b> risponde solo alle chiamate di ricezione NFT e a <code>supportsInterface</code>: viene chiamata dalla UP con una chiamata normale, quindi non può leggere né modificare dati o fondi della UP. Sorgente, bytecode e istruzioni per verificarlo sono nella cartella <code>contracts/</code> del repository.</li><li><b>Ricevere NFT</b> significa anche poter ricevere NFT indesiderati (spam): non dare mai approvazioni o firme per NFT che non conosci.</li><li><b>Nessuna garanzia.</b> Software \"così com'è\" (licenza MIT): lo usi a tuo rischio. Bertrand Juglas non risponde di perdite o danni. Nessuna affiliazione con LUKSO o altri.</li><li><b>Questa pagina non chiede mai chiavi private</b>: firmi tutto in MetaMask.</li></ul>",
         ackLabel: "Ho letto e accetto: uso questo strumento a mio rischio.",
         ackRequired: "Prima accetta le condizioni nel pannello 0.",
         panel1Title: "1 · Rete",
@@ -541,16 +580,16 @@
         finalOk: "✅✅ Fatto: la UP ora può ricevere NFT ERC-721 ed ERC-1155 su questa rete, e i permessi del controller sono uguali a prima.",
         finalBad: (v) => `⚠️ Transazione confermata, ma la verifica finale non torna: ${v.what}. Controlla sull'explorer.`,
 
-        footerHtml: `Servizi di consulenza in integrazione dati &amp; blockchain a cura di ChainIntegrate <a href="https://www.linkedin.com/company/chainintegrate" target="_blank" rel="noopener" aria-label="LinkedIn" class="footer-li"><svg width="20" height="20" viewBox="0 0 20 20"><rect width="20" height="20" rx="4" fill="#0A66C2"/><text x="10" y="15" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#fff">in</text></svg></a> · <a href="https://t.me/Simone_1977_2" target="_blank" rel="noopener">Assistenza via Telegram</a> · <a href="https://github.com/ChainIntegrate/Cross_Chain" target="_blank" rel="noopener">Codice sorgente su GitHub</a>`,
+        footerHtml: `Servizi di integrazione dati &amp; blockchain a cura di Bertrand Juglas <a href="https://www.linkedin.com/in/bjuglas" target="_blank" rel="noopener" aria-label="LinkedIn" class="footer-li"><svg width="20" height="20" viewBox="0 0 20 20"><rect width="20" height="20" rx="4" fill="#0A66C2"/><text x="10" y="15" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#fff">in</text></svg></a> · <a href="https://t.me/bertux0x" target="_blank" rel="noopener">Assistenza via Telegram</a> · <a href="https://github.com/bertux/Cross_Chain_LSP" target="_blank" rel="noopener">Codice sorgente su GitHub</a>`,
       },
       en: {
-        pageTitle: "NFT reception on the UP — ChainIntegrate",
+        pageTitle: "NFT reception on the UP — Bertrand Juglas",
         h1: "NFT reception on the UP (experimental)",
         subtitle: "Let your Universal Profile receive ERC-721 and ERC-1155 NFTs on a network where you redeployed it (for example purchases on OpenSea).",
         langToggleBtn: "Italiano",
         panel0Title: "0 · How it works",
         panel0Note: "When a standard NFT is delivered with a \"safe transfer\", the token contract asks the recipient whether it can receive it. A UP answers only through an <b>extension</b> (LSP17) registered in its data; redeployed UPs usually have none, so purchases fail (\"wallet cannot receive\").<br><br>This page: <b>(1)</b> if needed, takes you to the publishing page to publish on the network the <code>NFTReceiverExtension</code>, a minimal contract with no owner, data or funds, always at the same address on every network; <b>(2)</b> registers it on the UP with <b>a single atomic Key Manager transaction</b>: it grants the controller the permission to add extensions, registers the extension, and sets the controller's permissions back to <b>exactly</b> what they were. If any part fails, nothing changes. Before signing you see the list of operations and the simulation result.",
-        disclaimer: "<b>⚠️ Read before using this page</b><ul style=\"margin:8px 0 0; padding-left:20px;\"><li><b>Experimental tool, not externally audited.</b> Real, irreversible transactions.</li><li><b>It changes the UP's configuration on this network:</b> it adds the extension keys to receive NFTs (repeat it on other networks). The controller's permissions stay the same as before.</li><li><b>The extension</b> answers only NFT-reception calls and <code>supportsInterface</code>: the UP calls it with a normal call, so it cannot read or change the UP's data or funds. Source, bytecode and verification steps are in the repository's <code>contracts/</code> folder.</li><li><b>Receiving NFTs</b> also means being able to receive unwanted NFTs (spam): never give approvals or signatures for NFTs you do not know.</li><li><b>No warranty.</b> Software \"as is\" (MIT license): you use it at your own risk. ChainIntegrate is not liable for any loss or damage. No affiliation with LUKSO or others.</li><li><b>This page never asks for private keys</b>: you sign everything in MetaMask.</li></ul>",
+        disclaimer: "<b>⚠️ Read before using this page</b><ul style=\"margin:8px 0 0; padding-left:20px;\"><li><b>Experimental tool, not externally audited.</b> Real, irreversible transactions.</li><li><b>It changes the UP's configuration on this network:</b> it adds the extension keys to receive NFTs (repeat it on other networks). The controller's permissions stay the same as before.</li><li><b>The extension</b> answers only NFT-reception calls and <code>supportsInterface</code>: the UP calls it with a normal call, so it cannot read or change the UP's data or funds. Source, bytecode and verification steps are in the repository's <code>contracts/</code> folder.</li><li><b>Receiving NFTs</b> also means being able to receive unwanted NFTs (spam): never give approvals or signatures for NFTs you do not know.</li><li><b>No warranty.</b> Software \"as is\" (MIT license): you use it at your own risk. Bertrand Juglas is not liable for any loss or damage. No affiliation with LUKSO or others.</li><li><b>This page never asks for private keys</b>: you sign everything in MetaMask.</li></ul>",
         ackLabel: "I have read and accept: I use this tool at my own risk.",
         ackRequired: "Accept the conditions in panel 0 first.",
         panel1Title: "1 · Network",
@@ -635,7 +674,7 @@
         finalOk: "✅✅ Done: the UP can now receive ERC-721 and ERC-1155 NFTs on this network, and the controller's permissions are the same as before.",
         finalBad: (v) => `⚠️ Transaction confirmed, but the final check does not match: ${v.what}. Check on the explorer.`,
 
-        footerHtml: `Data &amp; blockchain integration consulting by ChainIntegrate <a href="https://www.linkedin.com/company/chainintegrate" target="_blank" rel="noopener" aria-label="LinkedIn" class="footer-li"><svg width="20" height="20" viewBox="0 0 20 20"><rect width="20" height="20" rx="4" fill="#0A66C2"/><text x="10" y="15" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#fff">in</text></svg></a> · <a href="https://t.me/Simone_1977_2" target="_blank" rel="noopener">Support via Telegram</a> · <a href="https://github.com/ChainIntegrate/Cross_Chain" target="_blank" rel="noopener">Source code on GitHub</a>`,
+        footerHtml: `Data &amp; blockchain integration by Bertrand Juglas <a href="https://www.linkedin.com/in/bjuglas" target="_blank" rel="noopener" aria-label="LinkedIn" class="footer-li"><svg width="20" height="20" viewBox="0 0 20 20"><rect width="20" height="20" rx="4" fill="#0A66C2"/><text x="10" y="15" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#fff">in</text></svg></a> · <a href="https://t.me/bertux0x" target="_blank" rel="noopener">Support via Telegram</a> · <a href="https://github.com/bertux/Cross_Chain_LSP" target="_blank" rel="noopener">Source code on GitHub</a>`,
       },
     };
 
