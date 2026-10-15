@@ -4,6 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <script src="theme.js"></script>
+  <script src="button-processing.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="referrer" content="no-referrer">
   <title data-i18n="pageTitle">UP Cross-Chain Deploy</title>
@@ -1266,7 +1267,7 @@
         setFetchStatus(t("fetchFailed", { err: e.message }), "line-err");
       }
     }
-    $("fetchCalldataBtn").addEventListener("click", autoFetchCalldata);
+    $("fetchCalldataBtn").addEventListener("click", withButtonDisabled($("fetchCalldataBtn"), autoFetchCalldata));
 
     // Init code EIP-1167 completo: usato SOLO per calcolare l'hash che entra nella formula CREATE2.
     // Include il preambolo "3d602d80600a3d3981f3" che al deploy copia il resto e lo restituisce.
@@ -1515,7 +1516,7 @@
       return { ok: true, chainId: expectedChainId };
     }
 
-    $("checkBtn").addEventListener("click", async () => {
+    $("checkBtn").addEventListener("click", withButtonDisabled($("checkBtn"), async () => {
       $("log").innerHTML = "";
       lastCheckOk = false;
       checkedContext = null;
@@ -1649,7 +1650,7 @@
       } catch (e) {
         log(t("verifyErrorLog", { err: e.shortMessage || e.message }), "line-err");
       }
-    });
+    }));
 
     $("deployBtn").addEventListener("click", async () => {
       if (!lastCheckOk || !decoded || !checkedContext) return;

@@ -4,6 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <script src="theme.js"></script>
+  <script src="button-processing.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="referrer" content="no-referrer">
   <title data-i18n="pageTitle">UP Publish Implementation — Bertrand Juglas</title>
@@ -721,7 +722,7 @@
       $("sourceStatus").innerHTML = `<span class="badge err">${escapeHtml(msg)}</span>`;
     }
 
-    $("loadBtn").addEventListener("click", async () => {
+    $("loadBtn").addEventListener("click", withButtonDisabled($("loadBtn"), async () => {
       source = null;
       invalidateCheck();
       const implRaw = $("implAddress").value.trim();
@@ -785,7 +786,7 @@
       } catch (e) {
         showSourceError(t("genericError", { err: e.shortMessage || e.message }));
       }
-    });
+    }));
 
     // --- 2. Signing wallet ---
     const discoveredProviders = [];
@@ -846,7 +847,7 @@
     }
 
     // --- 4. Verify ---
-    $("checkBtn").addEventListener("click", async () => {
+    $("checkBtn").addEventListener("click", withButtonDisabled($("checkBtn"), async () => {
       $("log").innerHTML = "";
       lastCheckOk = false;
       checkedContext = null;
@@ -894,7 +895,7 @@
       } catch (e) {
         log(t("genericError", { err: e.shortMessage || e.message }), "line-err");
       }
-    });
+    }));
 
     // --- 4. Publish ---
     $("publishBtn").addEventListener("click", async () => {

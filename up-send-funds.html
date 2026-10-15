@@ -4,6 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <script src="theme.js"></script>
+  <script src="button-processing.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="referrer" content="no-referrer">
   <title data-i18n="pageTitle">UP Send Funds — Bertrand Juglas</title>
@@ -1308,7 +1309,7 @@
     const bsIsSpam = (tok) => !!(tok && ((tok.reputation && tok.reputation !== "ok") || tok.is_scam === true));
 
     let discoverRequestId = 0;
-    $("discoverBtn").addEventListener("click", async () => {
+    $("discoverBtn").addEventListener("click", withButtonDisabled($("discoverBtn"), async () => {
       const requestId = ++discoverRequestId;
       const up = currentProfile().address;
       const status = $("discoverStatus"), list = $("discoverList");
@@ -1360,7 +1361,7 @@
       if (!rows.length) { status.textContent = t("discoverEmpty"); return; }
       status.textContent = t("discoverFound", { n: rows.length });
       renderDiscoverRows(rows);
-    });
+    }));
 
     function renderDiscoverRows(rows) {
       const list = $("discoverList");
@@ -1436,7 +1437,7 @@
       return r.json();
     }
 
-    $("alchemyBtn").addEventListener("click", async () => {
+    $("alchemyBtn").addEventListener("click", withButtonDisabled($("alchemyBtn"), async () => {
       const requestId = ++discoverRequestId;
       const isStale = () => requestId !== discoverRequestId;
       const up = currentProfile().address;
@@ -1497,11 +1498,11 @@
       if (errors.length) msg = (msg ? msg + " " : "") + errors.join(" ");
       status.textContent = msg;
       renderDiscoverRows(rows);
-    });
+    }));
 
     // "All": the whole balance. The controller pays the gas, not the UP, so the native balance can
     // be sent in full.
-    $("maxBtn").addEventListener("click", async () => {
+    $("maxBtn").addEventListener("click", withButtonDisabled($("maxBtn"), async () => {
       const net = getNetwork();
       const up = currentProfile().address;
       if (!net || !net.rpc || !ethers.isAddress(up)) { log(t("maxNeedsDataLog"), "line-warn"); return; }
@@ -1523,7 +1524,7 @@
       } catch (e) {
         log(t("balanceReadErr", { err: e.shortMessage || e.message }), "line-err");
       }
-    });
+    }));
 
     // --- 5. Check and send ---
     // The Key Manager is read from the UP itself (LSP0 owner()), not recomputed from a fixed
@@ -1685,7 +1686,7 @@
       } catch (e) { /* the transfer is confirmed; this is only an extra reading */ }
     }
 
-    $("checkBtn").addEventListener("click", withBusy(async () => {
+    $("checkBtn").addEventListener("click", withButtonDisabled($("checkBtn"), withBusy(async () => {
       $("log").innerHTML = "";
       lastCheckOk = false;
       $("sendBtn").disabled = true;
@@ -1810,7 +1811,7 @@
       } catch (e) {
         log(t("verifyErrorLog", { err: e.shortMessage || e.message }), "line-err");
       }
-    }));
+    })));
 
     $("sendBtn").addEventListener("click", withBusy(async () => {
       if (!lastCheckOk || !checkedContext) return;

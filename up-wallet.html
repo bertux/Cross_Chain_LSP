@@ -4,6 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <script src="theme.js"></script>
+  <script src="button-processing.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="referrer" content="no-referrer">
   <meta name="robots" content="noindex, nofollow">
@@ -1225,7 +1226,11 @@
         setStatus("complianceBox", t("connectionRejected"), "line-err");
       }
     });
-    $("recheckBtn").addEventListener("click", () => scheduleCompliance(0));
+    $("recheckBtn").addEventListener("click", withButtonDisabled($("recheckBtn"), async () => {
+      scheduleCompliance(0);
+      clearTimeout(complianceTimer);
+      await runCompliance();
+    }));
 
     // The result of the last check. Pairing and every request need a green one.
     let compliance = null, lastCompliance = null, complianceRun = 0, complianceTimer = null;

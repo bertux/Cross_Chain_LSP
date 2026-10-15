@@ -4,6 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <script src="theme.js"></script>
+  <script src="button-processing.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="referrer" content="no-referrer">
   <title data-i18n="pageTitle">UP Deploy — Verify Only — Bertrand Juglas</title>
@@ -682,9 +683,9 @@
         setFetchStatus(t("fetchFailed", { err: e.message }), "line-err");
       }
     }
-    $("fetchCalldataBtn").addEventListener("click", autoFetchCalldata);
+    $("fetchCalldataBtn").addEventListener("click", withButtonDisabled($("fetchCalldataBtn"), autoFetchCalldata));
 
-    $("verifyBtn").addEventListener("click", async () => {
+    $("verifyBtn").addEventListener("click", withButtonDisabled($("verifyBtn"), async () => {
       $("log").innerHTML = "";
       const calldataRaw = $("calldataInput").value.trim();
       const expected = $("expectedAddress").value.trim();
@@ -795,7 +796,7 @@
       } catch (e) {
         log(t("genericErrorLog", { err: e.shortMessage || e.message }), "line-err");
       }
-    });
+    }));
   </script>
 
 </body>
