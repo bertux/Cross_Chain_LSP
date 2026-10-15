@@ -4,6 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <script src="theme.js"></script>
+  <script src="button-processing.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="referrer" content="no-referrer">
   <meta name="robots" content="noindex, nofollow">
@@ -803,7 +804,11 @@
         setStatus("checkBox", t("connectionRejected"), "line-err");
       }
     });
-    $("recheckBtn").addEventListener("click", () => scheduleCheck(0));
+    $("recheckBtn").addEventListener("click", withButtonDisabled($("recheckBtn"), async () => {
+      scheduleCheck(0);
+      clearTimeout(checkTimer);
+      await runCheck();
+    }));
     $("ackRisk").addEventListener("change", updateButtons);
 
     let check = null, lastCheck = null, checkRun = 0, checkTimer = null, plan = null;
@@ -998,7 +1003,7 @@
       };
     }
 
-    $("prepareBtn").addEventListener("click", async () => {
+    $("prepareBtn").addEventListener("click", withButtonDisabled($("prepareBtn"), async () => {
       if (!riskAccepted()) { log(t("ackRequired"), "line-err"); return; }
       logSeparator();
       clearPlan();
@@ -1038,7 +1043,7 @@
       plan = { data, gasLimit, c, replacing };
       log(t("readyToSign"), "line-warn");
       updateButtons();
-    });
+    }));
     $("ackReplace").addEventListener("change", updateButtons);
 
     $("enableBtn").addEventListener("click", async () => {

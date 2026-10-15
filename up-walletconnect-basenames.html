@@ -4,6 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <script src="theme.js"></script>
+  <script src="button-processing.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="referrer" content="no-referrer">
   <meta name="robots" content="noindex, nofollow">
@@ -812,7 +813,7 @@
     function resetUp() { upAddress = null; kmAddress = null; setStatus("upStatus", t("notChecked"), "empty"); }
     $("upAddress").addEventListener("input", resetUp);
 
-    $("checkUpBtn").addEventListener("click", async () => {
+    $("checkUpBtn").addEventListener("click", withButtonDisabled($("checkUpBtn"), async () => {
       if (DEPRECATED) return;
       resetUp();
       const raw = $("upAddress").value.trim();
@@ -830,7 +831,7 @@
       } catch (e) {
         setStatus("upStatus", t("genericError", { err: e.shortMessage || e.message }), "line-err");
       }
-    });
+    }));
 
     // ==================== 2. Controller wallet ====================
     let signerProvider = null, signerAddress = null;

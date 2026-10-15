@@ -4,6 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <script src="theme.js"></script>
+  <script src="button-processing.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="referrer" content="no-referrer">
   <meta name="robots" content="noindex, nofollow">
@@ -687,7 +688,11 @@
     $("network").addEventListener("change", () => scheduleCheck(0));
     ["email"].forEach(id => $(id).addEventListener("input", updateButtons));
     ["ackRisk", "ackPrivacy"].forEach(id => $(id).addEventListener("change", updateButtons));
-    $("recheckBtn").addEventListener("click", () => scheduleCheck(0));
+    $("recheckBtn").addEventListener("click", withButtonDisabled($("recheckBtn"), async () => {
+      scheduleCheck(0);
+      clearTimeout(checkTimer);
+      await runCheck();
+    }));
 
     async function runCheck() {
       const run = ++checkRun;

@@ -738,7 +738,11 @@ $("networkFilter").addEventListener("input", (e) => { renderNetworkOptions(e.tar
 networkSelectEl.addEventListener("change", onInputsChanged);
 ["customRpc", "ownerAddress", "upAddress"].forEach(id => $(id).addEventListener("input", () => scheduleCheck()));
 ["testTo", "testAmount"].forEach(id => $(id).addEventListener("input", () => { planGen++; signedOp = null; setStatus("opBox", t("noOp"), "empty"); updateButtons(); }));
-$("recheckBtn").addEventListener("click", () => scheduleCheck(0));
+$("recheckBtn").addEventListener("click", withButtonDisabled($("recheckBtn"), async () => {
+  scheduleCheck(0);
+  clearTimeout(checkTimer);
+  await runCheck();
+}));
 $("ackRisk").addEventListener("change", updateButtons);
 
 // ==================== STATE ====================
