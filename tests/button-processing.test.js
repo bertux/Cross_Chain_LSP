@@ -54,3 +54,16 @@ Deno.test("reenables the button when the handler rejects", async () => {
     throw new Error("button was not reenabled after rejection");
   }
 });
+
+Deno.test("each page banner links back to the homepage", () => {
+  for (const entry of Deno.readDirSync(".")) {
+    if (!entry.name.endsWith(".html") || entry.name === "index.html") {
+      continue;
+    }
+
+    const html = Deno.readTextFileSync(entry.name);
+    if (!html.includes('<a href="index.html" aria-label="Go to homepage" style="display:block;">')) {
+      throw new Error(`${entry.name} does not link the banner back to the homepage`);
+    }
+  }
+});
