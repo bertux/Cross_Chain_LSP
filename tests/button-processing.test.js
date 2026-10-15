@@ -55,7 +55,7 @@ Deno.test("reenables the button when the handler rejects", async () => {
   }
 });
 
-Deno.test("each page banner links back to the homepage", () => {
+Deno.test("each page links back to the homepage from its banner and Home button", () => {
   for (const entry of Deno.readDirSync(".")) {
     if (!entry.name.endsWith(".html") || entry.name === "index.html") {
       continue;
@@ -64,6 +64,9 @@ Deno.test("each page banner links back to the homepage", () => {
     const html = Deno.readTextFileSync(entry.name);
     if (!html.includes('<a href="index.html" aria-label="Go to homepage" style="display:block;">')) {
       throw new Error(`${entry.name} does not link the banner back to the homepage`);
+    }
+    if (!/<a href="index\.html"[^>]*>Home<\/a>/.test(html)) {
+      throw new Error(`${entry.name} does not have a Home button`);
     }
   }
 });
