@@ -21,6 +21,7 @@ const CHAINS = [
   { key: "gnosis", name: "Gnosis", chainId: 100, rpc: "https://rpc.gnosischain.com", explorerBase: "https://gnosisscan.io", currency: "XDAI" },
   { key: "gravity-alpha", name: "Gravity Alpha", chainId: 1625, rpc: "https://rpc.gravity.xyz", explorerBase: "https://explorer.gravity.xyz", currency: "G" },
   { key: "hashkey-chain", name: "HashKey Chain", chainId: 177, rpc: "https://mainnet.hsk.xyz", explorerBase: "https://hsk.blockscout.com", currency: "HSK" },
+  { key: "hyperevm", name: "HyperEVM", chainId: 999, rpc: "https://rpc.hyperliquid.xyz/evm", explorerBase: "https://hyperevmscan.io", currency: "HYPE" },
   { key: "immutable-zkevm", name: "Immutable zkEVM", chainId: 13371, rpc: "https://rpc.immutable.com", explorerBase: "https://explorer.immutable.com", currency: "IMX" },
   { key: "ink", name: "Ink", chainId: 57073, rpc: "https://rpc-gel.inkonchain.com", explorerBase: "https://explorer.inkonchain.com", currency: "ETH" },
   { key: "katana", name: "Katana", chainId: 747474, rpc: "https://rpc.katana.network", explorerBase: "https://katanascan.com", currency: "ETH" },
