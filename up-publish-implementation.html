@@ -23,6 +23,7 @@
     integrity="sha384-6Zl0Pc8zjSz8KvmNeXRvUQgY4ryFb+BwDvKCmLYcBME0joAaru491tQgi9B7zsMM" crossorigin="anonymous"
     referrerpolicy="no-referrer"></script>
   <script src="chains.js"></script>
+  <script src="chain-availability.js"></script>
   <style>
     :root {
       --bg: #0f1115;
@@ -369,6 +370,7 @@
     <input type="text" id="networkFilter" data-i18n-placeholder="networkFilterPlaceholder"
       placeholder="Filter by name...">
     <select id="network" style="margin-top:8px;"></select>
+    <div class="note" id="chainAvailabilityStatus" style="margin-top:8px;" aria-live="polite"></div>
     <div id="customRpcWrap" style="display:none;">
       <label data-i18n="customRpcLabel">Custom RPC URL</label>
       <input type="text" id="customRpc" placeholder="https://...">
@@ -426,6 +428,10 @@
         notConnected: "Non connesso.",
         panel3Title: "3 · Rete di destinazione",
         networkFilterPlaceholder: "Filtra per nome...",
+        chainScanPrompt: "Leggi prima il deploy originale per mostrare solo le reti dove il contratto manca.",
+        chainScanLoading: "Controllo su tutte le reti...",
+        chainScanResult: (v) => `${v.available} reti disponibili; ${v.skipped} non verificate per errori RPC${v.skippedNames ? ` (${v.skippedNames})` : ""}.`,
+        chainScanFailed: (v) => `Impossibile controllare le reti: ${v.err}`,
         customRpcLabel: "RPC URL custom",
         panel4Title: "4 · Verifica e pubblica",
         checkBtn: "Verifica",
@@ -505,6 +511,10 @@
         notConnected: "Not connected.",
         panel3Title: "3 · Target network",
         networkFilterPlaceholder: "Filter by name...",
+        chainScanPrompt: "Read the original deployment first to show only networks where the contract is missing.",
+        chainScanLoading: "Checking all networks...",
+        chainScanResult: (v) => `${v.available} networks available; ${v.skipped} could not be checked because of RPC errors${v.skippedNames ? ` (${v.skippedNames})` : ""}.`,
+        chainScanFailed: (v) => `Could not check networks: ${v.err}`,
         customRpcLabel: "Custom RPC URL",
         panel4Title: "4 · Verify and publish",
         checkBtn: "Verify",
@@ -616,21 +626,27 @@
 
     // --- Network ---
     const networkSelectEl = $("network");
+    const chainAvailabilityStatus = $("chainAvailabilityStatus");
+    let availableNetworks = null;
+    let chainScanGeneration = 0;
+    chainAvailabilityStatus.textContent = t("chainScanPrompt");
     function renderNetworkOptions(filter) {
       const f = (filter || "").toLowerCase();
+      const previous = networkSelectEl.value;
       networkSelectEl.innerHTML = "";
-      CHAINS.filter(c => c.name.toLowerCase().includes(f)).forEach(c => {
+      const chains = availableNetworks === null ? CHAINS : [...availableNetworks, CHAINS.find(c => c.key === "custom")];
+      chains.filter(c => c && c.name.toLowerCase().includes(f)).forEach(c => {
         const opt = document.createElement("option");
         opt.value = c.key;
         opt.textContent = c.chainId ? `${c.name} (chainId ${c.chainId})` : c.name;
         networkSelectEl.appendChild(opt);
       });
+      if ([...networkSelectEl.options].some(option => option.value === previous)) networkSelectEl.value = previous;
+      if (previous !== networkSelectEl.value) networkSelectEl.dispatchEvent(new Event("change"));
     }
     renderNetworkOptions("");
     $("networkFilter").addEventListener("input", (e) => {
       renderNetworkOptions(e.target.value);
-      // Filtering can silently change the selected option: propagate it like a user selection.
-      networkSelectEl.dispatchEvent(new Event("change"));
     });
     networkSelectEl.addEventListener("change", () => {
       $("customRpcWrap").style.display = networkSelectEl.value === "custom" ? "block" : "none";
@@ -685,8 +701,43 @@
     }
     function resetSource() {
       source = null;
+      chainScanGeneration++;
+      availableNetworks = null;
+      chainAvailabilityStatus.textContent = t("chainScanPrompt");
+      renderNetworkOptions($("networkFilter").value);
       $("sourceStatus").innerHTML = `<span class="empty">${t("notLoaded")}</span>`;
       invalidateCheck();
+    }
+    async function updateAvailableNetworks(impl) {
+      const generation = ++chainScanGeneration;
+      chainAvailabilityStatus.textContent = t("chainScanLoading");
+      try {
+        const results = await ChainAvailability.classify(
+          CHAINS.filter(chain => chain.chainId && chain.rpc),
+          [impl],
+          async (chain, address) => {
+            const provider = new ethers.JsonRpcProvider(chain.rpc, undefined, { batchMaxCount: 1 });
+            const chainId = Number(await provider.send("eth_chainId", []));
+            if (chainId !== chain.chainId) throw new Error(`RPC chainId ${chainId} does not match ${chain.chainId}`);
+            return provider.getCode(address);
+          },
+        );
+        if (generation !== chainScanGeneration) return;
+        availableNetworks = results.filter(result => !result.error && !result.deployed).map(result => result.chain);
+        const skippedChains = results.filter(result => result.error).map(result => result.chain.name);
+        const skippedNames = skippedChains.slice(0, 5).join(", ") + (skippedChains.length > 5 ? `, +${skippedChains.length - 5}` : "");
+        chainAvailabilityStatus.textContent = t("chainScanResult", {
+          available: availableNetworks.length,
+          skipped: skippedChains.length,
+          skippedNames,
+        });
+        renderNetworkOptions($("networkFilter").value);
+      } catch (error) {
+        if (generation !== chainScanGeneration) return;
+        availableNetworks = [];
+        chainAvailabilityStatus.textContent = t("chainScanFailed", { err: error.shortMessage || error.message });
+        renderNetworkOptions($("networkFilter").value);
+      }
     }
     ["implAddress", "txHash", "rawInput"].forEach(id => $(id).addEventListener("input", resetSource));
     $("customRpc").addEventListener("input", invalidateCheck);
@@ -788,6 +839,7 @@
           `<span class="badge ok">OK</span> ${escapeHtml(t("sourceOk", { tx: txHash || "(input data)", impl }))}<br>` +
           (fromExplorer ? escapeHtml(t("txFromExplorerLog")) + "<br>" : "") +
           escapeHtml(t("sourceSize", { bytes: source.codeBytes }));
+        void updateAvailableNetworks(impl);
       } catch (e) {
         showSourceError(t("genericError", { err: e.shortMessage || e.message }));
       }
