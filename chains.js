@@ -45,6 +45,7 @@ const CHAINS = [
   { key: "robinhood-chain", name: "Robinhood Chain", chainId: 4663, rpc: "https://rpc.mainnet.chain.robinhood.com", explorerBase: "https://robinscan.io", currency: "ETH" },
   { key: "ronin", name: "Ronin", chainId: 2020, rpc: "https://api.roninchain.com/rpc", explorerBase: "https://app.roninchain.com", currency: "RON" },
   { key: "scroll", name: "Scroll", chainId: 534352, rpc: "https://rpc.scroll.io", explorerBase: "https://scrollscan.com", currency: "ETH" },
+  { key: "sei", name: "Sei", chainId: 1329, rpc: "https://evm-rpc.sei-apis.com", explorerBase: "https://seitrace.com", currency: "SEI" },
   { key: "somnia", name: "Somnia", chainId: 5031, rpc: "https://api.infra.mainnet.somnia.network", explorerBase: "https://mainnet.somnia.w3us.site", currency: "SOMI" },
   { key: "soneium", name: "Soneium", chainId: 1868, rpc: "https://rpc.soneium.org", explorerBase: "https://soneium.blockscout.com", currency: "ETH" },
   { key: "sonic", name: "Sonic", chainId: 146, rpc: "https://rpc.soniclabs.com", explorerBase: "https://sonicscan.org", currency: "S" },
@@ -68,7 +69,6 @@ const CHAINS = [
   { key: "ethereum-sepolia", name: "Ethereum Sepolia (testnet)", chainId: 11155111, rpc: "https://rpc.sepolia.org", explorerBase: "https://sepolia.etherscan.io", currency: "ETH" },
   { key: "polygon-amoy", name: "Polygon Amoy (testnet)", chainId: 80002, rpc: "https://rpc-amoy.polygon.technology", explorerBase: "https://amoy.polygonscan.com", currency: "POL" },
   { key: "zksync-sepolia", name: "zkSync Sepolia (testnet)", chainId: 300, rpc: "https://sepolia.era.zksync.dev", explorerBase: "https://sepolia.explorer.zksync.io", currency: "ETH" },
-  { key: "sei", name: "Sei", chainId: 1329, rpc: "https://evm-rpc.sei-apis.com", explorerBase: "https://seitrace.com", currency: "SEI" },
   { key: "custom", name: "Custom RPC...", chainId: null, rpc: null, explorerBase: null, currency: "?" },
 ];
 
