@@ -63,7 +63,7 @@ The tools never ask for a private key. The calldata is public on-chain data, and
 | `vendor/` | The WalletConnect bundle used by the UP Wallet, pinned and documented. See [vendor/README.md](vendor/README.md). |
 | `config.example.js` | Template of the site's `config.js` (WalletConnect project ID, Alchemy key). |
 | `guide-assets/` | Screenshots used by the guide. |
-| `banner.png`, `logo.png`, `favicon.ico` | Branding for the pages. |
+| `logo.png`, `favicon.ico` | Branding for the pages. |
 | `AUDIT.md` | Full security, privacy and bug audit report. |
 | `SECURITY.md` | How to report a vulnerability privately. |
 | `CONTRIBUTING.md` | What contributions are accepted, and how to propose them. |
