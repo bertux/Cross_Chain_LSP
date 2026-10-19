@@ -243,4 +243,3 @@ A page that reads and shows a UP's LSP3 identity on any network where it is depl
 - **AUDIT R-07:** decided 2026-10-03: Basenames demo deprecated.
 - **AUDIT R-02 / I-03:** Content-Security-Policy and security headers.
 - **AUDIT R-03 / L-07:** refresh stale RPCs (e.g. `rpc.sepolia.org`).
-- **`banner.png`:** about 6 MB; optimise it.

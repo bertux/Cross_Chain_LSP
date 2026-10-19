@@ -55,15 +55,18 @@ Deno.test("reenables the button when the handler rejects", async () => {
   }
 });
 
-Deno.test("each page links back to the homepage from its banner and Home button", () => {
+Deno.test("pages keep a Home button without any banner asset reference", () => {
   for (const entry of Deno.readDirSync(".")) {
-    if (!entry.name.endsWith(".html") || entry.name === "index.html") {
+    if (!entry.name.endsWith(".html")) {
       continue;
     }
 
     const html = Deno.readTextFileSync(entry.name);
-    if (!html.includes('<a href="index.html" aria-label="Go to homepage" style="display:block;">')) {
-      throw new Error(`${entry.name} does not link the banner back to the homepage`);
+    if (html.includes("banner.png") || html.includes("og:image") || html.includes("twitter:image")) {
+      throw new Error(`${entry.name} still references the removed banner image`);
+    }
+    if (entry.name === "index.html") {
+      continue;
     }
     if (!/<a href="index\.html"[^>]*>Home<\/a>/.test(html)) {
       throw new Error(`${entry.name} does not have a Home button`);
