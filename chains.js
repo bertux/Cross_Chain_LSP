@@ -13,7 +13,6 @@ const CHAINS = [
   { key: "core-blockchain", name: "Core Blockchain", chainId: 1116, rpc: "https://rpc.coredao.org", explorerBase: "https://scan.coredao.org", currency: "CORE" },
   { key: "coti", name: "COTI", chainId: 2632500, rpc: "https://mainnet.coti.io/rpc", explorerBase: "https://mainnet.cotiscan.io", currency: "COTI" },
   { key: "cronos", name: "Cronos", chainId: 25, rpc: "https://evm.cronos.org", explorerBase: "https://explorer.cronos.org", currency: "CRO" },
-  { key: "degen-chain", name: "Degen Chain", chainId: 666666666, rpc: "https://666666666.rpc.thirdweb.com", rpcFallbacks: ["https://rpc.degen.tips"], explorerBase: null, currency: "DEGEN" },
   { key: "ethereum", name: "Ethereum", chainId: 1, rpc: "https://ethereum-rpc.publicnode.com", explorerBase: "https://etherscan.io", currency: "ETH" },
   { key: "ethereum-classic", name: "Ethereum Classic", chainId: 61, rpc: "https://etc.etcdesktop.com", rpcFallbacks: ["https://besu-at.etc-network.info", "https://geth-at.etc-network.info", "https://61.rpc.thirdweb.com", "https://etc.rivet.link"], explorerBase: "https://etc.blockscout.com", currency: "ETC" },
   { key: "etherlink", name: "Etherlink", chainId: 42793, rpc: "https://node.mainnet.etherlink.com", explorerBase: "https://explorer.etherlink.com", currency: "XTZ" },
@@ -67,7 +66,6 @@ const CHAINS = [
   { key: "base-sepolia", name: "Base Sepolia (testnet)", chainId: 84532, rpc: "https://sepolia.base.org", explorerBase: "https://sepolia.basescan.org", currency: "ETH" },
   { key: "ethereum-hoodi", name: "Ethereum Hoodi (testnet)", chainId: 560048, rpc: "https://rpc.hoodi.ethpandaops.io", explorerBase: "https://light-hoodi.beaconcha.in", currency: "ETH" },
   { key: "ethereum-sepolia", name: "Ethereum Sepolia (testnet)", chainId: 11155111, rpc: "https://ethereum-sepolia-rpc.publicnode.com", rpcFallbacks: ["https://rpc2.sepolia.org", "https://sepolia.drpc.org", "https://11155111.rpc.thirdweb.com", "https://rpc.sepolia.org"], explorerBase: "https://sepolia.etherscan.io", currency: "ETH" },
-  { key: "polygon-amoy", name: "Polygon Amoy (testnet)", chainId: 80002, rpc: "https://rpc-amoy.polygon.technology", explorerBase: "https://amoy.polygonscan.com", currency: "POL" },
   { key: "zksync-sepolia", name: "zkSync Sepolia (testnet)", chainId: 300, rpc: "https://sepolia.era.zksync.dev", explorerBase: "https://sepolia.explorer.zksync.io", currency: "ETH" },
   { key: "custom", name: "Custom RPC...", chainId: null, rpc: null, explorerBase: null, currency: "?" },
 ];
