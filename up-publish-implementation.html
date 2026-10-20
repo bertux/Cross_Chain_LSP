@@ -708,8 +708,9 @@
       chainAvailabilityStatus.textContent = t("chainScanLoading");
       renderNetworkOptions($("networkFilter").value);
       try {
+        const excludedChainKeys = new Set(["degen-chain", "polygon-amoy"]);
         const results = await ChainAvailability.classify(
-          CHAINS.filter(chain => chain.chainId && chain.rpc),
+          CHAINS.filter(chain => chain.chainId && chain.rpc && !excludedChainKeys.has(chain.key)),
           [impl],
           (chain, address) => ChainAvailability.getCodeWithFallback(chain, address, async (rpc, currentChain, currentAddress) => {
             const provider = new ethers.JsonRpcProvider(rpc, undefined, { batchMaxCount: 1 });
