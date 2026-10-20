@@ -1,6 +1,7 @@
 import "../chain-availability.js";
 
 const classify = globalThis.ChainAvailability.classify;
+const getCodeWithFallback = globalThis.ChainAvailability.getCodeWithFallback;
 
 Deno.test("classifies chains by whether every requested implementation is deployed", async () => {
   const chains = [{ key: "ready" }, { key: "partial" }, { key: "missing" }];
@@ -33,6 +34,41 @@ Deno.test("reports RPC failures without classifying the chain as deployed", asyn
   });
 
   if (results[0].error?.message !== "RPC unavailable") throw new Error("RPC failure was not surfaced");
+});
+
+Deno.test("tries chain RPC fallbacks after an endpoint error", async () => {
+  const tried = [];
+  const code = await getCodeWithFallback({
+    rpc: "https://primary.example",
+    rpcFallbacks: ["https://fallback.example", "https://fallback.example"],
+  }, "0x1234", async (rpc, _chain, address) => {
+    tried.push(rpc);
+    if (rpc === "https://primary.example") throw new Error("primary unavailable");
+    return `${address}:0x6000`;
+  });
+
+  if (tried.join(",") !== "https://primary.example,https://fallback.example") {
+    throw new Error(`unexpected RPC fallback order: ${tried.join(",")}`);
+  }
+  if (code !== "0x1234:0x6000") throw new Error("fallback result was not returned");
+});
+
+Deno.test("reports all RPC endpoint errors when every fallback fails", async () => {
+  let message = "";
+  try {
+    await getCodeWithFallback({ rpc: "https://primary.example", rpcFallbacks: ["https://fallback.example"] }, "0x1234", async (rpc) => {
+      throw new Error(`${rpc} unavailable`);
+    });
+  } catch (error) {
+    message = error.message;
+  }
+
+  if (!message.includes("https://primary.example: https://primary.example unavailable")) {
+    throw new Error("primary RPC error was not included");
+  }
+  if (!message.includes("https://fallback.example: https://fallback.example unavailable")) {
+    throw new Error("fallback RPC error was not included");
+  }
 });
 
 Deno.test("limits concurrent chain checks", async () => {

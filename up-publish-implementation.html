@@ -709,17 +709,17 @@
         const results = await ChainAvailability.classify(
           CHAINS.filter(chain => chain.chainId && chain.rpc),
           [impl],
-          async (chain, address) => {
-            const provider = new ethers.JsonRpcProvider(chain.rpc, undefined, { batchMaxCount: 1 });
+          (chain, address) => ChainAvailability.getCodeWithFallback(chain, address, async (rpc, currentChain, currentAddress) => {
+            const provider = new ethers.JsonRpcProvider(rpc, undefined, { batchMaxCount: 1 });
             const chainId = Number(await provider.send("eth_chainId", []));
-            if (chainId !== chain.chainId) throw new Error(`RPC chainId ${chainId} does not match ${chain.chainId}`);
-            return provider.getCode(address);
-          },
+            if (chainId !== currentChain.chainId) throw new Error(`RPC chainId ${chainId} does not match ${currentChain.chainId}`);
+            return provider.getCode(currentAddress);
+          }),
         );
         if (generation !== chainScanGeneration) return;
         availableNetworks = results.filter(result => !result.error && !result.deployed).map(result => result.chain);
         const skippedChains = results.filter(result => result.error).map(result => result.chain.name);
-        const skippedNames = skippedChains.slice(0, 5).join(", ") + (skippedChains.length > 5 ? `, +${skippedChains.length - 5}` : "");
+        const skippedNames = skippedChains.slice(0, 10).join(", ") + (skippedChains.length > 10 ? `, +${skippedChains.length - 10}` : "");
         chainAvailabilityStatus.textContent = t("chainScanResult", {
           available: availableNetworks.length,
           skipped: skippedChains.length,
