@@ -416,7 +416,7 @@
         panel4Title: "4 · Verifica e pubblica",
         checkBtn: "Verifica",
         publishBtn: "Pubblica il contratto",
-        chipNftExtension: "Estensione ricezione NFT",
+        chipLsp0: "LSP0",
         logInitial: "In attesa dei dati sopra.",
 
         connectedBadge: "Connesso",
@@ -499,7 +499,7 @@
         panel4Title: "4 · Verify and publish",
         checkBtn: "Verify",
         publishBtn: "Publish the contract",
-        chipNftExtension: "NFT reception extension",
+        chipLsp0: "LSP0",
         logInitial: "Waiting for the data above.",
 
         connectedBadge: "Connected",
@@ -647,9 +647,9 @@
     const presetNetwork = params.get("network");
     if (presetNetwork && presetNetwork !== "custom" && CHAINS.some(c => c.key === presetNetwork)) preferredNetworkKey = presetNetwork;
     // Contracts that can always be picked with one click. Their original deploy is read from LUKSO and
-    // checked like any other address: the shortcut only fills the field.
+    // checked like any other address: the shortcut fills the field and starts the chain scan.
     const KNOWN_PUBLISHABLE = [
-      { addr: "0x7F68e74483867058C806218aa05aB5527984C03e", label: "chipNftExtension" },
+      { addr: "0x3024D38EA2434BA6635003Dc1BDC0daB5882ED4F", label: "chipLsp0" },
     ];
     KNOWN_PUBLISHABLE.forEach(k => {
       const chip = document.createElement("button");
