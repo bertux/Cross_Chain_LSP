@@ -408,7 +408,7 @@
         notConnected: "Non connesso.",
         panel3Title: "3 · Rete di destinazione",
         networkFilterPlaceholder: "Filtra per nome...",
-        chainScanPrompt: "Leggi prima il deploy originale per mostrare solo le reti dove il contratto manca.",
+        chainScanPrompt: "Inserisci un indirizzo di contratto valido per mostrare solo le reti dove manca.",
         chainScanLoading: "Controllo su tutte le reti...",
         chainScanResult: (v) => `${v.available} reti disponibili; ${v.skipped} non verificate per errori RPC${v.skippedNames ? ` (${v.skippedNames})` : ""}.`,
         chainScanFailed: (v) => `Impossibile controllare le reti: ${v.err}`,
@@ -491,7 +491,7 @@
         notConnected: "Not connected.",
         panel3Title: "3 · Target network",
         networkFilterPlaceholder: "Filter by name...",
-        chainScanPrompt: "Read the original deployment first to show only networks where the contract is missing.",
+        chainScanPrompt: "Enter a valid contract address to show only networks where it is missing.",
         chainScanLoading: "Checking all networks...",
         chainScanResult: (v) => `${v.available} networks available; ${v.skipped} could not be checked because of RPC errors${v.skippedNames ? ` (${v.skippedNames})` : ""}.`,
         chainScanFailed: (v) => `Could not check networks: ${v.err}`,
@@ -609,27 +609,33 @@
     const chainAvailabilityStatus = $("chainAvailabilityStatus");
     let availableNetworks = null;
     let chainScanGeneration = 0;
+    let networkScanTimer = null;
+    let preferredNetworkKey = null;
+    let renderingNetworkOptions = false;
     chainAvailabilityStatus.textContent = t("chainScanPrompt");
     function renderNetworkOptions(filter) {
       const f = (filter || "").toLowerCase();
       const previous = networkSelectEl.value;
       networkSelectEl.innerHTML = "";
-      const chains = availableNetworks === null ? CHAINS : [...availableNetworks, CHAINS.find(c => c.key === "custom")];
+      const chains = [...(availableNetworks || []), CHAINS.find(c => c.key === "custom")];
       chains.filter(c => c && c.name.toLowerCase().includes(f)).forEach(c => {
         const opt = document.createElement("option");
         opt.value = c.key;
         opt.textContent = c.chainId ? `${c.name} (chainId ${c.chainId})` : c.name;
         networkSelectEl.appendChild(opt);
       });
-      if ([...networkSelectEl.options].some(option => option.value === previous)) networkSelectEl.value = previous;
-      if (previous !== networkSelectEl.value) networkSelectEl.dispatchEvent(new Event("change"));
+      const options = [...networkSelectEl.options];
+      const selected = [preferredNetworkKey, previous].find(key => options.some(option => option.value === key));
+      if (selected) networkSelectEl.value = selected;
+      if (previous !== networkSelectEl.value) {
+        renderingNetworkOptions = true;
+        networkSelectEl.dispatchEvent(new Event("change"));
+        renderingNetworkOptions = false;
+      }
     }
     renderNetworkOptions("");
     $("networkFilter").addEventListener("input", (e) => {
       renderNetworkOptions(e.target.value);
-    });
-    networkSelectEl.addEventListener("change", () => {
-      $("customRpcWrap").style.display = networkSelectEl.value === "custom" ? "block" : "none";
     });
     function getNetwork() {
       if (networkSelectEl.value === "custom") return { name: t("customNetName"), chainId: null, rpc: $("customRpc").value.trim() };
@@ -639,7 +645,7 @@
     // --- Preset from the verify/deploy pages: ?network=<key>&impl=<addr>,<addr> ---
     const params = new URLSearchParams(location.search);
     const presetNetwork = params.get("network");
-    if (presetNetwork && presetNetwork !== "custom" && CHAINS.some(c => c.key === presetNetwork)) networkSelectEl.value = presetNetwork;
+    if (presetNetwork && presetNetwork !== "custom" && CHAINS.some(c => c.key === presetNetwork)) preferredNetworkKey = presetNetwork;
     // Contracts that can always be picked with one click. Their original deploy is read from LUKSO and
     // checked like any other address: the shortcut only fills the field.
     const KNOWN_PUBLISHABLE = [
@@ -652,7 +658,12 @@
       chip.dataset.i18nChip = k.label;
       chip.dataset.addr = k.addr;
       chip.textContent = `${t(k.label)} · ${k.addr.slice(0, 10)}…`;
-      chip.addEventListener("click", () => { $("implAddress").value = k.addr; $("txHash").value = ""; resetSource(); });
+      chip.addEventListener("click", () => {
+        $("implAddress").value = k.addr;
+        $("txHash").value = "";
+        resetSource();
+        scheduleNetworkScan();
+      });
       $("implChips").appendChild(chip);
     });
     const presetImpls = (params.get("impl") || "").split(",").map(s => s.trim()).filter(s => ethers.isAddress(s) && !KNOWN_PUBLISHABLE.some(k => k.addr.toLowerCase() === s.toLowerCase()));
@@ -661,7 +672,12 @@
       chip.type = "button";
       chip.className = "chip";
       chip.textContent = ethers.getAddress(addr);
-      chip.addEventListener("click", () => { $("implAddress").value = chip.textContent; $("txHash").value = ""; resetSource(); });
+      chip.addEventListener("click", () => {
+        $("implAddress").value = chip.textContent;
+        $("txHash").value = "";
+        resetSource();
+        scheduleNetworkScan();
+      });
       $("implChips").appendChild(chip);
     });
     const presetAll = (params.get("impl") || "").split(",").map(s => s.trim()).filter(s => ethers.isAddress(s));
@@ -681,16 +697,14 @@
     }
     function resetSource() {
       source = null;
-      chainScanGeneration++;
-      availableNetworks = null;
-      chainAvailabilityStatus.textContent = t("chainScanPrompt");
-      renderNetworkOptions($("networkFilter").value);
       $("sourceStatus").innerHTML = `<span class="empty">${t("notLoaded")}</span>`;
       invalidateCheck();
     }
     async function updateAvailableNetworks(impl) {
       const generation = ++chainScanGeneration;
+      availableNetworks = [];
       chainAvailabilityStatus.textContent = t("chainScanLoading");
+      renderNetworkOptions($("networkFilter").value);
       try {
         const results = await ChainAvailability.classify(
           CHAINS.filter(chain => chain.chainId && chain.rpc),
@@ -719,9 +733,33 @@
         renderNetworkOptions($("networkFilter").value);
       }
     }
-    ["implAddress", "txHash", "rawInput"].forEach(id => $(id).addEventListener("input", resetSource));
+    function scheduleNetworkScan() {
+      clearTimeout(networkScanTimer);
+      chainScanGeneration++;
+      availableNetworks = null;
+      const impl = $("implAddress").value.trim();
+      const validAddress = ethers.isAddress(impl);
+      chainAvailabilityStatus.textContent = t(validAddress ? "chainScanLoading" : "chainScanPrompt");
+      renderNetworkOptions($("networkFilter").value);
+      if (!validAddress) return;
+      networkScanTimer = setTimeout(() => {
+        networkScanTimer = null;
+        void updateAvailableNetworks(ethers.getAddress(impl));
+      }, 400);
+    }
+    $("implAddress").addEventListener("input", () => {
+      resetSource();
+      scheduleNetworkScan();
+    });
+    ["txHash", "rawInput"].forEach(id => $(id).addEventListener("input", resetSource));
     $("customRpc").addEventListener("input", invalidateCheck);
-    networkSelectEl.addEventListener("change", invalidateCheck);
+    networkSelectEl.addEventListener("change", () => {
+      if (!renderingNetworkOptions) preferredNetworkKey = networkSelectEl.value;
+      $("customRpcWrap").style.display = networkSelectEl.value === "custom" ? "block" : "none";
+      invalidateCheck();
+    });
+    $("customRpcWrap").style.display = networkSelectEl.value === "custom" ? "block" : "none";
+    if (presetAll.length) scheduleNetworkScan();
 
     // --- 1. Read and verify the original deploy on LUKSO ---
     async function findCreationTx(impl) {
@@ -819,7 +857,6 @@
           `<span class="badge ok">OK</span> ${escapeHtml(t("sourceOk", { tx: txHash || "(input data)", impl }))}<br>` +
           (fromExplorer ? escapeHtml(t("txFromExplorerLog")) + "<br>" : "") +
           escapeHtml(t("sourceSize", { bytes: source.codeBytes }));
-        void updateAvailableNetworks(impl);
       } catch (e) {
         showSourceError(t("genericError", { err: e.shortMessage || e.message }));
       }
