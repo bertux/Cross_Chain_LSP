@@ -15,6 +15,18 @@ Deno.test("classifies chains by whether every requested implementation is deploy
   if (results[2].deployed !== false) throw new Error("chain missing both implementations was classified as available");
 });
 
+Deno.test("treats blank or zero bytecode as not deployed and non-zero bytecode as deployed", async () => {
+  const results = await classify([{ key: "empty" }, { key: "code" }, { key: "spaces" }], ["implementation"], async (chain) => {
+    if (chain.key === "empty") return "0x";
+    if (chain.key === "code") return "0x6000";
+    return " 0x ";
+  });
+
+  if (results[0].deployed !== false) throw new Error("zero bytecode should not be considered deployed");
+  if (results[1].deployed !== true) throw new Error("non-zero bytecode should be considered deployed");
+  if (results[2].deployed !== false) throw new Error("whitespace-wrapped zero bytecode should not be considered deployed");
+});
+
 Deno.test("reports RPC failures without classifying the chain as deployed", async () => {
   const results = await classify([{ key: "unavailable" }], ["implementation"], async () => {
     throw new Error("RPC unavailable");

@@ -1,4 +1,9 @@
 (function (root) {
+  function hasBytecode(code) {
+    if (typeof code !== "string") return false;
+    return code.trim().toLowerCase() !== "0x";
+  }
+
   async function classify(chains, addresses, getCode, concurrency = 4) {
     if (!Array.isArray(chains) || !Array.isArray(addresses) || addresses.length === 0) {
       throw new TypeError("chains and a non-empty address list are required");
@@ -15,7 +20,7 @@
         try {
           const codes = await Promise.all(addresses.map(address => getCode(chain, address)));
           if (codes.some(code => typeof code !== "string")) throw new TypeError("getCode must return bytecode strings");
-          results[index] = { chain, deployed: codes.every(code => code.toLowerCase() !== "0x") };
+          results[index] = { chain, deployed: codes.every(hasBytecode) };
         } catch (error) {
           results[index] = { chain, error };
         }
