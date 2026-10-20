@@ -681,7 +681,9 @@
       $("implChips").appendChild(chip);
     });
     const presetAll = (params.get("impl") || "").split(",").map(s => s.trim()).filter(s => ethers.isAddress(s));
-    if (presetAll.length) $("implAddress").value = ethers.getAddress(presetAll[0]);
+    $("implAddress").value = presetAll.length
+      ? ethers.getAddress(presetAll[0])
+      : "0x3024D38EA2434BA6635003Dc1BDC0daB5882ED4F";
 
     // --- State and invalidation ---
     let source = null;         // verified original deploy read from LUKSO
@@ -759,7 +761,7 @@
       invalidateCheck();
     });
     $("customRpcWrap").style.display = networkSelectEl.value === "custom" ? "block" : "none";
-    if (presetAll.length) scheduleNetworkScan();
+    scheduleNetworkScan();
 
     // --- 1. Read and verify the original deploy on LUKSO ---
     async function findCreationTx(impl) {
